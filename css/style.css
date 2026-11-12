@@ -211,7 +211,7 @@ svg { display: block; }
 .auth { min-height: 100vh; min-height: 100dvh; max-width: 1000px; margin: 0 auto; padding: 32px 16px; display: grid; grid-template-columns: 1fr 420px; gap: 56px; align-items: center; }
 @media (max-width: 900px) { .auth { grid-template-columns: 1fr; gap: 24px; align-content: start; padding-top: 32px; } }
 .auth-hero { color: #fff; }
-.auth-logo { width: 96px; height: 96px; padding: 10px; background: #fff; object-fit: contain; border-radius: 26px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+.auth-logo { width: 110px; height: 110px; object-fit: contain; }
 .auth-hero h1 { margin: 22px 0 6px; font-size: 44px; font-weight: 800; letter-spacing: -.8px; color: #fff; }
 .auth-tag { margin: 0 0 28px; font-size: 19px; font-weight: 500; line-height: 1.5; color: var(--blue-100); }
 .auth-points { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
@@ -220,7 +220,7 @@ svg { display: block; }
 .pt svg { width: 20px; height: 20px; }
 @media (max-width: 900px) {
   .auth-hero { text-align: center; }
-  .auth-logo { width: 80px; height: 80px; padding: 8px; border-radius: 22px; }
+  .auth-logo { width: 88px; height: 88px; margin: 0 auto; }
   .auth-hero h1 { font-size: 34px; margin-top: 14px; }
   .auth-tag { font-size: 16px; margin-bottom: 0; }
   .auth-points { display: none; }
