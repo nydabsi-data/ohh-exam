@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>เข้าสู่ระบบ · Ohh-Exam</title>
   <meta name="description" content="ฝึกข้อสอบวันละไม่กี่นาที สนุกเหมือนเล่นเกม">
-  <meta name="theme-color" content="#060F1D">
+  <meta name="theme-color" content="#FFFFFF">
   <script>
     /* Already signed in → straight to the app */
     try {
@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=5">
+  <link rel="stylesheet" href="css/style.css?v=7">
 </head>
 <body class="auth-body">
 
@@ -41,7 +41,10 @@
       </div>
 
       <form id="f" class="form" novalidate>
-        <label>ชื่อผู้ใช้ (Username)
+        <label id="email-wrap" class="hidden">อีเมล (Email)
+          <input type="email" id="email" autocomplete="email" autocapitalize="none" placeholder="you@example.com">
+        </label>
+        <label><span id="user-label">ชื่อผู้ใช้หรืออีเมล</span>
           <input type="text" id="user" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="เช่น captain01">
           <span class="hint hidden" id="user-hint">ภาษาอังกฤษ ตัวเลข . _ - ได้ ยาว 3–20 ตัว</span>
         </label>
@@ -65,7 +68,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <script src="js/config.js?v=4"></script>
-  <script src="js/login.js?v=4"></script>
+  <script src="js/config.js?v=7"></script>
+  <script src="js/login.js?v=7"></script>
 </body>
 </html>
