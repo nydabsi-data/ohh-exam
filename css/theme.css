@@ -262,3 +262,4 @@ body {
 .tabbar .tab-dot { top: 4px; right: calc(50% - 24px); }
 #home-view { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
 @media (max-width: 480px) { .tabbar a img { width: 36px; height: 36px; } }
+.lesson-card.exam-lc { text-decoration: none; color: inherit; }

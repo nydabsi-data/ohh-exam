@@ -122,6 +122,7 @@
     [/^ระบบบัญชียังไม่เปิดใช้งาน[\s\S]*$/, 'Accounts are not available yet. Use "Try without an account" for now.'],
     [/^ได้รับ \+(\d+) XP$/, '+$1 XP received'],
     [/^บทที่ (\d+)$/, 'Lesson $1'],
+    [/^ชุดที่ (\d+)$/, 'Test $1'],
     [/^ผ่านแล้ว (\d+)%$/, 'Passed $1%'],
     [/^ผิด (\d+) ครั้ง$/, '$1 wrong'],
     [/^ผิด (\d+) ครั้ง · แม่นยำ (\d+)%$/, '$1 wrong · $2% accuracy']
@@ -132,6 +133,7 @@
     'สำเร็จ': 'Done', 'ชุดข้อสอบ': 'exam sets', 'บทเรียนผ่าน': 'Lessons passed', 'แม่นยำ': 'accuracy', 'รวม': 'Total',
     'เปลี่ยนสิทธิ์ไม่ได้:': 'Could not change role:', 'โหลดข้อมูลไม่ได้:': 'Could not load data:',
     'ระบบอากาศยานและเครื่องวัด': 'Aircraft & Instruments', 'วิทยุสื่อสารและปัจจัยมนุษย์': 'Radio & Human Factors',
+    'แบบทดสอบความถนัด': 'Aptitude tests',
     'หลักการบิน': 'Principles of Flight', 'อุตุนิยมวิทยา': 'Meteorology', 'การเดินอากาศ': 'Navigation', 'กฎหมายการบิน': 'Air Law'
   })).sort((a, b) => b[0].length - a[0].length);
   const UNITS = [

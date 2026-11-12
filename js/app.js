@@ -34,7 +34,7 @@
   // Courses: each has its own learning path. UNITS / LESSONS point at the course being viewed.
   const flatten = (units) => { const out = []; units.forEach((u) => u.lessons.forEach((l) => out.push(Object.assign({}, l, { unit: u })))); return out; };
   const COURSES = {
-    pilot:   { units: window.UNITS || [], hash: '#learn', back: '#pilot', note: true },
+    pilot:   { units: window.UNITS || [], hash: '#learn', back: '#exams', note: true },
     physics: { units: window.PHYSICS_UNITS || [], hash: '#learn-physics', back: '#exams' }
   };
   Object.values(COURSES).forEach((c) => { c.lessons = flatten(c.units); });
@@ -218,6 +218,23 @@
       });
       html += '</div></section>';
     });
+    // Pilot: the 6 aptitude tests as one more unit, same card style (always open)
+    if (course === 'pilot') {
+      const tests = EXAMS.filter((x) => x.href.charAt(0) !== '#');
+      html += '<section class="unit" style="--c:#FF4B4B;--d:#E03A3A;--t:#fff">' +
+        '<header class="unit-head"><div><small>Unit ' + (UNITS.length + 1) + ' · แบบทดสอบความถนัด</small><h2>Aptitude tests</h2></div>' +
+        '<span class="unit-tools"><span class="unit-count">' + tests.length + ' ' + T('ชุด') + '</span>' +
+          '<button class="row-arrow" data-dir="-1" aria-label="ก่อนหน้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>' +
+          '<button class="row-arrow" data-dir="1" aria-label="ถัดไป"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></span>' +
+        '</header><div class="lesson-row">' +
+        tests.map((x, ti) => '<a class="lesson-card open exam-lc" href="' + x.href + '" style="--c:' + x.color + ';--d:' + x.dark + '">' +
+          '<span class="lc-top"><span class="lc-num">ชุดที่ ' + (ti + 1) + '</span></span>' +
+          '<span class="lc-ico">' + EX_ICON[x.icon] + '</span>' +
+          '<span class="lc-title">' + esc(x.title) + '</span>' +
+          '<span class="lc-meta">' + x.meta.map(esc).join(' · ') + '</span>' +
+          '<span class="lc-foot"><span class="lc-go">เริ่ม</span></span></a>').join('') +
+        '</div></section>';
+    }
     $('#path').innerHTML = html;
     // Bring the next lesson to do into view in its row
     const curCard = $('#path .lesson-card.current');
@@ -446,7 +463,8 @@
 
   // Modes on the home page. Each mode groups its own exam cards (only "Pilot" for now).
   const MODES = [
-    { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#pilot', items: EXAMS, course: 'pilot' },
+    { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#learn', course: 'pilot',
+      items: (window.UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
     { id: 'physics', title: 'ฟิสิกส์ ม.ปลาย', th: 'กลศาสตร์ คลื่น ไฟฟ้า และฟิสิกส์ยุคใหม่', icon: 'atom', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#learn-physics', course: 'physics',
       items: (window.PHYSICS_UNITS || []).map((u) => ({ title: u.title, color: u.color, sym: u.sym })) }
   ];
@@ -482,7 +500,7 @@
           '<span class="mc-top"><span class="mc-ico">' + EX_ICON[m.icon] + '</span>' +
             '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
           '<span class="mc-foot"><span class="mc-meta">' +
-            (m.id === 'pilot' ? m.items.length + ' ' + T('ชุดข้อสอบ') : m.items.length + ' ' + T('บท')) + ' · ' + T('บทเรียนผ่าน') + ' ' + doneIn(m.course) + '/' + COURSES[m.course].lessons.length + '</span>' +
+            m.items.length + ' ' + T('บท') + ' · ' + T('บทเรียนผ่าน') + ' ' + doneIn(m.course) + '/' + COURSES[m.course].lessons.length + '</span>' +
           '</span></a>').join('');
       return;
     }
@@ -693,6 +711,7 @@
   const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
+    if (location.hash === '#pilot') history.replaceState(null, '', location.pathname + location.search + '#learn');   // old Pilot page → Pilot lessons
     const page = PAGES[location.hash] || 'hub';
     const sub = location.hash === '#pilot' ? 'pilot' : null;
     if (page === 'learn') setCourse(location.hash === '#learn-physics' ? 'physics' : 'pilot');
@@ -817,6 +836,8 @@
       row.scrollBy({ left: +arrow.dataset.dir * (row.clientWidth * 0.8), behavior: 'smooth' });
       return;
     }
+    const ex = e.target.closest('a.exam-lc');
+    if (ex) { S.daily.exams++; save(); return; }   // aptitude test link: let the browser follow it
     const n = e.target.closest('.lesson-card'); if (!n) return;
     if (n.classList.contains('locked')) return toast('ผ่านบทเรียนก่อนหน้าก่อน แล้วบทนี้จะปลดล็อก');
     startLesson(+n.dataset.i);
