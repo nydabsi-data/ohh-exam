@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Pilot Exam</title>
+  <title>Ohh-Exam</title>
   <meta name="description" content="ฝึกทำข้อสอบนักบินทีละบทสั้นๆ แบบเกม">
   <meta name="theme-color" content="#58CC02">
   <link rel="manifest" href="manifest.webmanifest">
@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Noto+Sans+Thai:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=1">
+  <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
 
@@ -20,10 +20,11 @@
   <div id="home-view">
     <header class="topbar">
       <div class="topbar-in">
-        <div class="brand"><img src="icon.svg" alt=""><span>Pilot Exam</span></div>
+        <div class="brand"><img src="icon.svg" alt=""><span>Ohh-Exam</span></div>
         <div class="stat streak" data-stat="streak"></div>
         <div class="stat xp" data-stat="xp"></div>
         <div class="stat hearts" data-stat="hearts"></div>
+        <button class="top-acct hidden" id="top-acct"></button>
       </div>
     </header>
     <main class="home">
@@ -54,7 +55,9 @@
   <div id="modal" class="modal hidden"><div class="modal-box" id="modal-box" role="dialog" aria-modal="true"></div></div>
   <div id="toast" class="toast"></div>
 
-  <script src="data/questions.js?v=1"></script>
-  <script src="js/app.js?v=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js?v=2"></script>
+  <script src="data/questions.js?v=2"></script>
+  <script src="js/app.js?v=2"></script>
 </body>
 </html>

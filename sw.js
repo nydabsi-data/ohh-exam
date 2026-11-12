@@ -1,6 +1,6 @@
 /* Service worker: network first, cache as offline fallback. */
-const CACHE = 'pilot-exam-v1';
-const SHELL = ['./', './index.html', './css/style.css', './js/app.js', './data/questions.js', './icon.svg', './manifest.webmanifest'];
+const CACHE = 'ohh-exam-v2';
+const SHELL = ['./', './index.html', './css/style.css', './js/app.js', './js/config.js', './data/questions.js', './icon.svg', './manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

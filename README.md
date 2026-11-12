@@ -1,4 +1,4 @@
-# Pilot Exam
+# Ohh-Exam
 
 A website for practising pilot exam questions in short lessons, in the style of Duolingo: a learning path, hearts, XP, a streak and a daily goal. We build the website first and turn it into a mobile app later.
 

@@ -1,4 +1,4 @@
-/* Pilot Exam — learning path, lessons, hearts, XP, streak.
+/* Ohh-Exam — learning path, lessons, hearts, XP, streak.
    Progress is kept in localStorage for now (Supabase sync later). */
 (function () {
   'use strict';
@@ -41,7 +41,47 @@
 
   let S = fresh();
   try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(fresh(), JSON.parse(raw)); } catch (e) { /* private mode etc. */ }
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ } };
+  const save = () => {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
+    if (sb && user) { clearTimeout(pushTimer); pushTimer = setTimeout(pushRemote, 1500); }
+  };
+
+  /* ---------- Supabase: sign-in + progress sync (optional) ---------- */
+  const CFG = window.PE_SUPABASE || {};
+  const sb = CFG.url && CFG.key && window.supabase ? window.supabase.createClient(CFG.url, CFG.key) : null;
+  let user = null, pushTimer = null;
+
+  async function pushRemote() {
+    if (!sb || !user) return;
+    const { error } = await sb.from('progress').upsert({ user_id: user.id, state: S, xp: S.xp, updated_at: new Date().toISOString() });
+    if (error) console.warn('sync failed', error.message);
+  }
+
+  // Combine progress from this device (a) and the account (b) without losing either.
+  function merge(a, b) {
+    b = Object.assign(fresh(), b);
+    const out = Object.assign({}, a);
+    out.xp = Math.max(a.xp, b.xp);
+    out.done = Object.assign({}, b.done);
+    for (const k in a.done) {
+      const x = a.done[k], y = out.done[k];
+      out.done[k] = !y ? x : { best: Math.max(x.best, y.best), times: Math.max(x.times, y.times), at: Math.max(x.at || 0, y.at || 0) };
+    }
+    if ((b.lastDay || '') > (a.lastDay || '') || (b.lastDay === a.lastDay && b.streak > a.streak)) { out.streak = b.streak; out.lastDay = b.lastDay; }
+    if (b.today === a.today) out.todayXp = Math.max(a.todayXp, b.todayXp);
+    else if ((b.today || '') > (a.today || '')) { out.today = b.today; out.todayXp = b.todayXp; }
+    if (b.hearts < a.hearts) { out.hearts = b.hearts; out.heartsAt = b.heartsAt; }
+    return out;
+  }
+
+  async function pullRemote() {
+    if (!sb || !user) return;
+    const { data, error } = await sb.from('progress').select('state').eq('user_id', user.id).maybeSingle();
+    if (error) { console.warn('load failed', error.message); return; }
+    if (data && data.state) S = merge(S, data.state);
+    save(); pushRemote();
+    if (!L) renderHome();
+  }
 
   function sync() {
     if (S.today !== dayKey()) { S.today = dayKey(); S.todayXp = 0; }
@@ -95,6 +135,11 @@
       el.classList.toggle('off', (k === 'streak' && !S.streak) || (k === 'hearts' && !S.hearts));
       el.title = { streak: 'เรียนต่อเนื่อง ' + S.streak + ' วัน', xp: 'XP สะสม ' + S.xp, hearts: 'หัวใจ ' + S.hearts + '/' + MAX_HEARTS }[k];
     });
+    const ta = $('#top-acct');
+    ta.classList.toggle('hidden', !sb);
+    ta.classList.toggle('in', !!user);
+    ta.textContent = user ? (user.email || '?').charAt(0).toUpperCase() : 'เข้าสู่ระบบ';
+    ta.title = user ? user.email : 'เข้าสู่ระบบเพื่อบันทึกความคืบหน้า';
   }
 
   const isDone = (id) => !!S.done[id];
@@ -129,7 +174,10 @@
     const doneN = LESSONS.filter((l) => isDone(l.id)).length;
     const pct = Math.min(100, (S.todayXp / DAILY_GOAL) * 100);
     const next = minsToNextHeart();
-    $('#aside').innerHTML =
+    const acct = !sb ? '' : user
+      ? '<div class="card"><h3>บัญชี</h3><p class="acct">' + esc(user.email || '') + '</p><p class="note flat">ความคืบหน้าซิงก์อัตโนมัติ ใช้ได้ทุกอุปกรณ์</p><button class="linkbtn" id="logout">ออกจากระบบ</button></div>'
+      : '<div class="card"><h3>บันทึกความคืบหน้า</h3><p class="note flat">เข้าสู่ระบบเพื่อเก็บ XP และบทเรียนไว้ในบัญชี ใช้ต่อได้ทุกอุปกรณ์</p><button class="btn block" id="login">เข้าสู่ระบบ / สมัคร</button></div>';
+    $('#aside').innerHTML = acct +
       '<div class="card"><h3>เป้าหมายวันนี้</h3><div class="goal-row">' + ICON.bolt +
         '<div class="bar"><span style="width:' + pct + '%"></span></div><b>' + S.todayXp + '/' + DAILY_GOAL + ' XP</b></div></div>' +
       '<div class="card"><h3>ความคืบหน้า</h3><ul class="kv">' +
@@ -281,7 +329,7 @@
   function goHome() { L = null; show('home'); renderHome(); }
 
   /* ---------- Modal & toast ---------- */
-  let modalOutside = null;
+  let modalOutside = null, modalGuard = null;
   function modal(o) {
     $('#modal-box').innerHTML = '<h3>' + o.title + '</h3><p>' + o.body + '</p><div class="modal-actions"></div>';
     const wrap = $('#modal-box .modal-actions');
@@ -296,8 +344,66 @@
     $('#modal').classList.remove('hidden');
     wrap.firstChild.focus();
   }
-  function closeModal() { $('#modal').classList.add('hidden'); modalOutside = null; }
-  function dismissModal() { const f = modalOutside; closeModal(); if (f) f(); }
+  function closeModal() { $('#modal').classList.add('hidden'); modalOutside = null; modalGuard = null; }
+  function dismissModal() {
+    if (modalGuard && !modalGuard()) return;   // form pop-ups ask before leaving
+    const f = modalOutside; closeModal(); if (f) f();
+  }
+
+  const AUTH_ERR = {
+    'Invalid login credentials': 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
+    'Email not confirmed': 'ยังไม่ได้ยืนยันอีเมล กรุณากดลิงก์ในอีเมลก่อน',
+    'User already registered': 'อีเมลนี้สมัครไว้แล้ว ลองเข้าสู่ระบบแทน'
+  };
+
+  function openAuth(mode) {
+    const isIn = mode !== 'up';
+    $('#modal-box').innerHTML =
+      '<button class="mx" id="mx" aria-label="ปิด">' + ICON.x + '</button>' +
+      '<h3>' + (isIn ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก') + '</h3>' +
+      '<p>บันทึกความคืบหน้าไว้ในบัญชี ใช้ต่อได้ทุกอุปกรณ์</p>' +
+      '<form id="authf" class="form" novalidate>' +
+        '<input type="email" id="ae" placeholder="อีเมล" autocomplete="email" required>' +
+        '<input type="password" id="ap" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)" minlength="6" autocomplete="' + (isIn ? 'current-password' : 'new-password') + '" required>' +
+        '<div class="form-msg" id="amsg"></div>' +
+        '<button class="btn block" type="submit" id="asubmit">' + (isIn ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก') + '</button>' +
+      '</form>' +
+      '<button class="linkbtn alt" id="aswitch">' + (isIn ? 'ยังไม่มีบัญชี? สมัครสมาชิก' : 'มีบัญชีแล้ว? เข้าสู่ระบบ') + '</button>';
+    $('#modal').classList.remove('hidden');
+    modalOutside = null;
+    modalGuard = () => !($('#ae').value || $('#ap').value) || confirm('ปิดหน้าต่างนี้? ข้อมูลที่กรอกจะหายไป');
+    $('#ae').focus();
+    $('#mx').onclick = closeModal;
+    $('#aswitch').onclick = () => openAuth(isIn ? 'up' : 'in');
+    $('#authf').onsubmit = async (e) => {
+      e.preventDefault();
+      const email = $('#ae').value.trim(), password = $('#ap').value, msg = $('#amsg'), btn = $('#asubmit');
+      msg.className = 'form-msg';
+      if (!/^\S+@\S+\.\S+$/.test(email)) { msg.textContent = 'กรุณากรอกอีเมลให้ถูกต้อง'; msg.classList.add('err'); return; }
+      if (password.length < 6) { msg.textContent = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว'; msg.classList.add('err'); return; }
+      btn.disabled = true; msg.textContent = 'กำลังดำเนินการ...';
+      const res = isIn
+        ? await sb.auth.signInWithPassword({ email, password })
+        : await sb.auth.signUp({ email, password, options: { emailRedirectTo: location.origin + location.pathname } });
+      btn.disabled = false;
+      if (res.error) { msg.textContent = AUTH_ERR[res.error.message] || res.error.message; msg.classList.add('err'); return; }
+      if (!isIn && !res.data.session) {
+        msg.textContent = 'ส่งลิงก์ยืนยันไปที่ ' + email + ' แล้ว กดยืนยันในอีเมล แล้วกลับมาเข้าสู่ระบบ';
+        msg.classList.add('ok'); $('#ap').value = ''; return;
+      }
+      closeModal(); toast(isIn ? 'เข้าสู่ระบบแล้ว' : 'สมัครสมาชิกเรียบร้อย');
+    };
+  }
+
+  function openAccount() {
+    if (!user) return openAuth('in');
+    modal({
+      title: 'บัญชีของคุณ',
+      body: esc(user.email || '') + '<br>ความคืบหน้าซิงก์อัตโนมัติ',
+      actions: [{ label: 'ปิด' }, { label: 'ออกจากระบบ', cls: 'danger', fn: signOut }]
+    });
+  }
+  async function signOut() { await sb.auth.signOut(); toast('ออกจากระบบแล้ว ความคืบหน้ายังอยู่ในเครื่องนี้'); }
 
   function askQuit() {
     modal({
@@ -330,7 +436,10 @@
     startLesson(+n.dataset.i);
   });
 
+  $('#top-acct').addEventListener('click', openAccount);
   $('#aside').addEventListener('click', (e) => {
+    if (e.target.id === 'login') return openAuth('in');
+    if (e.target.id === 'logout') return signOut();
     if (e.target.id === 'reset') {
       modal({
         title: 'ล้างความคืบหน้า?',
@@ -363,6 +472,17 @@
 
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
+  if (sb) {
+    sb.auth.onAuthStateChange((ev, session) => {
+      const u = session ? session.user : null;
+      const changed = (u && u.id) !== (user && user.id);
+      user = u;
+      if (changed && user) setTimeout(pullRemote, 0);   // don't call Supabase inside the callback
+      renderStats();
+      if (!$('#home-view').classList.contains('hidden')) renderAside();
+    });
   }
 
   renderHome();

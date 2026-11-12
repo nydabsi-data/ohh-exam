@@ -156,6 +156,23 @@ svg { display: block; }
 .streak-msg svg { width: 26px; height: 26px; }
 .result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
 
+/* ---------- Account ---------- */
+.top-acct { border: 2px solid var(--line); background: #fff; color: var(--blue); font-weight: 900; font-size: 14px; border-radius: 12px; padding: 6px 12px; }
+.top-acct.in { width: 36px; height: 36px; padding: 0; border-radius: 50%; border: 0; background: var(--blue); color: #fff; font-size: 16px; }
+.acct { margin: 0 0 6px; font-weight: 800; word-break: break-all; }
+.note.flat { margin: 0 0 14px; }
+.modal-box { position: relative; }
+.mx { position: absolute; top: 14px; right: 14px; background: none; border: 0; padding: 4px; color: var(--faint); }
+.mx svg { width: 22px; height: 22px; }
+.form { display: grid; gap: 12px; text-align: left; }
+.form input { width: 100%; font: inherit; font-size: 16px; font-weight: 700; color: var(--ink); background: var(--soft); border: 2px solid var(--line); border-radius: 14px; padding: 13px 16px; outline: none; transition: border-color .15s, background .15s; }
+.form input:focus { border-color: #84D8FF; background: #fff; }
+.form-msg { min-height: 0; font-size: 14px; font-weight: 700; color: var(--muted); line-height: 1.5; }
+.form-msg:empty { display: none; }
+.form-msg.err { color: var(--red-d); }
+.form-msg.ok { color: var(--green-d); }
+.linkbtn.alt { margin-top: 16px; color: var(--blue); }
+
 /* ---------- Modal & toast ---------- */
 .modal { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.45); display: grid; place-items: center; padding: 16px; }
 .modal-box { background: #fff; border-radius: 20px; padding: 28px 24px 24px; max-width: 400px; width: 100%; text-align: center; animation: pop .18s ease-out; }
