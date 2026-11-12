@@ -83,3 +83,7 @@ returns boolean language sql stable security definer set search_path = '' as $$
 $$;
 revoke all on function public.is_super_admin() from public;
 grant execute on function public.is_super_admin() to authenticated;
+
+-- Lock down (advisor): the trigger function is not callable over the API; role check needs a signed-in user.
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+revoke execute on function public.is_super_admin() from anon;
