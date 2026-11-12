@@ -60,6 +60,7 @@
     'บัญชี': 'Account', 'บัญชีของคุณ': 'Your account', 'บันทึกความคืบหน้า': 'Save your progress',
     'ปิด': 'Close', 'ผลคะแนน': 'Score', 'ผลคะแนนและพัฒนาการของคุณ': 'Your scores and progress',
     'ผ่านบทเรียนก่อนหน้าก่อน แล้วบทนี้จะปลดล็อก': 'Finish the previous lesson to unlock this one',
+    'เลือกตัวละคร': 'Choose your character', 'นักอ่าน': 'Reader', 'นักผจญภัย': 'Explorer', 'สายเทค': 'Techie', 'คนรักดนตรี': 'Music lover', 'นักคิด': 'Thinker', 'เพื่อนใจดี': 'Buddy', 'เชฟ': 'Chef', 'นักปลูก': 'Gardener',
     'ผู้เยี่ยมชม': 'Guest', 'ผู้ใช้': 'User',
     'ฝึกข้อสอบวันละไม่กี่นาที สนุกเหมือนเล่นเกม': 'Practice exams a few minutes a day. As fun as a game.',
     'พิมพ์รหัสผ่านอีกครั้ง': 'Type the password again',

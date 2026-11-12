@@ -235,3 +235,21 @@ body {
 .eye { color: var(--sky-d); }
 .toast { background: var(--ink); }
 .modal-box h3 { color: var(--ink); }
+
+/* Characters */
+.hub-head { padding-right: 190px; min-height: 150px; }
+.hub-char { position: absolute; z-index: 1; right: 18px; bottom: 0; height: 138px; width: auto; filter: drop-shadow(0 8px 14px rgba(110,84,0,.25)); animation: charIn .5s cubic-bezier(.3,1.4,.5,1) both; pointer-events: none; }
+@keyframes charIn { from { transform: translateY(24px) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (max-width: 480px) { .hub-head { padding-right: 128px; min-height: 128px; } .hub-char { height: 108px; right: 8px; } }
+.avatar.char { background: color-mix(in srgb, var(--bg) 22%, #fff); border: 3px solid var(--bg); overflow: hidden; align-items: end; }
+.avatar.char img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.char-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.char-pick { display: grid; justify-items: center; gap: 4px; padding: 10px 6px 8px; border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 16px; background: #fff; cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; color: var(--muted); transition: transform .12s; }
+.char-pick img { width: 100%; max-width: 92px; aspect-ratio: 1; object-fit: contain; border-radius: 12px; background: color-mix(in srgb, var(--bg) 16%, #fff); }
+.char-pick:hover { transform: translateY(-2px); }
+.char-pick.on { border-color: var(--bg); color: var(--ink); background: color-mix(in srgb, var(--bg) 8%, #fff); }
+.res-char { position: relative; width: 150px; margin: 0 auto 8px; animation: pop .4s ease-out; }
+.res-char img { width: 100%; display: block; }
+.res-badge { position: absolute; right: -8px; bottom: -4px; width: 52px; height: 52px; padding: 8px; border-radius: 50%; background: #fff; color: var(--gold); box-shadow: 0 6px 14px rgba(0,0,0,.14); }
+.res-badge svg { width: 100%; height: 100%; }
+.hub-char:not([src]) { visibility: hidden; }

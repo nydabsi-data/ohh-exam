@@ -103,6 +103,7 @@
     });
     out.miss = Object.assign({}, b.miss);
     for (const k in (a.miss || {})) { const x = a.miss[k], y = out.miss[k]; out.miss[k] = !y || x.at >= y.at ? x : y; }
+    if ((b.avatarAt || 0) > (a.avatarAt || 0)) { out.avatar = b.avatar; out.avatarAt = b.avatarAt; }
     out.answered = Math.max(a.answered || 0, b.answered || 0);
     out.correctTotal = Math.max(a.correctTotal || 0, b.correctTotal || 0);
     const da = a.daily || freshDaily(), db = b.daily || freshDaily();
@@ -402,7 +403,7 @@
 
     const i = L.i, practice = L.practice;
     $('#result-view').innerHTML =
-      '<div class="result-in"><div class="trophy">' + ICON.trophy + '</div>' +
+      '<div class="result-in"><div class="res-char"><img src="' + charSrc(myChar()) + '" alt=""><span class="res-badge">' + ICON.trophy + '</span></div>' +
       '<h1>' + (acc === 100 ? 'สมบูรณ์แบบ!' : practice ? 'ฝึกเสร็จแล้ว!' : 'จบบทเรียนแล้ว!') + '</h1>' +
       '<p class="muted">' + esc(L.les.unit.title) + ' · ' + esc(L.les.title) + '</p>' +
       '<div class="tiles">' +
@@ -451,11 +452,27 @@
   EX_ICON.atom = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/></svg>';
   const doneIn = (c) => COURSES[c].lessons.filter((l) => isDone(l.id)).length;
 
+  /* ---------- Characters (img/chars/c1..c8.png) ---------- */
+  const CHARS = [
+    { th: 'นักอ่าน', bg: '#A570FF' }, { th: 'นักผจญภัย', bg: '#FFC800' }, { th: 'สายเทค', bg: '#FF4B9B' }, { th: 'คนรักดนตรี', bg: '#00C2D1' },
+    { th: 'นักคิด', bg: '#FF9600' }, { th: 'เพื่อนใจดี', bg: '#FF86D0' }, { th: 'เชฟ', bg: '#FF4B4B' }, { th: 'นักปลูก', bg: '#1CB0F6' }
+  ];
+  const charSrc = (n) => 'img/chars/c' + n + '.png';
+  function myChar() {
+    if (S.avatar >= 1 && S.avatar <= 8) return S.avatar;
+    const s = user ? uname() : 'guest';
+    let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return (h % 8) + 1;
+  }
+  function setChar(n) { S.avatar = n; S.avatarAt = Date.now(); save(); }
+
   function renderHub(sub) {
     const doneN = doneIn('pilot');
     const mode = sub && MODES.find((m) => m.id === sub);
     $('#hub-hello').textContent = mode ? 'โหมด ' + mode.title : (user ? 'สวัสดี ' + uname() : 'สวัสดีผู้เยี่ยมชม');
     $('#hub-title').textContent = mode ? mode.title : 'เลือกโหมดที่จะฝึก';
+    const hc = $('#hub-char');
+    if (hc) { hc.src = charSrc(myChar()); hc.alt = T(CHARS[myChar() - 1].th); }
     $('#exam-grid').classList.toggle('modes', !mode);
     if (!mode) {
       $('#exam-grid').innerHTML = MODES.map((m) =>
@@ -607,10 +624,14 @@
   function renderProfile() {
     const name = user ? uname() : T('ผู้เยี่ยมชม');
     $('#profile-body').innerHTML =
-      '<div class="profile-card"><span class="avatar">' + esc(name.charAt(0).toUpperCase()) + '</span>' +
+      '<div class="profile-card"><span class="avatar char" style="--bg:' + CHARS[myChar() - 1].bg + '"><img src="' + charSrc(myChar()) + '" alt=""></span>' +
         '<div><h1>' + esc(name) + '</h1><p>' + (user ? esc(user.email || '') : 'ยังไม่ได้เข้าสู่ระบบ ความคืบหน้าเก็บในเครื่องนี้') + '</p>' +
         (isAdmin ? '<span class="role-badge">Super admin</span>' : '') + '</div></div>' +
       (isAdmin ? '<button class="admin-entry" id="open-mgmt"><span class="ae-ico">' + TAB_ICON.stats + '</span><span><b>Management</b><i>จัดการผู้ใช้และดูภาพรวมระบบ</i></span><span class="ae-go">เปิด</span></button>' : '') +
+      '<div class="card"><h3>เลือกตัวละคร</h3><div class="char-grid">' +
+        CHARS.map((c, i) => '<button type="button" class="char-pick' + (myChar() === i + 1 ? ' on' : '') + '" data-char="' + (i + 1) + '" style="--bg:' + c.bg + '">' +
+          '<img src="' + charSrc(i + 1) + '" alt="" loading="lazy"><span>' + c.th + '</span></button>').join('') +
+      '</div></div>' +
       '<div class="card"><h3>ตั้งค่า</h3>' +
         '<label class="switch"><input type="checkbox" id="snd2"' + (S.sound ? ' checked' : '') + '> เสียงเอฟเฟกต์</label>' +
         '<button class="linkbtn" id="reset2">ล้างความคืบหน้าทั้งหมด</button></div>' +
@@ -716,6 +737,8 @@
   });
   $('#profile').addEventListener('click', (e) => {
     const id = e.target.closest('button') && e.target.closest('button').id;
+    const pick = e.target.closest('[data-char]');
+    if (pick) { setChar(+pick.dataset.char); renderProfile(); return; }
     if (id === 'open-mgmt') openManagement();
     else if (id === 'logout2') signOut();
     else if (id === 'login2') gotoLogin();
