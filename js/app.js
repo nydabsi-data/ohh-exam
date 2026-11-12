@@ -37,7 +37,10 @@
   /* ---------- State ---------- */
   const dayKey = (d) => { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
   const yesterday = () => { const d = new Date(); d.setDate(d.getDate() - 1); return dayKey(d); };
-  const fresh = () => ({ xp: 0, hearts: MAX_HEARTS, heartsAt: Date.now(), streak: 0, lastDay: null, today: dayKey(), todayXp: 0, done: {}, sound: true });
+  const freshDaily = () => ({ day: dayKey(), lessons: 0, correct: 0, exams: 0, perfect: 0, claimed: {} });
+  // hist: { 'YYYY-MM-DD': xp } · answered/correctTotal: every graded answer · daily: today's mission counters
+  const fresh = () => ({ xp: 0, hearts: MAX_HEARTS, heartsAt: Date.now(), streak: 0, lastDay: null, today: dayKey(), todayXp: 0, done: {}, sound: true,
+    hist: {}, answered: 0, correctTotal: 0, daily: freshDaily() });
 
   let S = fresh();
   try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(fresh(), JSON.parse(raw)); } catch (e) { /* private mode etc. */ }
@@ -72,6 +75,15 @@
     if (b.today === a.today) out.todayXp = Math.max(a.todayXp, b.todayXp);
     else if ((b.today || '') > (a.today || '')) { out.today = b.today; out.todayXp = b.todayXp; }
     if (b.hearts < a.hearts) { out.hearts = b.hearts; out.heartsAt = b.heartsAt; }
+    out.hist = Object.assign({}, b.hist);
+    for (const d in (a.hist || {})) out.hist[d] = Math.max(a.hist[d], out.hist[d] || 0);
+    out.answered = Math.max(a.answered || 0, b.answered || 0);
+    out.correctTotal = Math.max(a.correctTotal || 0, b.correctTotal || 0);
+    const da = a.daily || freshDaily(), db = b.daily || freshDaily();
+    if (da.day === db.day) {
+      out.daily = { day: da.day, claimed: Object.assign({}, db.claimed, da.claimed) };
+      ['lessons', 'correct', 'exams', 'perfect'].forEach((k) => { out.daily[k] = Math.max(da[k] || 0, db[k] || 0); });
+    } else out.daily = da.day > db.day ? da : db;
     return out;
   }
 
@@ -86,6 +98,8 @@
 
   function sync() {
     if (S.today !== dayKey()) { S.today = dayKey(); S.todayXp = 0; }
+    if (!S.daily || S.daily.day !== dayKey()) S.daily = freshDaily();
+    if (!S.hist) S.hist = {};
     if (S.lastDay && S.lastDay !== dayKey() && S.lastDay !== yesterday()) S.streak = 0;
     if (S.hearts >= MAX_HEARTS) { S.hearts = MAX_HEARTS; S.heartsAt = Date.now(); }
     else {
@@ -270,6 +284,8 @@
       });
     }
     if (ok) { L.correct++; L.xp += XP_PER_Q; } else { L.wrong++; loseHeart(); }
+    S.answered = (S.answered || 0) + 1;
+    if (ok) { S.correctTotal = (S.correctTotal || 0) + 1; S.daily.correct++; }
     tone(ok); renderStats();
     $('#prog').style.width = (L.correct / L.total) * 100 + '%';
 
@@ -301,6 +317,9 @@
     const acc = Math.round((L.total / (L.total + L.wrong)) * 100);
     sync();
     S.xp += L.xp; S.todayXp += L.xp;
+    S.hist[dayKey()] = (S.hist[dayKey()] || 0) + L.xp;
+    S.daily.lessons++;
+    if (acc === 100) S.daily.perfect++;
     const prev = S.done[L.les.id];
     S.done[L.les.id] = { best: Math.max(acc, prev ? prev.best : 0), times: (prev ? prev.times : 0) + 1, at: Date.now() };
     let streakUp = false;
@@ -340,13 +359,13 @@
     math: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 7h6M8 4v6M14 7h6M5.5 15.5l5 5M10.5 15.5l-5 5M14 16h6M14 20h6"/></svg>'
   };
   const EXAMS = [
-    { id: 'learn', title: 'Pilot Knowledge', th: 'ความรู้นักบิน แบบบทเรียนสั้น', icon: 'book', color: '#9BC1E2', dark: '#4978B0', text: '#0B1E3F', href: '#learn', meta: ['6 วิชา', 'XP · Streak'] },
-    { id: 'series', title: 'Series Number', th: 'หาตัวเลขถัดไปในอนุกรม', icon: 'series', color: '#4978B0', dark: '#2B5177', text: '#fff', href: 'exams/series/', meta: ['15 ข้อ', '6 นาที'] },
-    { id: 'math', title: 'Math Test', th: 'คณิตศาสตร์สำหรับนักบิน', icon: 'math', color: '#386B9F', dark: '#1F4673', text: '#fff', href: 'exams/math/', meta: ['20 ข้อ', '30 นาที'] },
-    { id: 'rotation', title: 'Aircraft Rotation', th: 'อ่านทิศทางและการหมุนของเครื่องบิน', icon: 'plane', color: '#2B5177', dark: '#162B5B', text: '#fff', href: 'exams/rotation/', meta: ['12 ข้อ', '3 นาที'] },
-    { id: 'jigsaw', title: 'Spatial Jigsaw', th: 'มิติสัมพันธ์ ประกอบชิ้นส่วนภาพ', icon: 'puzzle', color: '#162B5B', dark: '#060F1D', text: '#fff', href: 'exams/jigsaw/', meta: ['10 ข้อ', '3 นาที'] },
-    { id: 'joystick', title: 'Joy Stick', th: 'ควบคุมและความแม่นยำ', icon: 'stick', color: '#060F1D', dark: '#000', text: '#9BC1E2', href: 'exams/joystick/', meta: ['90 วินาที'] },
-    { id: 'multitask', title: 'Multitask', th: 'ทำหลายอย่างพร้อมกัน', icon: 'multi', color: '#CDE0EF', dark: '#9BC1E2', text: '#162B5B', href: 'exams/multitask/', meta: ['5 นาที'] }
+    { id: 'learn', title: 'Pilot Knowledge', th: 'ความรู้นักบิน แบบบทเรียนสั้น', icon: 'book', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#learn', meta: ['6 วิชา', 'XP · Streak'] },
+    { id: 'series', title: 'Series Number', th: 'หาตัวเลขถัดไปในอนุกรม', icon: 'series', color: '#FF4B4B', dark: '#E03A3A', text: '#fff', href: 'exams/series/', meta: ['15 ข้อ', '6 นาที'] },
+    { id: 'math', title: 'Math Test', th: 'คณิตศาสตร์สำหรับนักบิน', icon: 'math', color: '#FF9600', dark: '#E07F00', text: '#fff', href: 'exams/math/', meta: ['20 ข้อ', '30 นาที'] },
+    { id: 'rotation', title: 'Aircraft Rotation', th: 'อ่านทิศทางและการหมุนของเครื่องบิน', icon: 'plane', color: '#A570FF', dark: '#8549E8', text: '#fff', href: 'exams/rotation/', meta: ['12 ข้อ', '3 นาที'] },
+    { id: 'jigsaw', title: 'Spatial Jigsaw', th: 'มิติสัมพันธ์ ประกอบชิ้นส่วนภาพ', icon: 'puzzle', color: '#E5279B', dark: '#C21A80', text: '#fff', href: 'exams/jigsaw/', meta: ['10 ข้อ', '3 นาที'] },
+    { id: 'joystick', title: 'Joy Stick', th: 'ควบคุมและความแม่นยำ', icon: 'stick', color: '#00B4E6', dark: '#0094C2', text: '#fff', href: 'exams/joystick/', meta: ['90 วินาที'] },
+    { id: 'multitask', title: 'Multitask', th: 'ทำหลายอย่างพร้อมกัน', icon: 'multi', color: '#FF86D0', dark: '#E865B5', text: '#fff', href: 'exams/multitask/', meta: ['5 นาที'] }
   ];
 
   function renderHub() {
@@ -364,20 +383,181 @@
     }).join('');
   }
 
+  /* ---------- Missions (tab 2) ---------- */
+  const MISSIONS = [
+    { id: 'lesson1', title: 'จบบทเรียน 1 บท', need: 1, get: () => S.daily.lessons, xp: 10 },
+    { id: 'xp50', title: 'สะสม 50 XP วันนี้', need: DAILY_GOAL, get: () => S.todayXp, xp: 20 },
+    { id: 'correct15', title: 'ตอบถูก 15 ข้อ', need: 15, get: () => S.daily.correct, xp: 15 },
+    { id: 'exam1', title: 'ลองทำแบบทดสอบ 1 ชุด', need: 1, get: () => S.daily.exams, xp: 10 },
+    { id: 'perfect', title: 'ทำบทเรียนได้ 100%', need: 1, get: () => S.daily.perfect, xp: 25 }
+  ];
+  const claimable = () => MISSIONS.filter((m) => m.get() >= m.need && !S.daily.claimed[m.id]).length;
+  const TAB_ICON = {
+    home: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10.5V20a1 1 0 0 0 1 1h5v-6h6v6h5a1 1 0 0 0 1-1v-9.5z"/></svg>',
+    missions: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>',
+    stats: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="12" width="4.5" height="9" rx="1.5"/><rect x="9.75" y="7" width="4.5" height="14" rx="1.5"/><rect x="16.5" y="3" width="4.5" height="18" rx="1.5"/></svg>',
+    profile: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21a8.5 8.5 0 0 1 17 0z"/></svg>'
+  };
+
+  function renderMissions() {
+    const left = Math.max(0, Math.ceil((new Date(new Date().setHours(24, 0, 0, 0)) - Date.now()) / 3600000));
+    const doneN = MISSIONS.filter((m) => S.daily.claimed[m.id]).length;
+    $('#mission-list').innerHTML =
+      '<div class="page-banner"><p>ภารกิจประจำวัน · รีเซ็ตในอีก ' + left + ' ชม.</p><h1>ภารกิจวันนี้</h1>' +
+        '<div class="banner-row"><span>' + ICON.flame + 'ต่อเนื่อง ' + S.streak + ' วัน</span><span>' + ICON.check + 'สำเร็จ ' + doneN + '/' + MISSIONS.length + '</span></div></div>' +
+      MISSIONS.map((m) => {
+        const v = Math.min(m.need, m.get()), full = v >= m.need, got = !!S.daily.claimed[m.id];
+        return '<div class="mission' + (got ? ' got' : '') + '">' +
+          '<span class="m-ico">' + (got ? ICON.check : TAB_ICON.missions) + '</span>' +
+          '<div class="m-body"><b>' + esc(m.title) + '</b>' +
+            '<div class="m-prog"><div class="bar"><span style="width:' + (v / m.need) * 100 + '%"></span></div><i>' + v + '/' + m.need + '</i></div></div>' +
+          (got ? '<span class="m-done">รับแล้ว</span>'
+            : '<button class="btn m-claim" data-m="' + m.id + '"' + (full ? '' : ' disabled') + '>+' + m.xp + ' XP</button>') +
+          '</div>';
+      }).join('');
+  }
+
+  /* ---------- Score & performance (tab 3) ---------- */
+  function renderPerf() {
+    const doneN = LESSONS.filter((l) => isDone(l.id)).length;
+    const acc = S.answered ? Math.round((S.correctTotal / S.answered) * 100) : null;
+    const days = [];
+    for (let k = 6; k >= 0; k--) { const d = new Date(); d.setDate(d.getDate() - k); days.push(d); }
+    const vals = days.map((d) => S.hist[dayKey(d)] || 0), max = Math.max(50, ...vals);
+    const WD = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+    const bars = days.map((d, k) =>
+      '<div class="col"><div class="track"><span class="v" style="height:' + (vals[k] / max) * 100 + '%" data-tip="' + vals[k] + ' XP"></span></div>' +
+      '<i class="' + (k === 6 ? 'today' : '') + '">' + WD[d.getDay()] + '</i></div>').join('');
+    const units = UNITS.map((u) => {
+      const ls = u.lessons.filter((l) => isDone(l.id));
+      const best = ls.length ? Math.round(ls.reduce((s, l) => s + S.done[l.id].best, 0) / ls.length) : 0;
+      const pct = (ls.length / u.lessons.length) * 100;
+      return '<div class="mrow"><div class="mrow-top"><b>' + esc(u.title) + '</b><span>' + ls.length + '/' + u.lessons.length + ' บท' + (ls.length ? ' · แม่นยำ ' + best + '%' : '') + '</span></div>' +
+        '<div class="bar"><span style="width:' + pct + '%"></span></div></div>';
+    }).join('');
+    const week = vals.reduce((a, b) => a + b, 0);
+    $('#perf-body').innerHTML =
+      '<div class="page-banner"><p>ผลคะแนนและพัฒนาการของคุณ</p><h1>Performance</h1></div>' +
+      '<div class="kpis">' +
+        '<div class="kpi"><span>XP สะสม</span><b>' + S.xp + '</b></div>' +
+        '<div class="kpi"><span>ความแม่นยำ</span><b>' + (acc == null ? '–' : acc + '%') + '</b></div>' +
+        '<div class="kpi"><span>เรียนต่อเนื่อง</span><b>' + S.streak + ' <small>วัน</small></b></div>' +
+        '<div class="kpi"><span>บทเรียนที่ผ่าน</span><b>' + doneN + '<small>/' + LESSONS.length + '</small></b></div>' +
+      '</div>' +
+      '<div class="card"><div class="card-head"><h3>XP 7 วันล่าสุด</h3><span>รวม ' + week + ' XP</span></div><div class="xpchart" role="img" aria-label="XP 7 วันล่าสุด: ' + vals.join(', ') + '">' + bars + '</div></div>' +
+      '<div class="card"><h3>ความคืบหน้ารายวิชา</h3>' + units + '</div>' +
+      '<p class="note">คะแนนจากแบบทดสอบ 6 ชุด (Series Number, Math ฯลฯ) จะแสดงที่นี่ในขั้นถัดไป</p>';
+  }
+
+  /* ---------- Profile (tab 4) ---------- */
+  let isAdmin = false;
+  function renderProfile() {
+    const name = user ? uname() : 'ผู้เยี่ยมชม';
+    $('#profile-body').innerHTML =
+      '<div class="profile-card"><span class="avatar">' + esc(name.charAt(0).toUpperCase()) + '</span>' +
+        '<div><h1>' + esc(name) + '</h1><p>' + (user ? esc(user.email || '') : 'ยังไม่ได้เข้าสู่ระบบ ความคืบหน้าเก็บในเครื่องนี้') + '</p>' +
+        (isAdmin ? '<span class="role-badge">Super admin</span>' : '') + '</div></div>' +
+      (isAdmin ? '<button class="admin-entry" id="open-mgmt"><span class="ae-ico">' + TAB_ICON.stats + '</span><span><b>Management</b><i>จัดการผู้ใช้และดูภาพรวมระบบ</i></span><span class="ae-go">เปิด</span></button>' : '') +
+      '<div class="card"><h3>ตั้งค่า</h3>' +
+        '<label class="switch"><input type="checkbox" id="snd2"' + (S.sound ? ' checked' : '') + '> เสียงเอฟเฟกต์</label>' +
+        '<button class="linkbtn" id="reset2">ล้างความคืบหน้าทั้งหมด</button></div>' +
+      (user ? '<button class="btn danger block" id="logout2">ออกจากระบบ</button>'
+            : '<button class="btn block" id="login2">เข้าสู่ระบบ / สมัครสมาชิก</button>');
+  }
+
+  /* ---------- Management pop-up (super admin) ---------- */
+  async function openManagement() {
+    const box = $('#modal-box');
+    box.classList.add('wide');
+    box.innerHTML = '<button class="mx" id="mx" aria-label="ปิด">' + ICON.x + '</button><h3>Management</h3>' +
+      '<div class="tabs mg-tabs"><button class="on" data-mg="users">ผู้ใช้</button><button data-mg="overview">ภาพรวม</button></div>' +
+      '<div id="mg-body" class="mg-body"><p class="note">กำลังโหลด...</p></div>';
+    $('#modal').classList.remove('hidden');
+    modalOutside = null;
+    modalGuard = () => confirm('ออกจากหน้า Management?');
+    $('#mx').onclick = closeModal;
+    const { data, error } = await sb.rpc('admin_list_users');
+    if (error) {
+      $('#mg-body').innerHTML = '<p class="form-msg err">โหลดข้อมูลไม่ได้: ' + esc(error.message) + '</p><p class="note">ถ้ายังไม่ได้ติดตั้งฟังก์ชัน admin ให้รันไฟล์ database/admin.sql ใน Supabase SQL Editor</p>';
+      return;
+    }
+    const users = data || [];
+    const fmt = (t) => t ? new Date(t).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '–';
+    const today = dayKey();
+    const views = {
+      users: () => '<div class="mg-table-wrap"><table class="mg-table"><thead><tr><th>ผู้ใช้</th><th>XP</th><th>สมัครเมื่อ</th><th>ใช้งานล่าสุด</th><th>สิทธิ์</th></tr></thead><tbody>' +
+        users.map((u) => '<tr><td><b>' + esc(u.username) + '</b><small>' + esc(u.email) + '</small></td><td>' + u.xp + '</td><td>' + fmt(u.created_at) + '</td><td>' + fmt(u.last_sign_in_at) + '</td>' +
+          '<td>' + (u.id === user.id ? '<span class="role-badge">Super admin</span>'
+            : '<select class="role-sel" data-uid="' + u.id + '"><option value="user"' + (u.role === 'user' ? ' selected' : '') + '>User</option><option value="super_admin"' + (u.role === 'super_admin' ? ' selected' : '') + '>Super admin</option></select>') +
+          '</td></tr>').join('') + '</tbody></table></div>',
+      overview: () => {
+        const active = users.filter((u) => u.last_sign_in_at && dayKey(new Date(u.last_sign_in_at)) === today).length;
+        const xp = users.reduce((s, u) => s + (u.xp || 0), 0);
+        return '<div class="kpis">' +
+          '<div class="kpi"><span>สมาชิกทั้งหมด</span><b>' + users.length + '</b></div>' +
+          '<div class="kpi"><span>เข้าใช้วันนี้</span><b>' + active + '</b></div>' +
+          '<div class="kpi"><span>Super admin</span><b>' + users.filter((u) => u.role === 'super_admin').length + '</b></div>' +
+          '<div class="kpi"><span>XP รวมทุกคน</span><b>' + xp + '</b></div></div>';
+      }
+    };
+    const showMg = (k) => {
+      document.querySelectorAll('.mg-tabs button').forEach((b) => b.classList.toggle('on', b.dataset.mg === k));
+      $('#mg-body').innerHTML = views[k]();
+    };
+    document.querySelectorAll('.mg-tabs button').forEach((b) => b.onclick = () => showMg(b.dataset.mg));
+    $('#mg-body').onchange = async (e) => {
+      const sel = e.target.closest('.role-sel'); if (!sel) return;
+      const { error: err } = await sb.rpc('admin_set_role', { p_user: sel.dataset.uid, p_role: sel.value });
+      if (err) { toast('เปลี่ยนสิทธิ์ไม่ได้: ' + err.message); return; }
+      const u = users.find((x) => x.id === sel.dataset.uid); if (u) u.role = sel.value;
+      toast('อัปเดตสิทธิ์แล้ว');
+    };
+    showMg('users');
+  }
+
+  /* ---------- Router: bottom tab bar ---------- */
+  const PAGES = { '#learn': 'learn', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
-    const learn = location.hash === '#learn';
+    const page = PAGES[location.hash] || 'hub';
     show('home');
-    $('#hub').classList.toggle('hidden', learn);
-    $('#learn').classList.toggle('hidden', !learn);
-    $('#to-hub').classList.toggle('hidden', !learn);
-    if (learn) renderHome(); else { sync(); renderStats(); renderHub(); }
+    ['hub', 'learn', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
+    $('#to-hub').classList.toggle('hidden', page !== 'learn');
+    const tab = page === 'learn' || page === 'hub' ? 'home' : page;
+    $$('#tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.tab === tab));
+    sync(); renderStats();
+    if (page === 'learn') renderHome();
+    else if (page === 'missions') renderMissions();
+    else if (page === 'stats') renderPerf();
+    else if (page === 'profile') renderProfile();
+    else renderHub();
+    $('#tab-dot').classList.toggle('hidden', !claimable());
   }
   window.addEventListener('hashchange', () => { if (!L) route(); });
+
+  $('#mission-list').addEventListener('click', (e) => {
+    const b = e.target.closest('.m-claim'); if (!b || b.disabled) return;
+    const m = MISSIONS.find((x) => x.id === b.dataset.m); if (!m || S.daily.claimed[m.id]) return;
+    S.daily.claimed[m.id] = true; S.xp += m.xp; S.hist[dayKey()] = (S.hist[dayKey()] || 0) + m.xp;
+    save(); tone(true); toast('ได้รับ +' + m.xp + ' XP'); route();
+  });
+  $('#exam-grid').addEventListener('click', (e) => {
+    const a = e.target.closest('.exam-card'); if (!a || a.getAttribute('href').charAt(0) === '#') return;
+    S.daily.exams++; save();
+  });
+  $('#profile').addEventListener('click', (e) => {
+    const id = e.target.closest('button') && e.target.closest('button').id;
+    if (id === 'open-mgmt') openManagement();
+    else if (id === 'logout2') signOut();
+    else if (id === 'login2') gotoLogin();
+    else if (id === 'reset2') askReset();
+  });
+  $('#profile').addEventListener('change', (e) => { if (e.target.id === 'snd2') { S.sound = e.target.checked; save(); } });
 
   /* ---------- Modal & toast ---------- */
   let modalOutside = null, modalGuard = null;
   function modal(o) {
+    $('#modal-box').classList.remove('wide');
     $('#modal-box').innerHTML = '<h3>' + o.title + '</h3><p>' + o.body + '</p><div class="modal-actions"></div>';
     const wrap = $('#modal-box .modal-actions');
     o.actions.forEach((a) => {
@@ -391,7 +571,7 @@
     $('#modal').classList.remove('hidden');
     wrap.firstChild.focus();
   }
-  function closeModal() { $('#modal').classList.add('hidden'); modalOutside = null; modalGuard = null; }
+  function closeModal() { $('#modal').classList.add('hidden'); $('#modal-box').classList.remove('wide'); modalOutside = null; modalGuard = null; }
   function dismissModal() {
     if (modalGuard && !modalGuard()) return;   // form pop-ups ask before leaving
     const f = modalOutside; closeModal(); if (f) f();
@@ -444,17 +624,18 @@
     startLesson(+n.dataset.i);
   });
 
-  $('#top-acct').addEventListener('click', openAccount);
+  function askReset() {
+    modal({
+      title: 'ล้างความคืบหน้า?',
+      body: 'XP, streak และบทเรียนที่ผ่านแล้วทั้งหมดจะถูกลบ',
+      actions: [{ label: 'ยกเลิก' }, { label: 'ล้างทั้งหมด', cls: 'danger', fn: () => { S = fresh(); save(); route(); toast('ล้างความคืบหน้าแล้ว'); } }]
+    });
+  }
+  $('#top-acct').addEventListener('click', () => { if (user) location.hash = '#profile'; else gotoLogin(); });
   $('#aside').addEventListener('click', (e) => {
     if (e.target.id === 'login') return gotoLogin();
     if (e.target.id === 'logout') return signOut();
-    if (e.target.id === 'reset') {
-      modal({
-        title: 'ล้างความคืบหน้า?',
-        body: 'XP, streak และบทเรียนที่ผ่านแล้วทั้งหมดจะถูกลบ',
-        actions: [{ label: 'ยกเลิก' }, { label: 'ล้างทั้งหมด', cls: 'danger', fn: () => { S = fresh(); save(); renderHome(); toast('ล้างความคืบหน้าแล้ว'); } }]
-      });
-    }
+    if (e.target.id === 'reset') askReset();
   });
   $('#aside').addEventListener('change', (e) => { if (e.target.id === 'snd') { S.sound = e.target.checked; save(); } });
 
@@ -488,6 +669,14 @@
       const changed = (u && u.id) !== (user && user.id);
       user = u;
       if (changed && user) setTimeout(pullRemote, 0);   // don't call Supabase inside the callback
+      if (changed) {
+        isAdmin = false;
+        if (user) setTimeout(async () => {
+          const r = await sb.rpc('is_super_admin');
+          isAdmin = !!(r && r.data);
+          if (!L && location.hash === '#profile') route();
+        }, 0);
+      }
       // Session gone (signed out elsewhere / expired) and not a guest → back to the login page
       if (!user && ev === 'INITIAL_SESSION') {
         let guest = false; try { guest = !!localStorage.getItem('ohh_guest'); } catch (e) { /* ignore */ }

@@ -1,0 +1,118 @@
+/* Ohh-Exam — playful color theme (user reference: bright illustration tone, NO green).
+   Loaded last; overrides the earlier blue tokens. */
+:root {
+  --sun: #FFC800; --sun-l: #FFE15A; --sun-d: #E5A800; --sun-50: #FFF6CF;
+  --sky: #1CB0F6; --sky-l: #7FD6FF; --sky-d: #1899D6; --sky-50: #E3F6FF;
+  --berry: #FF4B4B; --berry-d: #E03A3A;
+  --tang: #FF9600; --tang-d: #E07F00;
+  --grape: #A570FF; --grape-d: #8549E8; --grape-50: #F2EAFF;
+  --rose: #FF86D0; --magenta: #E5279B;
+  --cyan: #00CDFF;
+  --ink: #2B2B2B; --muted: #6B6B6B; --faint: #AFAFAF;
+  --line: #ECE7DA; --soft: #FBF8F0; --page: #FFFDF6;
+
+  --pri-grad: linear-gradient(180deg, #3CC0FA 0%, #1CB0F6 100%);
+  --pri-d: var(--sky-d);
+  --ok: var(--sky); --ok-bg: #DDF4FF; --ok-ink: #1474B5;
+  --navy-800: #2B2B2B;
+  --shadow: 0 1px 2px rgba(60, 45, 0, .05), 0 6px 18px rgba(60, 45, 0, .06);
+}
+
+body {
+  background:
+    radial-gradient(760px 460px at -8% -6%, #FFF1B8 0%, rgba(255,241,184,0) 62%),
+    radial-gradient(640px 420px at 108% 4%, #FFE3F4 0%, rgba(255,227,244,0) 60%),
+    radial-gradient(700px 480px at 50% 112%, #E3F6FF 0%, rgba(227,246,255,0) 60%),
+    var(--page);
+  background-attachment: fixed;
+}
+
+/* Brand + top bar */
+.brand span { background: linear-gradient(90deg, var(--sky-d), var(--grape)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.top-acct { color: var(--sky-d); }
+.top-acct.in { background: linear-gradient(135deg, var(--sky), var(--grape)); }
+
+/* Buttons */
+.btn { background: var(--pri-grad); color: #fff; box-shadow: 0 3px 0 var(--sky-d), 0 8px 18px rgba(28,176,246,.28); }
+.btn.ghost { color: var(--sky-d); }
+.foot.ok .btn { background: var(--pri-grad); box-shadow: 0 3px 0 var(--sky-d); }
+
+/* Sunny banners (hub + pages) — dark ink on yellow, white blobs like the reference */
+.hub-head, .page-banner {
+  color: var(--ink);
+  background:
+    radial-gradient(260px 200px at 82% 18%, rgba(255,255,255,.55), rgba(255,255,255,0) 70%),
+    linear-gradient(120deg, var(--sun-l) 0%, var(--sun) 100%);
+  box-shadow: 0 14px 30px rgba(229,168,0,.25);
+}
+.hub-head::before, .page-banner::after { background: rgba(255,255,255,.35); }
+.hub-head::after { background: rgba(229,168,0,.25); }
+.hub-head h1, .page-banner h1 { color: #3A2A00; }
+.hub-hello, .page-banner p { color: #6E5400; }
+.banner-row span { background: rgba(255,255,255,.55); color: #3A2A00; }
+#missions .page-banner { background: radial-gradient(260px 200px at 82% 18%, rgba(255,255,255,.45), rgba(255,255,255,0) 70%), linear-gradient(120deg, #FFB547 0%, var(--tang) 100%); box-shadow: 0 14px 30px rgba(255,150,0,.25); }
+#stats .page-banner { background: radial-gradient(260px 200px at 82% 18%, rgba(255,255,255,.35), rgba(255,255,255,0) 70%), linear-gradient(120deg, #C39BFF 0%, var(--grape) 100%); box-shadow: 0 14px 30px rgba(165,112,255,.28); }
+#missions .page-banner h1, #missions .page-banner p, #stats .page-banner h1, #stats .page-banner p { color: #fff; }
+#missions .banner-row span { background: rgba(255,255,255,.25); color: #fff; }
+
+/* Exam cards */
+.exam-card:hover { border-color: var(--sun); }
+.ex-meta i { color: var(--sky-d); background: var(--sky-50); }
+.ex-go { color: var(--sky-d); background: var(--sky-50); }
+.exam-card:hover .ex-go { background: var(--pri-grad); color: #fff; }
+.ex-ico { background: linear-gradient(140deg, color-mix(in srgb, var(--c) 70%, #fff) 0%, var(--c) 75%); }
+
+/* Bars */
+.bar > span, .ex-prog .bar > span, .m-prog .bar > span, .mrow .bar > span { background: linear-gradient(90deg, var(--sky), var(--sky-l)); }
+.goal-row .bar > span { background: linear-gradient(90deg, var(--sun), var(--sun-l)); }
+.progress span { background: linear-gradient(90deg, var(--sky-d), var(--sky-l)); }
+
+/* Path */
+.node.current { box-shadow: 0 6px 0 var(--d), 0 0 0 8px var(--page), 0 0 0 12px var(--sun-l); }
+.start-tip { color: var(--sky-d); }
+
+/* Lesson */
+.q-kind { color: var(--grape); }
+.opt.sel { border-color: var(--sky-l); background: var(--sky-50); color: var(--sky-d); }
+.opt.sel .k { border-color: var(--sky-l); color: var(--sky-d); }
+.tile.green { --tc: var(--sky); }
+.tile.blue { --tc: var(--grape); }
+.result h1 { color: var(--sun-d); }
+
+/* Tab bar */
+.tabbar a.on { color: var(--sky-d); background: var(--sky-50); }
+
+/* Missions */
+.m-ico { background: linear-gradient(140deg, #FFB547, var(--tang)); }
+.mission:nth-child(3) .m-ico { background: linear-gradient(140deg, #4FC6FA, var(--sky)); }
+.mission:nth-child(4) .m-ico { background: linear-gradient(140deg, #FF7A7A, var(--berry)); }
+.mission:nth-child(5) .m-ico { background: linear-gradient(140deg, #C39BFF, var(--grape)); }
+.mission:nth-child(6) .m-ico { background: linear-gradient(140deg, #FFA6DD, var(--magenta)); }
+.mission.got .m-ico { background: linear-gradient(140deg, var(--sun-l), var(--sun-d)); }
+
+/* Performance */
+.xpchart .v { background: var(--sky); }
+.xpchart .v:hover { background: var(--sky-d); }
+.xpchart .v::after { background: var(--ink); }
+.kpi:nth-child(1) b { color: var(--sun-d); }
+.kpi:nth-child(2) b { color: var(--sky-d); }
+.kpi:nth-child(3) b { color: var(--tang); }
+.kpi:nth-child(4) b { color: var(--grape); }
+
+/* Profile + admin */
+.avatar { background: linear-gradient(140deg, var(--sky), var(--grape)); }
+.role-badge { background: linear-gradient(90deg, var(--grape), var(--magenta)); }
+.admin-entry { background: linear-gradient(120deg, var(--grape-d), var(--grape) 55%, var(--rose)); box-shadow: 0 12px 28px rgba(165,112,255,.30); }
+.ae-ico { color: #fff; background: rgba(255,255,255,.22); }
+.admin-entry i { color: #F6EEFF; }
+
+/* Login */
+.auth-hero h1 { background: linear-gradient(90deg, var(--sky-d) 10%, var(--grape) 60%, var(--magenta)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.auth-points li:nth-child(1) .pt { background: var(--sun-50); color: var(--sun-d); }
+.auth-points li:nth-child(2) .pt { background: #FFE5E5; color: var(--berry); }
+.auth-points li:nth-child(3) .pt { background: var(--sky-50); color: var(--sky-d); }
+.tabs button.on { color: var(--sky-d); }
+.form input:focus { border-color: var(--sky-l); box-shadow: 0 0 0 4px var(--sky-50); }
+.eye { color: var(--sky-d); }
+.toast { background: var(--ink); }
+.modal-box h3 { color: var(--ink); }
