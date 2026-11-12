@@ -488,7 +488,7 @@
 
   // Modes on the home page. Each mode groups its own exam cards (only "Pilot" for now).
   const MODES = [
-    { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#learn', course: 'pilot',
+    { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', cls: 'cream', color: '#F2C66D', dark: '#D9A23C', text: '#fff', href: '#learn', course: 'pilot',
       items: (window.UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
     { id: 'physics', title: 'ฟิสิกส์ ม.ปลาย', th: 'กลศาสตร์ คลื่น ไฟฟ้า และฟิสิกส์ยุคใหม่', icon: 'atom', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#learn-physics', course: 'physics',
       items: (window.PHYSICS_UNITS || []).map((u) => ({ title: u.title, color: u.color, sym: u.sym })) },
@@ -531,7 +531,7 @@
     $('#exam-grid').classList.toggle('modes', !mode);
     if (!mode) {
       $('#exam-grid').innerHTML = MODES.filter((m) => COURSES[m.course].units.length).map((m) =>
-        '<a class="exam-card mode-card" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '">' +
+        '<a class="exam-card mode-card' + (m.cls ? ' ' + m.cls : '') + '" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '">' +
           '<span class="mc-deco">' + EX_ICON[m.icon] + '</span>' +
           '<span class="mc-top"><span class="mc-ico">' + EX_ICON[m.icon] + '</span>' +
             '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +

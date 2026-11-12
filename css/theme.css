@@ -270,3 +270,12 @@ body {
 .mode-card .mc-nums span { display: inline-flex; align-items: baseline; gap: 5px; padding: 6px 12px; border-radius: 12px; background: rgba(255,255,255,.22); }
 .mode-card .mc-nums b { font-size: 24px; font-weight: 800; line-height: 1; letter-spacing: -.3px; }
 .mode-card .mc-nums i { font-style: normal; font-size: 13px; font-weight: 700; opacity: .95; }
+
+/* Pilot home card: egg-cream */
+.exam-card.mode-card.cream { color: #5A3E00; border: 2px solid #F3DFAE;
+  background: radial-gradient(240px 170px at 100% 0%, rgba(255,255,255,.85), rgba(255,255,255,0) 70%), linear-gradient(150deg, #FFF9EA 0%, #FFF1CC 55%, #FBE3A6 100%);
+  box-shadow: 0 14px 30px rgba(217,162,60,.22); }
+.mode-card.cream .mc-ico { background: #FFE3A0; color: #8A5A00; }
+.mode-card.cream .mc-deco { color: rgba(217,162,60,.20); }
+.mode-card.cream .mc-sub, .mode-card.cream .mc-meta { color: #7A5A1A; }
+.mode-card.cream .mc-nums span { background: rgba(255,255,255,.75); }
