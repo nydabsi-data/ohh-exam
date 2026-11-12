@@ -1,7 +1,7 @@
 /* Ohh-Exam — bottom tab bar + Missions / Performance / Profile / Management pop-up */
 #home-view { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
 .tabbar { position: fixed; z-index: 20; left: 50%; bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateX(-50%);
-  width: min(560px, calc(100% - 24px)); display: grid; grid-template-columns: repeat(4, 1fr);
+  width: min(620px, calc(100% - 20px)); display: grid; grid-template-columns: repeat(5, 1fr);
   background: rgba(255,255,255,.94); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 22px; padding: 6px;
   box-shadow: 0 10px 30px rgba(11,30,63,.14); }
 .tabbar a { position: relative; display: grid; justify-items: center; gap: 2px; padding: 8px 4px; border-radius: 16px; color: var(--faint); text-decoration: none; font-size: 12px; font-weight: 700; transition: color .15s, background .15s; }

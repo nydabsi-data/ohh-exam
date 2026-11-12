@@ -94,6 +94,15 @@
     'หลักการบิน': 'Principles of Flight', 'อุตุนิยมวิทยา': 'Meteorology', 'การเดินอากาศ': 'Navigation',
     'กฎหมายการบิน': 'Air Law', 'ระบบอากาศยานและเครื่องวัด': 'Aircraft & Instruments', 'วิทยุสื่อสารและปัจจัยมนุษย์': 'Radio & Human Factors',
     'ง่าย': 'Easy', 'ปานกลาง': 'Medium', 'ยาก': 'Hard', 'บท': 'chapters',
+    'ฝึกฝน': 'Practice', 'ไม่เสียหัวใจ · ได้ XP ตามระดับความยาก': 'No hearts lost · XP by difficulty',
+    'ฝึกข้อที่ตอบผิด': 'Practise your mistakes', 'ฝึกจุดอ่อน': 'Work on weak spots', 'ทบทวนแบบสุ่ม': 'Random review',
+    'ตอบถูก 2 ครั้งแล้วข้อจะหายจากรายการ': 'A question leaves the list after 2 right answers',
+    'ยังไม่มีข้อที่ตอบผิด': 'No wrong answers yet', 'รวมข้อจากบทที่ยังทำได้ไม่ดี': 'Questions from lessons you find hard',
+    'ยังไม่พบจุดอ่อน': 'No weak spots found yet', 'สุ่ม 10 ข้อจากบทที่ผ่านแล้ว': '10 random questions from passed lessons',
+    'ผ่านบทเรียนก่อนแล้วจะทบทวนได้': 'Pass a lesson first to review it', 'บทที่ยังอ่อน': 'Lessons to work on',
+    'ยังไม่มี ทำบทเรียนไปสักพักแล้วระบบจะบอกว่าบทไหนควรฝึกเพิ่ม': 'Nothing yet. After a few lessons this shows which ones need more practice.',
+    'ฝึก': 'Practise', 'ฝึกเสร็จแล้ว!': 'Practice done!', 'ยังไม่มีข้อให้ฝึก': 'Nothing to practise yet',
+    'ข้อ': 'Qs', 'ผ่านแล้ว': 'Passed', 'ล็อก': 'Locked', 'ก่อนหน้า': 'Previous', 'ถัดไป': 'Next',
     'ความแม่นยำตามระดับความยาก': 'Accuracy by difficulty',
     'ง่าย 10 · ปานกลาง 15 · ยาก 20 XP': 'Easy 10 · Medium 15 · Hard 20 XP',
     'ระดับความยาก: ง่าย +10 XP · ปานกลาง +15 XP · ยาก +20 XP ต่อข้อ': 'Difficulty: Easy +10 XP · Medium +15 XP · Hard +20 XP per question'
@@ -110,7 +119,11 @@
     [/^หัวใจจะเติม 1 ดวงทุก 30 นาที ดวงถัดไปในอีก (\d+) นาที$/, 'You get 1 heart back every 30 minutes. Next one in $1 min.'],
     [/^สมัครเรียบร้อย ส่งลิงก์ยืนยันไปที่ (\S+) แล้ว[\s\S]*$/, 'Signed up! We sent a confirmation link to $1. Click it to activate your account.'],
     [/^ระบบบัญชียังไม่เปิดใช้งาน[\s\S]*$/, 'Accounts are not available yet. Use "Try without an account" for now.'],
-    [/^ได้รับ \+(\d+) XP$/, '+$1 XP received']
+    [/^ได้รับ \+(\d+) XP$/, '+$1 XP received'],
+    [/^บทที่ (\d+)$/, 'Lesson $1'],
+    [/^ผ่านแล้ว (\d+)%$/, 'Passed $1%'],
+    [/^ผิด (\d+) ครั้ง$/, '$1 wrong'],
+    [/^ผิด (\d+) ครั้ง · แม่นยำ (\d+)%$/, '$1 wrong · $2% accuracy']
   ];
   // Phrase replacements for mixed strings (longest first), then number + unit patterns.
   const PHRASES = Object.entries(Object.assign({}, EXTRA, {

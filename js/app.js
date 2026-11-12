@@ -38,6 +38,11 @@
     physics: { units: window.PHYSICS_UNITS || [], hash: '#learn-physics', back: '#exams' }
   };
   Object.values(COURSES).forEach((c) => { c.lessons = flatten(c.units); });
+  // Every question gets a stable key "<lesson id>#<index>" so wrong answers can be practised later.
+  const QBANK = {};
+  Object.values(COURSES).forEach((c) => c.lessons.forEach((l) => l.questions.forEach((q, k) => {
+    q.__key = l.id + '#' + k; QBANK[q.__key] = { q, lesson: l };
+  })));
   const ALL_LESSONS = [].concat(...Object.values(COURSES).map((c) => c.lessons));
   let course = 'pilot', UNITS = COURSES.pilot.units, LESSONS = COURSES.pilot.lessons;
   function setCourse(c) { course = COURSES[c] ? c : 'pilot'; UNITS = COURSES[course].units; LESSONS = COURSES[course].lessons; }
@@ -96,6 +101,8 @@
       const x = (a.diff || {})[k] || { a: 0, c: 0 }, y = (b.diff || {})[k] || { a: 0, c: 0 };
       out.diff[k] = x.a >= y.a ? x : y;
     });
+    out.miss = Object.assign({}, b.miss);
+    for (const k in (a.miss || {})) { const x = a.miss[k], y = out.miss[k]; out.miss[k] = !y || x.at >= y.at ? x : y; }
     out.answered = Math.max(a.answered || 0, b.answered || 0);
     out.correctTotal = Math.max(a.correctTotal || 0, b.correctTotal || 0);
     const da = a.daily || freshDaily(), db = b.daily || freshDaily();
@@ -188,20 +195,41 @@
       const doneN = u.lessons.filter((l) => isDone(l.id)).length;
       html += '<section class="unit" style="--c:' + u.color + ';--d:' + u.dark + ';--t:' + (u.text || '#fff') + '">' +
         '<header class="unit-head"><div><small>Unit ' + (ui + 1) + ' · ' + esc(u.th) + '</small><h2>' + esc(u.title) + '</h2></div>' +
-        '<span class="unit-count">' + doneN + '/' + u.lessons.length + '</span></header><div class="path">';
+        '<span class="unit-tools"><span class="unit-count">' + doneN + '/' + u.lessons.length + '</span>' +
+          '<button class="row-arrow" data-dir="-1" aria-label="ก่อนหน้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>' +
+          '<button class="row-arrow" data-dir="1" aria-label="ถัดไป"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></span>' +
+        '</header><div class="lesson-row">';
+      // One card per lesson, in a row you swipe sideways
       u.lessons.forEach((l, li) => {
         const st = isDone(l.id) ? 'done' : i === cur ? 'current' : isUnlocked(i) ? 'open' : 'locked';
-        const ico = st === 'done' ? ICON.check : st === 'locked' ? ICON.lock : ICON.star;
-        html += '<div class="node-wrap" style="transform:translateX(' + OFFSETS[li % OFFSETS.length] + 'px)">' +
-          (st === 'current' ? '<div class="start-tip">เริ่ม</div>' : '') +
-          '<button class="node ' + st + '" data-i="' + i + '" aria-label="' + esc(l.title) + '">' + ico + '</button>' +
-          '<div class="node-label">' + esc(l.title) + diffChip(lessonDiff(l)) + '</div></div>';
+        const best = st === 'done' ? S.done[l.id].best : 0;
+        const foot = st === 'done' ? '<span class="lc-state done">' + ICON.check + '<span>ผ่านแล้ว ' + best + '%</span></span>'
+          : st === 'locked' ? '<span class="lc-state locked">' + ICON.lock + '<span>ล็อก</span></span>'
+          : '<span class="lc-go">เริ่ม</span>';
+        html += '<button class="lesson-card ' + st + '" data-i="' + i + '" aria-label="' + esc(l.title) + '">' +
+          '<span class="lc-top"><span class="lc-num">บทที่ ' + (li + 1) + '</span>' + diffChip(lessonDiff(l)) + '</span>' +
+          '<span class="lc-ico">' + (st === 'done' ? ICON.check : st === 'locked' ? ICON.lock : ICON.star) + '</span>' +
+          '<span class="lc-title">' + esc(l.title) + '</span>' +
+          '<span class="lc-meta">' + l.questions.length + ' ข้อ</span>' +
+          '<span class="lc-foot">' + foot + '</span></button>';
         i++;
       });
       html += '</div></section>';
     });
     $('#path').innerHTML = html;
+    // Bring the next lesson to do into view in its row
+    const curCard = $('#path .lesson-card.current');
+    if (curCard) { const row = curCard.parentElement; row.scrollLeft = Math.max(0, curCard.offsetLeft - row.offsetLeft - 16); }
+    $$('#path .lesson-row').forEach(updateArrows);
     renderAside();
+  }
+  function updateArrows(row) {
+    const btns = row.parentElement.querySelectorAll('.row-arrow');
+    const more = row.scrollWidth - row.clientWidth > 4;
+    btns.forEach((b) => {
+      b.classList.toggle('hidden', !more);
+      b.disabled = +b.dataset.dir < 0 ? row.scrollLeft <= 2 : row.scrollLeft + row.clientWidth >= row.scrollWidth - 2;
+    });
   }
 
   function renderAside() {
@@ -235,6 +263,18 @@
     if (S.hearts <= 0) return heartsEmpty(false);
     const les = LESSONS[i];
     L = { i, les, queue: shuffle(les.questions.slice()), total: les.questions.length, correct: 0, wrong: 0, xp: 0, start: Date.now(), state: 'answer', sel: null, opts: null };
+    openLesson();
+  }
+  // Practice: a mixed set of questions; no hearts lost, lessons are not marked as passed.
+  function startPractice(questions, title) {
+    if (!questions.length) return toast('ยังไม่มีข้อให้ฝึก');
+    sync();
+    const qs = shuffle(questions.slice()).slice(0, 10);
+    L = { i: null, practice: { title, src: questions }, les: { id: null, title, unit: { title: 'Practice' } },
+          queue: qs, total: qs.length, correct: 0, wrong: 0, xp: 0, start: Date.now(), state: 'answer', sel: null, opts: null };
+    openLesson();
+  }
+  function openLesson() {
     $('#quit').innerHTML = ICON.x;
     $('#prog').style.width = '0%';
     renderStats();
@@ -305,7 +345,14 @@
       });
     }
     const d = qDiff(L.q);
-    if (ok) { L.correct++; L.xp += DIFF[d].xp; } else { L.wrong++; loseHeart(); }
+    if (ok) { L.correct++; L.xp += DIFF[d].xp; } else { L.wrong++; if (!L.practice) loseHeart(); }
+    // Remember mistakes; a question leaves the list after it is answered right twice
+    S.miss = S.miss || {};
+    const key = L.q.__key;
+    if (key) {
+      if (!ok) S.miss[key] = { n: ((S.miss[key] && S.miss[key].n) || 0) + 1, ok: 0, at: Date.now() };
+      else if (S.miss[key]) { S.miss[key].ok++; S.miss[key].at = Date.now(); if (S.miss[key].ok >= 2) delete S.miss[key]; }
+    }
     S.answered = (S.answered || 0) + 1;
     if (ok) { S.correctTotal = (S.correctTotal || 0) + 1; S.daily.correct++; }
     S.diff = S.diff || {};
@@ -344,17 +391,19 @@
     S.xp += L.xp; S.todayXp += L.xp;
     S.hist[dayKey()] = (S.hist[dayKey()] || 0) + L.xp;
     S.daily.lessons++;
-    if (acc === 100) S.daily.perfect++;
-    const prev = S.done[L.les.id];
-    S.done[L.les.id] = { best: Math.max(acc, prev ? prev.best : 0), times: (prev ? prev.times : 0) + 1, at: Date.now() };
+    if (acc === 100 && !L.practice) S.daily.perfect++;
+    if (!L.practice) {
+      const prev = S.done[L.les.id];
+      S.done[L.les.id] = { best: Math.max(acc, prev ? prev.best : 0), times: (prev ? prev.times : 0) + 1, at: Date.now() };
+    }
     let streakUp = false;
     if (S.lastDay !== dayKey()) { S.streak = (S.lastDay === yesterday() ? S.streak : 0) + 1; S.lastDay = dayKey(); streakUp = true; }
     save();
 
-    const i = L.i;
+    const i = L.i, practice = L.practice;
     $('#result-view').innerHTML =
       '<div class="result-in"><div class="trophy">' + ICON.trophy + '</div>' +
-      '<h1>' + (acc === 100 ? 'สมบูรณ์แบบ!' : 'จบบทเรียนแล้ว!') + '</h1>' +
+      '<h1>' + (acc === 100 ? 'สมบูรณ์แบบ!' : practice ? 'ฝึกเสร็จแล้ว!' : 'จบบทเรียนแล้ว!') + '</h1>' +
       '<p class="muted">' + esc(L.les.unit.title) + ' · ' + esc(L.les.title) + '</p>' +
       '<div class="tiles">' +
         '<div class="tile gold"><span>XP ที่ได้</span><b>' + ICON.bolt + L.xp + '</b></div>' +
@@ -366,7 +415,7 @@
     L = null;
     show('result');
     tone(true);
-    $('#again').onclick = () => startLesson(i);
+    $('#again').onclick = () => practice ? startPractice(practice.src, practice.title) : startLesson(i);
     $('#cont').onclick = goHome;
     $('#cont').focus();
   }
@@ -417,7 +466,7 @@
           '<span class="mode-chips">' + m.items.map((x) => '<span class="chip-ico" title="' + esc(x.title) + '" style="--c:' + x.color + '">' + (x.icon ? EX_ICON[x.icon] : '<b>' + esc(x.sym) + '</b>') + '</span>').join('') + '</span>' +
           '<span class="mc-foot"><span class="mc-meta">' +
             (m.id === 'pilot' ? m.items.length + ' ' + T('ชุดข้อสอบ') : m.items.length + ' ' + T('บท')) + ' · ' + T('บทเรียนผ่าน') + ' ' + doneIn(m.course) + '/' + COURSES[m.course].lessons.length + '</span>' +
-          '<span class="mc-go">' + T('เข้า') + '</span></span></a>').join('');
+          '</span></a>').join('');
       return;
     }
     $('#exam-grid').innerHTML = mode.items.map((x) => {
@@ -464,6 +513,52 @@
             : '<button class="btn m-claim" data-m="' + m.id + '"' + (full ? '' : ' disabled') + '>+' + m.xp + ' XP</button>') +
           '</div>';
       }).join('');
+  }
+
+  /* ---------- Practice (tab 2): wrong answers and weak spots ---------- */
+  function missedQuestions() {
+    return Object.keys(S.miss || {}).filter((k) => QBANK[k])
+      .sort((a, b) => S.miss[b].n - S.miss[a].n || S.miss[b].at - S.miss[a].at).map((k) => QBANK[k].q);
+  }
+  function weakLessons() {
+    const misses = {};
+    Object.keys(S.miss || {}).forEach((k) => { if (QBANK[k]) { const id = QBANK[k].lesson.id; misses[id] = (misses[id] || 0) + S.miss[k].n; } });
+    return ALL_LESSONS
+      .filter((l) => misses[l.id] || (isDone(l.id) && S.done[l.id].best < 80))
+      .map((l) => ({ l, miss: misses[l.id] || 0, best: isDone(l.id) ? S.done[l.id].best : null }))
+      .sort((a, b) => b.miss - a.miss || (a.best == null ? 101 : a.best) - (b.best == null ? 101 : b.best));
+  }
+  const PR_ICON = {
+    redo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>',
+    target: TAB_ICON.missions,
+    shuffle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>'
+  };
+  let practiceSets = {};
+  function renderPractice() {
+    const missed = missedQuestions();
+    const weak = weakLessons();
+    const weakQs = [].concat(...weak.slice(0, 3).map((w) => w.l.questions));
+    const reviewQs = [].concat(...ALL_LESSONS.filter((l) => isDone(l.id)).map((l) => l.questions));
+    practiceSets = { missed, weak: weakQs, review: reviewQs };
+    const tile = (id, icon, title, sub, n, cls) =>
+      '<button class="pr-tile ' + cls + '" data-p="' + id + '"' + (n ? '' : ' disabled') + '>' +
+        '<span class="pr-ico">' + PR_ICON[icon] + '</span><span class="pr-body"><b>' + title + '</b><i>' + sub + '</i></span>' +
+        '<span class="pr-count">' + n + ' <small>ข้อ</small></span></button>';
+    $('#practice-body').innerHTML =
+      '<div class="page-banner"><p>ไม่เสียหัวใจ · ได้ XP ตามระดับความยาก</p><h1>Practice</h1></div>' +
+      '<div class="pr-tiles">' +
+        tile('missed', 'redo', 'ฝึกข้อที่ตอบผิด', missed.length ? 'ตอบถูก 2 ครั้งแล้วข้อจะหายจากรายการ' : 'ยังไม่มีข้อที่ตอบผิด', missed.length, 't-red') +
+        tile('weak', 'target', 'ฝึกจุดอ่อน', weak.length ? 'รวมข้อจากบทที่ยังทำได้ไม่ดี' : 'ยังไม่พบจุดอ่อน', weak.length ? weakQs.length : 0, 't-orange') +
+        tile('review', 'shuffle', 'ทบทวนแบบสุ่ม', reviewQs.length ? 'สุ่ม 10 ข้อจากบทที่ผ่านแล้ว' : 'ผ่านบทเรียนก่อนแล้วจะทบทวนได้', reviewQs.length, 't-sky') +
+      '</div>' +
+      '<div class="card"><h3>บทที่ยังอ่อน</h3>' +
+        (weak.length ? weak.slice(0, 6).map((w) =>
+          '<button class="weak-row" data-lesson="' + w.l.id + '"><span class="wr-dot" style="--c:' + w.l.unit.color + '"></span>' +
+          '<span class="wr-body"><b>' + esc(w.l.title) + '</b><i>' + esc(w.l.unit.title) + '</i></span>' +
+          '<span class="wr-stat">' + (w.miss ? 'ผิด ' + w.miss + ' ครั้ง' : '') + (w.miss && w.best != null ? ' · ' : '') + (w.best != null ? 'แม่นยำ ' + w.best + '%' : '') + '</span>' +
+          '<span class="wr-go">ฝึก</span></button>').join('')
+          : '<p class="note flat">ยังไม่มี ทำบทเรียนไปสักพักแล้วระบบจะบอกว่าบทไหนควรฝึกเพิ่ม</p>') +
+      '</div>';
   }
 
   /* ---------- Score & performance (tab 3) ---------- */
@@ -575,14 +670,14 @@
   }
 
   /* ---------- Router: bottom tab bar ---------- */
-  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
+  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
     const page = PAGES[location.hash] || 'hub';
     const sub = location.hash === '#pilot' ? 'pilot' : null;
     if (page === 'learn') setCourse(location.hash === '#learn-physics' ? 'physics' : 'pilot');
     show('home');
-    ['hub', 'learn', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
+    ['hub', 'learn', 'practice', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
     // Back arrow: Pilot lessons → Pilot page, physics lessons / Pilot page → mode picker
     $('#to-hub').classList.toggle('hidden', !(page === 'learn' || sub));
     $('#to-hub').setAttribute('href', page === 'learn' ? COURSES[course].back : '#exams');
@@ -593,12 +688,23 @@
     else if (page === 'missions') renderMissions();
     else if (page === 'stats') renderPerf();
     else if (page === 'profile') renderProfile();
+    else if (page === 'practice') renderPractice();
     else renderHub(sub);
     $('#tab-dot').classList.toggle('hidden', !claimable());
+    $('#tab-dot-p').classList.toggle('hidden', !Object.keys(S.miss || {}).some((k) => QBANK[k]));
   }
   window.addEventListener('hashchange', () => { if (!L) route(); });
   window.addEventListener('langchange', () => { if (!L) route(); });
 
+  $('#practice').addEventListener('click', (e) => {
+    const t = e.target.closest('.pr-tile');
+    if (t && !t.disabled) {
+      const titles = { missed: 'ฝึกข้อที่ตอบผิด', weak: 'ฝึกจุดอ่อน', review: 'ทบทวนแบบสุ่ม' };
+      return startPractice(practiceSets[t.dataset.p] || [], titles[t.dataset.p]);
+    }
+    const w = e.target.closest('.weak-row');
+    if (w) { const l = ALL_LESSONS.find((x) => x.id === w.dataset.lesson); if (l) startPractice(l.questions, l.title); }
+  });
   $('#mission-list').addEventListener('click', (e) => {
     const b = e.target.closest('.m-claim'); if (!b || b.disabled) return;
     const m = MISSIONS.find((x) => x.id === b.dataset.m); if (!m || S.daily.claimed[m.id]) return;
@@ -683,10 +789,18 @@
 
   /* ---------- Events ---------- */
   $('#path').addEventListener('click', (e) => {
-    const n = e.target.closest('.node'); if (!n) return;
+    const arrow = e.target.closest('.row-arrow');
+    if (arrow) {
+      const row = arrow.closest('.unit').querySelector('.lesson-row');
+      row.scrollBy({ left: +arrow.dataset.dir * (row.clientWidth * 0.8), behavior: 'smooth' });
+      return;
+    }
+    const n = e.target.closest('.lesson-card'); if (!n) return;
     if (n.classList.contains('locked')) return toast('ผ่านบทเรียนก่อนหน้าก่อน แล้วบทนี้จะปลดล็อก');
     startLesson(+n.dataset.i);
   });
+  $('#path').addEventListener('scroll', (e) => { if (e.target.classList && e.target.classList.contains('lesson-row')) updateArrows(e.target); }, true);
+  window.addEventListener('resize', () => $$('#path .lesson-row').forEach(updateArrows));
 
   function askReset() {
     modal({

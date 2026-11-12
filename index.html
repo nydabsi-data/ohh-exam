@@ -20,8 +20,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css?v=8">
-  <link rel="stylesheet" href="css/pages.css?v=8">
-  <link rel="stylesheet" href="css/theme.css?v=13">
+  <link rel="stylesheet" href="css/pages.css?v=14">
+  <link rel="stylesheet" href="css/theme.css?v=14">
   <link rel="stylesheet" href="css/buttons.css?v=1">
 </head>
 <body>
@@ -50,6 +50,7 @@
       <div id="path"></div>
       <aside class="aside" id="aside"></aside>
     </main>
+    <main class="page hidden" id="practice"><div id="practice-body"></div></main>
     <main class="page hidden" id="missions"><div id="mission-list" class="missions"></div></main>
     <main class="page hidden" id="stats"><div id="perf-body"></div></main>
     <main class="page hidden" id="profile"><div id="profile-body"></div></main>
@@ -57,6 +58,7 @@
     <!-- Bottom tab bar -->
     <nav class="tabbar" id="tabbar" aria-label="เมนูหลัก">
       <a href="#exams" data-tab="home"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10.5V20a1 1 0 0 0 1 1h5v-6h6v6h5a1 1 0 0 0 1-1v-9.5z"/></svg><span>หน้าแรก</span></a>
+      <a href="#practice" data-tab="practice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg><span>ฝึกฝน</span><i class="tab-dot hidden" id="tab-dot-p"></i></a>
       <a href="#missions" data-tab="missions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg><span>ภารกิจ</span><i class="tab-dot hidden" id="tab-dot"></i></a>
       <a href="#stats" data-tab="stats"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="12" width="4.5" height="9" rx="1.5"/><rect x="9.75" y="7" width="4.5" height="14" rx="1.5"/><rect x="16.5" y="3" width="4.5" height="18" rx="1.5"/></svg><span>ผลคะแนน</span></a>
       <a href="#profile" data-tab="profile"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21a8.5 8.5 0 0 1 17 0z"/></svg><span>โปรไฟล์</span></a>
@@ -89,7 +91,7 @@
   <script src="js/config.js?v=8"></script>
   <script src="data/questions.js?v=9"></script>
   <script src="data/physics.js?v=1"></script>
-  <script src="js/i18n.js?v=13"></script>
-  <script src="js/app.js?v=13"></script>
+  <script src="js/i18n.js?v=14"></script>
+  <script src="js/app.js?v=14"></script>
 </body>
 </html>

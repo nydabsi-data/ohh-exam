@@ -1,5 +1,5 @@
 /* Service worker: network first, cache as offline fallback. */
-const CACHE = 'ohh-exam-v15';
+const CACHE = 'ohh-exam-v16';
 const SHELL = ['./', './index.html', './login.html', './js/login.js', './js/i18n.js', './css/style.css', './css/pages.css', './css/theme.css', './css/buttons.css', './js/app.js', './js/config.js', './data/questions.js', './data/physics.js', './icon.svg', './img/logo.png', './manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
