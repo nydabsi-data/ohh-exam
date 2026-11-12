@@ -519,13 +519,13 @@
   const MODES = [
     { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', cls: 'cream', color: '#F2C66D', dark: '#D9A23C', text: '#fff', href: '#learn', course: 'pilot',
       items: (window.UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
-    { id: 'physics', title: 'ฟิสิกส์ ม.ปลาย', th: 'กลศาสตร์ คลื่น ไฟฟ้า และฟิสิกส์ยุคใหม่', icon: 'atom', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#learn-physics', course: 'physics',
+    { id: 'physics', title: 'ฟิสิกส์ ม.ปลาย', th: 'กลศาสตร์ คลื่น ไฟฟ้า และฟิสิกส์ยุคใหม่', icon: 'atom', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#learn-physics', course: 'physics',
       items: (window.PHYSICS_UNITS || []).map((u) => ({ title: u.title, color: u.color, sym: u.sym })) },
-    { id: 'chem', title: 'เคมี ม.ปลาย', th: 'อะตอม พันธะ โมล กรด–เบส และอินทรีย์', icon: 'flask', color: '#FF9600', dark: '#E07F00', text: '#fff', href: '#learn-chem', course: 'chem',
+    { id: 'chem', title: 'เคมี ม.ปลาย', th: 'อะตอม พันธะ โมล กรด–เบส และอินทรีย์', icon: 'flask', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#learn-chem', course: 'chem',
       items: (window.CHEM_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
     { id: 'bio', title: 'ชีววิทยา ม.ปลาย', th: 'เซลล์ พันธุศาสตร์ ระบบร่างกาย พืช นิเวศ และวิวัฒนาการ', icon: 'leaf', color: '#FF4B9B', dark: '#E0307F', text: '#fff', href: '#learn-bio', course: 'bio',
       items: (window.BIO_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
-    { id: 'mathhs', title: 'คณิตศาสตร์ ม.ปลาย', th: 'เซต ฟังก์ชัน ตรีโกณ ลำดับ ความน่าจะเป็น สถิติ แคลคูลัส', icon: 'sigma', color: '#00B4E6', dark: '#0094C2', text: '#fff', href: '#learn-math', course: 'math',
+    { id: 'mathhs', title: 'คณิตศาสตร์ ม.ปลาย', th: 'เซต ฟังก์ชัน ตรีโกณ ลำดับ ความน่าจะเป็น สถิติ แคลคูลัส', icon: 'sigma', color: '#FF9600', dark: '#E07F00', text: '#fff', href: '#learn-math', course: 'math',
       items: (window.MATH_UNITS || []).map((u) => ({ title: u.title, color: u.color })) }
   ];
   EX_ICON.sigma = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5H6l7 7-7 7h12"/></svg>';
