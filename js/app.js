@@ -265,7 +265,6 @@
         '<li><span>บทเรียนที่ผ่าน</span><b>' + doneN + '/' + LESSONS.length + '</b></li>' +
         '<li><span>XP สะสม</span><b>' + S.xp + '</b></li>' +
         '<li><span>เรียนต่อเนื่อง</span><b>' + S.streak + ' วัน</b></li>' +
-        '<li><span>หัวใจ</span><b>' + S.hearts + '/' + MAX_HEARTS + (next ? ' · +1 ใน ' + next + ' นาที' : '') + '</b></li>' +
       '</ul></div>' +
       '<div class="card"><h3>ตั้งค่า</h3>' +
         '<label class="switch"><input type="checkbox" id="snd"' + (S.sound ? ' checked' : '') + '> เสียงเอฟเฟกต์</label>' +
@@ -279,7 +278,6 @@
 
   function startLesson(i) {
     sync();
-    if (S.hearts <= 0) return heartsEmpty(false);
     const les = LESSONS[i];
     L = { i, les, queue: shuffle(les.questions.slice()), total: les.questions.length, correct: 0, wrong: 0, xp: 0, start: Date.now(), state: 'answer', sel: null, opts: null };
     openLesson();
@@ -293,7 +291,22 @@
           queue: qs, total: qs.length, correct: 0, wrong: 0, xp: 0, start: Date.now(), state: 'answer', sel: null, opts: null };
     openLesson();
   }
+  // Pilot lessons are always timed (stopwatch in the lesson top bar)
+  let timerId = null;
+  const isPilotRun = () => L.les.id ? !/^phy-/.test(L.les.id) : !/^phy-/.test((L.queue[0] && L.queue[0].__key) || '');
+  function startTimer(on) {
+    clearInterval(timerId);
+    const box = $('#l-timer');
+    box.classList.toggle('hidden', !on);
+    if (!on) return;
+    const tick = () => {
+      if (!L) { clearInterval(timerId); return; }
+      $('#l-time').textContent = fmtTime(Math.floor((Date.now() - L.start) / 1000));
+    };
+    tick(); timerId = setInterval(tick, 1000);
+  }
   function openLesson() {
+    startTimer(isPilotRun());
     $('#quit').innerHTML = ICON.x;
     $('#prog').style.width = '0%';
     renderStats();
@@ -364,7 +377,7 @@
       });
     }
     const d = qDiff(L.q);
-    if (ok) { L.correct++; L.xp += DIFF[d].xp; } else { L.wrong++; if (!L.practice) loseHeart(); }
+    if (ok) { L.correct++; L.xp += DIFF[d].xp; } else { L.wrong++; }
     // Remember mistakes; a question leaves the list after it is answered right twice
     S.miss = S.miss || {};
     const key = L.q.__key;
@@ -398,7 +411,6 @@
     } else if (L.state === 'feedback') {
       const q = L.queue.shift();
       if (!L.ok) L.queue.push(q);   // wrong answers come back at the end
-      if (S.hearts <= 0) return heartsEmpty(true);
       nextQuestion();
     }
   }
@@ -580,7 +592,7 @@
         '<span class="pr-ico">' + PR_ICON[icon] + '</span><span class="pr-body"><b>' + title + '</b><i>' + sub + '</i></span>' +
         '<span class="pr-count">' + n + ' <small>ข้อ</small></span></button>';
     $('#practice-body').innerHTML =
-      '<div class="page-banner"><p>ไม่เสียหัวใจ · ได้ XP ตามระดับความยาก</p><h1>Practice</h1></div>' +
+      '<div class="page-banner"><p>ฝึกได้ไม่จำกัด · ได้ XP ตามระดับความยาก</p><h1>Practice</h1></div>' +
       '<div class="pr-tiles">' +
         tile('missed', 'redo', 'ฝึกข้อที่ตอบผิด', missed.length ? 'ตอบถูก 2 ครั้งแล้วข้อจะหายจากรายการ' : 'ยังไม่มีข้อที่ตอบผิด', missed.length, 't-red') +
         tile('weak', 'target', 'ฝึกจุดอ่อน', weak.length ? 'รวมข้อจากบทที่ยังทำได้ไม่ดี' : 'ยังไม่พบจุดอ่อน', weak.length ? weakQs.length : 0, 't-orange') +
