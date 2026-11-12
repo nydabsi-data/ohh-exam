@@ -1,15 +1,16 @@
 {
   "name": "Ohh-Exam",
   "short_name": "Ohh-Exam",
-  "description": "ฝึกทำข้อสอบนักบินทีละบทสั้นๆ แบบเกม",
+  "description": "ฝึกข้อสอบวันละไม่กี่นาที สนุกเหมือนเล่นเกม",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#58CC02",
+  "theme_color": "#FFFFFF",
   "lang": "th",
   "icons": [
+    { "src": "img/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]
 }

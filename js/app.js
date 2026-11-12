@@ -50,6 +50,7 @@
   const CFG = window.PE_SUPABASE || {};
   const sb = CFG.url && CFG.key && window.supabase ? window.supabase.createClient(CFG.url, CFG.key) : null;
   let user = null, pushTimer = null;
+  const uname = () => !user ? '' : (user.user_metadata && user.user_metadata.username) || (user.email || '').split('@')[0];
 
   async function pushRemote() {
     if (!sb || !user) return;
@@ -138,8 +139,8 @@
     const ta = $('#top-acct');
     ta.classList.remove('hidden');
     ta.classList.toggle('in', !!user);
-    ta.textContent = user ? (user.email || '?').charAt(0).toUpperCase() : 'เข้าสู่ระบบ';
-    ta.title = user ? user.email : 'เข้าสู่ระบบเพื่อบันทึกความคืบหน้า';
+    ta.textContent = user ? (uname() || '?').charAt(0).toUpperCase() : 'เข้าสู่ระบบ';
+    ta.title = user ? uname() : 'เข้าสู่ระบบเพื่อบันทึกความคืบหน้า';
   }
 
   const isDone = (id) => !!S.done[id];
@@ -152,7 +153,7 @@
     let html = '', i = 0;
     UNITS.forEach((u, ui) => {
       const doneN = u.lessons.filter((l) => isDone(l.id)).length;
-      html += '<section class="unit" style="--c:' + u.color + ';--d:' + u.dark + '">' +
+      html += '<section class="unit" style="--c:' + u.color + ';--d:' + u.dark + ';--t:' + (u.text || '#fff') + '">' +
         '<header class="unit-head"><div><small>Unit ' + (ui + 1) + ' · ' + esc(u.th) + '</small><h2>' + esc(u.title) + '</h2></div>' +
         '<span class="unit-count">' + doneN + '/' + u.lessons.length + '</span></header><div class="path">';
       u.lessons.forEach((l, li) => {
@@ -175,7 +176,7 @@
     const pct = Math.min(100, (S.todayXp / DAILY_GOAL) * 100);
     const next = minsToNextHeart();
     const acct = user
-      ? '<div class="card"><h3>บัญชี</h3><p class="acct">' + esc(user.email || '') + '</p><p class="note flat">ความคืบหน้าซิงก์อัตโนมัติ ใช้ได้ทุกอุปกรณ์</p><button class="linkbtn" id="logout">ออกจากระบบ</button></div>'
+      ? '<div class="card"><h3>บัญชี</h3><p class="acct">' + esc(uname()) + '</p><p class="note flat">ความคืบหน้าซิงก์อัตโนมัติ ใช้ได้ทุกอุปกรณ์</p><button class="linkbtn" id="logout">ออกจากระบบ</button></div>'
       : '<div class="card"><h3>บันทึกความคืบหน้า</h3><p class="note flat">เข้าสู่ระบบเพื่อเก็บ XP และบทเรียนไว้ในบัญชี ใช้ต่อได้ทุกอุปกรณ์</p><button class="btn block" id="login">เข้าสู่ระบบ / สมัคร</button></div>';
     $('#aside').innerHTML = acct +
       '<div class="card"><h3>เป้าหมายวันนี้</h3><div class="goal-row">' + ICON.bolt +
@@ -339,23 +340,23 @@
     math: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 7h6M8 4v6M14 7h6M5.5 15.5l5 5M10.5 15.5l-5 5M14 16h6M14 20h6"/></svg>'
   };
   const EXAMS = [
-    { id: 'learn', title: 'Pilot Knowledge', th: 'ความรู้นักบิน แบบบทเรียนสั้น', icon: 'book', color: '#58CC02', dark: '#58A700', href: '#learn', meta: ['6 วิชา', 'XP · Streak'] },
-    { id: 'series', title: 'Series Number', th: 'หาตัวเลขถัดไปในอนุกรม', icon: 'series', color: '#1CB0F6', dark: '#1899D6', href: 'exams/series/', meta: ['15 ข้อ', '6 นาที'] },
-    { id: 'math', title: 'Math Test', th: 'คณิตศาสตร์สำหรับนักบิน', icon: 'math', color: '#FF9600', dark: '#CC7800', href: 'exams/math/', meta: ['20 ข้อ', '30 นาที'] },
-    { id: 'rotation', title: 'Aircraft Rotation', th: 'อ่านทิศทางและการหมุนของเครื่องบิน', icon: 'plane', color: '#CE82FF', dark: '#A568CC', href: 'exams/rotation/', meta: ['12 ข้อ', '3 นาที'] },
-    { id: 'jigsaw', title: 'Spatial Jigsaw', th: 'มิติสัมพันธ์ ประกอบชิ้นส่วนภาพ', icon: 'puzzle', color: '#FF4B4B', dark: '#EA2B2B', href: 'exams/jigsaw/', meta: ['10 ข้อ', '3 นาที'] },
-    { id: 'joystick', title: 'Joy Stick', th: 'ควบคุมและความแม่นยำ', icon: 'stick', color: '#2B70C9', dark: '#1F5AA6', href: 'exams/joystick/', meta: ['90 วินาที'] },
-    { id: 'multitask', title: 'Multitask', th: 'ทำหลายอย่างพร้อมกัน', icon: 'multi', color: '#00B8A9', dark: '#00968A', href: 'exams/multitask/', meta: ['5 นาที'] }
+    { id: 'learn', title: 'Pilot Knowledge', th: 'ความรู้นักบิน แบบบทเรียนสั้น', icon: 'book', color: '#9BC1E2', dark: '#4978B0', text: '#0B1E3F', href: '#learn', meta: ['6 วิชา', 'XP · Streak'] },
+    { id: 'series', title: 'Series Number', th: 'หาตัวเลขถัดไปในอนุกรม', icon: 'series', color: '#4978B0', dark: '#2B5177', text: '#fff', href: 'exams/series/', meta: ['15 ข้อ', '6 นาที'] },
+    { id: 'math', title: 'Math Test', th: 'คณิตศาสตร์สำหรับนักบิน', icon: 'math', color: '#386B9F', dark: '#1F4673', text: '#fff', href: 'exams/math/', meta: ['20 ข้อ', '30 นาที'] },
+    { id: 'rotation', title: 'Aircraft Rotation', th: 'อ่านทิศทางและการหมุนของเครื่องบิน', icon: 'plane', color: '#2B5177', dark: '#162B5B', text: '#fff', href: 'exams/rotation/', meta: ['12 ข้อ', '3 นาที'] },
+    { id: 'jigsaw', title: 'Spatial Jigsaw', th: 'มิติสัมพันธ์ ประกอบชิ้นส่วนภาพ', icon: 'puzzle', color: '#162B5B', dark: '#060F1D', text: '#fff', href: 'exams/jigsaw/', meta: ['10 ข้อ', '3 นาที'] },
+    { id: 'joystick', title: 'Joy Stick', th: 'ควบคุมและความแม่นยำ', icon: 'stick', color: '#060F1D', dark: '#000', text: '#9BC1E2', href: 'exams/joystick/', meta: ['90 วินาที'] },
+    { id: 'multitask', title: 'Multitask', th: 'ทำหลายอย่างพร้อมกัน', icon: 'multi', color: '#CDE0EF', dark: '#9BC1E2', text: '#162B5B', href: 'exams/multitask/', meta: ['5 นาที'] }
   ];
 
   function renderHub() {
     const doneN = LESSONS.filter((l) => isDone(l.id)).length;
-    $('#hub-hello').textContent = user ? 'สวัสดี ' + (user.email || '').split('@')[0] : 'สวัสดีผู้เยี่ยมชม';
+    $('#hub-hello').textContent = user ? 'สวัสดี ' + uname() : 'สวัสดีผู้เยี่ยมชม';
     $('#exam-grid').innerHTML = EXAMS.map((x) => {
       const extra = x.id === 'learn'
         ? '<span class="ex-prog"><span class="bar"><span style="width:' + (doneN / LESSONS.length) * 100 + '%"></span></span><b>' + doneN + '/' + LESSONS.length + '</b></span>'
         : '';
-      return '<a class="exam-card" href="' + x.href + '" style="--c:' + x.color + ';--d:' + x.dark + '">' +
+      return '<a class="exam-card" href="' + x.href + '" style="--c:' + x.color + ';--d:' + x.dark + ';--t:' + x.text + '">' +
         '<span class="ex-ico">' + EX_ICON[x.icon] + '</span>' +
         '<span class="ex-body"><b class="ex-title">' + esc(x.title) + '</b><span class="ex-th">' + esc(x.th) + '</span>' +
         '<span class="ex-meta">' + x.meta.map((m) => '<i>' + esc(m) + '</i>').join('') + '</span>' + extra + '</span>' +
@@ -402,7 +403,7 @@
     if (!user) return gotoLogin();
     modal({
       title: 'บัญชีของคุณ',
-      body: esc(user.email || '') + '<br>ความคืบหน้าซิงก์อัตโนมัติ',
+      body: esc(uname()) + '<br>ความคืบหน้าซิงก์อัตโนมัติ',
       actions: [{ label: 'ปิด' }, { label: 'ออกจากระบบ', cls: 'danger', fn: signOut }]
     });
   }
