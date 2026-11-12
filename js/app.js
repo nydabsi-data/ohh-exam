@@ -185,7 +185,8 @@
   }
 
   const isDone = (id) => !!S.done[id];
-  const isUnlocked = (i) => i === 0 || isDone(LESSONS[i - 1].id);
+  let isAdmin = false;   // super admin: every lesson unlocked
+  const isUnlocked = (i) => isAdmin || i === 0 || isDone(LESSONS[i - 1].id);
   const OFFSETS = [0, -70, -40, 40, 70, 0];
 
   function renderHome() {
@@ -620,7 +621,6 @@
   }
 
   /* ---------- Profile (tab 4) ---------- */
-  let isAdmin = false;
   function renderProfile() {
     const name = user ? uname() : T('ผู้เยี่ยมชม');
     $('#profile-body').innerHTML =
@@ -874,7 +874,7 @@
         if (user) setTimeout(async () => {
           const r = await sb.rpc('is_super_admin');
           isAdmin = !!(r && r.data);
-          if (!L && location.hash === '#profile') route();
+          if (!L) route();
         }, 0);
       }
       // Session gone (signed out elsewhere / expired) and not a guest → back to the login page
