@@ -1,0 +1,15 @@
+{
+  "name": "Pilot Exam",
+  "short_name": "Pilot Exam",
+  "description": "ฝึกทำข้อสอบนักบินทีละบทสั้นๆ แบบเกม",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#58CC02",
+  "lang": "th",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

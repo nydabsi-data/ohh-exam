@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pilot Exam</title>
+  <meta name="description" content="ฝึกทำข้อสอบนักบินทีละบทสั้นๆ แบบเกม">
+  <meta name="theme-color" content="#58CC02">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Noto+Sans+Thai:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+
+  <!-- Home: learning path -->
+  <div id="home-view">
+    <header class="topbar">
+      <div class="topbar-in">
+        <div class="brand"><img src="icon.svg" alt=""><span>Pilot Exam</span></div>
+        <div class="stat streak" data-stat="streak"></div>
+        <div class="stat xp" data-stat="xp"></div>
+        <div class="stat hearts" data-stat="hearts"></div>
+      </div>
+    </header>
+    <main class="home">
+      <div id="path"></div>
+      <aside class="aside" id="aside"></aside>
+    </main>
+  </div>
+
+  <!-- Lesson -->
+  <div id="lesson-view" class="lesson hidden">
+    <div class="l-top">
+      <button class="x" id="quit" aria-label="ออกจากบทเรียน"></button>
+      <div class="progress"><span id="prog"></span></div>
+      <div class="stat hearts" data-stat="hearts"></div>
+    </div>
+    <div class="l-body" id="qbox"></div>
+    <footer class="foot" id="foot">
+      <div class="foot-in">
+        <div class="fb" id="fb"></div>
+        <button class="btn" id="check" disabled>ตรวจคำตอบ</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Result -->
+  <div id="result-view" class="result hidden"></div>
+
+  <div id="modal" class="modal hidden"><div class="modal-box" id="modal-box" role="dialog" aria-modal="true"></div></div>
+  <div id="toast" class="toast"></div>
+
+  <script src="data/questions.js?v=1"></script>
+  <script src="js/app.js?v=1"></script>
+</body>
+</html>
