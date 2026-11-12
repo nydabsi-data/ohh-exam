@@ -198,6 +198,15 @@
   const aptBest = (id) => (S.apt && S.apt[id] ? S.apt[id].best : null);
   let isAdmin = false;   // super admin: every lesson unlocked
   const isUnlocked = (i) => isAdmin || i === 0 || isDone(LESSONS[i - 1].id);
+  // Trying without an account: only the first GUEST_FREE lessons of each course and the first aptitude test
+  const GUEST_FREE = 2;
+  const isGuest = () => !user && !isAdmin;
+  const guestLocked = (i) => isGuest() && i >= GUEST_FREE;
+  function askSignup() {
+    modal({ title: T('สมัครสมาชิกฟรีเพื่อปลดล็อก'),
+      body: T('โหมดทดลองใช้ทำได้ 2 บทแรกของแต่ละวิชา และแบบทดสอบชุดแรก สมัครสมาชิก (ฟรี) เพื่อปลดล็อกทุกบทและเก็บคะแนนไว้ในบัญชี'),
+      actions: [{ label: T('สมัคร / เข้าสู่ระบบ'), fn: () => { location.href = 'login.html'; } }, { label: T('ไว้ก่อน'), cls: 'ghost' }] });
+  }
   const OFFSETS = [0, -70, -40, 40, 70, 0];
 
   function renderHome() {
@@ -214,12 +223,14 @@
         '</header><div class="lesson-row">';
       // One card per lesson, in a row you swipe sideways
       u.lessons.forEach((l, li) => {
-        const st = isDone(l.id) ? 'done' : i === cur ? 'current' : isUnlocked(i) ? 'open' : 'locked';
+        const gl = guestLocked(i) && !isDone(l.id);
+        const st = gl ? 'locked' : isDone(l.id) ? 'done' : i === cur ? 'current' : isUnlocked(i) ? 'open' : 'locked';
         const best = st === 'done' ? S.done[l.id].best : 0;
         const foot = st === 'done' ? '<span class="lc-state done">' + ICON.check + '<span>ผ่านแล้ว ' + best + '%</span></span>'
+          : gl ? '<span class="lc-state locked">' + ICON.lock + '<span>สมัครเพื่อปลดล็อก</span></span>'
           : st === 'locked' ? '<span class="lc-state locked">' + ICON.lock + '<span>ล็อก</span></span>'
           : '<span class="lc-go">เริ่ม</span>';
-        html += '<button class="lesson-card ' + st + '" data-i="' + i + '" aria-label="' + esc(l.title) + '">' +
+        html += '<button class="lesson-card ' + st + (gl ? ' guest' : '') + '" data-i="' + i + '" aria-label="' + esc(l.title) + '">' +
           '<span class="lc-top"><span class="lc-num">บทที่ ' + (li + 1) + '</span>' + diffChip(lessonDiff(l)) + '</span>' +
           '<span class="lc-ico">' + (st === 'done' ? ICON.check : st === 'locked' ? ICON.lock : ICON.star) + '</span>' +
           '<span class="lc-title">' + esc(l.title) + '</span>' +
@@ -238,15 +249,30 @@
           '<button class="row-arrow" data-dir="-1" aria-label="ก่อนหน้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>' +
           '<button class="row-arrow" data-dir="1" aria-label="ถัดไป"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></span>' +
         '</header><div class="lesson-row">' +
-        tests.map((x, ti) => '<a class="lesson-card open exam-lc" href="' + x.href + '" style="--c:' + x.color + ';--d:' + x.dark + '">' +
+        tests.map((x, ti) => (isGuest() && ti > 0
+          ? '<button class="lesson-card locked guest" style="--c:' + x.color + ';--d:' + x.dark + '">' +
+            '<span class="lc-top"><span class="lc-num">ชุดที่ ' + (ti + 1) + '</span></span><span class="lc-ico">' + ICON.lock + '</span>' +
+            '<span class="lc-title">' + esc(x.title) + '</span><span class="lc-meta">' + x.meta.map(esc).join(' · ') + '</span>' +
+            '<span class="lc-foot"><span class="lc-state locked">' + ICON.lock + '<span>สมัครเพื่อปลดล็อก</span></span></span></button>'
+          : '<a class="lesson-card open exam-lc" href="' + x.href + '" style="--c:' + x.color + ';--d:' + x.dark + '">' +
           '<span class="lc-top"><span class="lc-num">ชุดที่ ' + (ti + 1) + '</span></span>' +
           '<span class="lc-ico">' + EX_ICON[x.icon] + '</span>' +
           '<span class="lc-title">' + esc(x.title) + '</span>' +
           '<span class="lc-meta">' + x.meta.map(esc).join(' · ') + '</span>' +
           '<span class="lc-foot">' + (aptBest(x.id) != null
             ? '<span class="lc-state done">' + ICON.check + '<span>ดีที่สุด ' + aptBest(x.id) + '%</span></span>'
-            : '<span class="lc-go">เริ่ม</span>') + '</span></a>').join('') +
+            : '<span class="lc-go">เริ่ม</span>') + '</span></a>')).join('') +
         '</div></section>';
+    }
+    // Picture cards for this course (tap to enlarge)
+    const figs = Object.keys(window.FIGS || {}).filter((k) => FIGS[k].course === course);
+    if (figs.length) {
+      html = '<section class="unit fig-unit" style="--c:#A570FF;--d:#8549E8;--t:#fff">' +
+        '<header class="unit-head"><div><small>ดูภาพแล้วจำง่ายขึ้น</small><h2>ภาพประกอบ</h2></div>' +
+        '<span class="unit-tools"><span class="unit-count">' + figs.length + ' ภาพ</span></span></header>' +
+        '<div class="lesson-row fig-row">' + figs.map((k) =>
+          '<button class="fig-card no-i18n" data-fig="' + k + '">' + FIGS[k].svg + '<span>' + FIGS[k].title + '</span></button>').join('') +
+        '</div></section>' + html;
     }
     $('#path').innerHTML = html;
     // Bring the next lesson to do into view in its row
@@ -359,7 +385,7 @@
     if (!L.opts || !L.opts[j]) return;
     L.sel = j;
     $$('#qbox .opt').forEach((b, k) => b.classList.toggle('sel', k === j));
-    setCheck('ตรวจคำตอบ', true);
+    onCheck();   // answer shows right away — no "check answer" step; then press "ไปต่อ"
   }
 
   function pickMatch(b) {
@@ -412,6 +438,9 @@
       '<div class="fb-head"><span class="ico">' + (ok ? ICON.check : ICON.x) + '</span><h4>' + (ok ? pick(PRAISE) : 'ยังไม่ถูก') + '</h4></div>' +
       (ans ? '<p><b>คำตอบที่ถูก:</b> ' + (L.q.type === 'tf' ? esc(ans) : '<span class="no-i18n">' + esc(ans) + '</span>') + '</p>' : '') +
       (L.q.ex ? '<p class="no-i18n">' + esc(L.q.ex) + '</p>' : '');
+    // A labelled picture for this topic (data/figs.js), shown under the question after answering
+    const fig = figFor(L.q);
+    if (fig) $('#qbox').insertAdjacentHTML('beforeend', '<figure class="q-fig no-i18n"><figcaption>ภาพประกอบ: ' + fig.title + '</figcaption>' + fig.svg + '</figure>');
     setCheck('ไปต่อ', true);
     $('#check').focus();
   }
@@ -785,6 +814,10 @@
     const aptId = /^#apt-(\w+)$/.exec(location.hash);
     if (aptId && window.APT && APT.TESTS[aptId[1]]) {
       if (aptOpen === aptId[1]) return;          // already open (e.g. language switch) — don't restart
+      if (isGuest() && aptId[1] !== 'series') {   // guests: first test only
+        history.replaceState(null, '', location.pathname + location.search + '#learn');
+        route(); return askSignup();
+      }
       aptOpen = aptId[1]; setCourse('pilot');
       show('apt');
       APT.open(aptOpen, APT_HOST);
@@ -843,6 +876,26 @@
     else if (id === 'reset2') askReset();
   });
   $('#profile').addEventListener('change', (e) => { if (e.target.id === 'snd2') { S.sound = e.target.checked; save(); } });
+
+  /* ---------- Pictures (data/figs.js) ---------- */
+  function figFor(q) {
+    if (!window.FIGS || !q) return null;
+    const lid = q.__key ? q.__key.split('#')[0] : '';
+    const c = /^bio-/.test(lid) ? 'bio' : /^chem-/.test(lid) ? 'chem' : /^phy-/.test(lid) ? 'physics' : /^math-/.test(lid) ? 'math' : 'pilot';
+    const text = (q.q || '') + ' ' + (q.ex || '');
+    const k = Object.keys(FIGS).find((id) => FIGS[id].course === c && FIGS[id].keys.test(text));
+    return k ? FIGS[k] : null;
+  }
+  function openFig(id) {
+    const f = (window.FIGS || {})[id]; if (!f) return;
+    const box = $('#modal-box');
+    box.classList.add('wide');
+    box.innerHTML = '<button class="mx" id="mx" aria-label="ปิด">' + ICON.x + '</button><h3>' + f.title + '</h3><div class="fig-big no-i18n">' + f.svg + '</div>';
+    $('#modal').classList.remove('hidden');
+    modalOutside = null;
+    modalGuard = () => confirm(T('ปิดภาพนี้?'));   // outside click / Esc asks first; × closes directly
+    $('#mx').onclick = closeModal;
+  }
 
   /* ---------- Modal & toast ---------- */
   let modalOutside = null, modalGuard = null;
@@ -915,6 +968,9 @@
       row.scrollBy({ left: +arrow.dataset.dir * (row.clientWidth * 0.8), behavior: 'smooth' });
       return;
     }
+    const fc = e.target.closest('.fig-card');
+    if (fc) return openFig(fc.dataset.fig);
+    if (e.target.closest('.lesson-card.guest')) return askSignup();
     const ex = e.target.closest('a.exam-lc');
     if (ex) return;   // aptitude test link: the router opens it
     const n = e.target.closest('.lesson-card'); if (!n) return;

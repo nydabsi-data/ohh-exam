@@ -272,10 +272,35 @@ body {
 .mode-card .mc-nums i { font-style: normal; font-size: 13px; font-weight: 700; opacity: .95; }
 
 /* Pilot home card: egg-cream */
-.exam-card.mode-card.cream { color: #5A3E00; border: 2px solid #F3DFAE;
+.exam-card.mode-card.cream { color: #5A3E00; border: 0;
   background: radial-gradient(240px 170px at 100% 0%, rgba(255,255,255,.85), rgba(255,255,255,0) 70%), linear-gradient(150deg, #FFF9EA 0%, #FFF1CC 55%, #FBE3A6 100%);
   box-shadow: 0 14px 30px rgba(217,162,60,.22); }
 .mode-card.cream .mc-ico { background: #FFE3A0; color: #8A5A00; }
 .mode-card.cream .mc-deco { color: rgba(217,162,60,.20); }
 .mode-card.cream .mc-sub, .mode-card.cream .mc-meta { color: #7A5A1A; }
 .mode-card.cream .mc-nums span { background: rgba(255,255,255,.75); }
+
+/* Pictures (data/figs.js) */
+.fig-svg { width: 100%; height: auto; display: block; }
+.fig-row .fig-card { flex: 0 0 230px; scroll-snap-align: start; display: grid; gap: 6px; padding: 10px; text-align: center; cursor: pointer; font: inherit;
+  background: #fff; border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 18px; transition: transform .12s, border-color .12s; }
+.fig-row .fig-card:hover { transform: translateY(-3px); border-color: #C9B2FF; }
+.fig-row .fig-card span { font-weight: 800; font-size: 14px; color: var(--ink); }
+.fig-big { max-width: 720px; margin: 8px auto 0; background: #fff; border-radius: 14px; }
+.q-fig { margin: 18px 0 0; padding: 12px; border: 2px solid #E6DAFF; border-radius: 16px; background: #FBF8FF; animation: pop .25s ease-out; }
+.q-fig figcaption { font-weight: 800; font-size: 13px; color: #8549E8; margin-bottom: 4px; }
+.q-fig .fig-svg { max-width: 520px; margin: 0 auto; }
+/* Guest-locked cards */
+.lesson-card.guest .lc-state { color: #E07F00; }
+
+/* Character picker: no card boxes, just the pictures (chosen one gets a coloured ring) */
+.char-pick { border: 0 !important; background: none !important; padding: 4px !important; box-shadow: none !important; }
+.char-pick img { border-radius: 50%; border: 4px solid transparent; transition: border-color .12s, transform .12s; }
+.char-pick:hover img { transform: translateY(-2px); }
+.char-pick.on img { border-color: var(--bg); }
+/* Pop-up close button (×) */
+.mx { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 50%;
+  background: var(--soft); color: var(--muted); cursor: pointer; }
+.mx:hover { background: var(--line); color: var(--ink); }
+.mx svg { width: 20px; height: 20px; }
+.modal-box { position: relative; }
