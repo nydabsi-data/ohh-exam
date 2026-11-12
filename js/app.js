@@ -43,7 +43,8 @@
     physics: { units: window.PHYSICS_UNITS || [], hash: '#learn-physics', back: '#exams' },
     chem:    { units: window.CHEM_UNITS || [], hash: '#learn-chem', back: '#exams' },
     bio:     { units: window.BIO_UNITS || [], hash: '#learn-bio', back: '#exams' },
-    math:    { units: window.MATH_UNITS || [], hash: '#learn-math', back: '#exams' }
+    math:    { units: window.MATH_UNITS || [], hash: '#learn-math', back: '#exams' },
+    toeic:   { units: (window.TOEIC_UNITS || []).slice().sort((a, b) => (a.n || 0) - (b.n || 0)), hash: '#learn-toeic', back: '#exams' }
   };
   Object.values(COURSES).forEach((c) => { c.lessons = flatten(c.units); });
   // Every question gets a stable key "<lesson id>#<index>" so wrong answers can be practised later.
@@ -378,7 +379,14 @@
       body = '<div class="opts">' + L.opts.map((o, j) => '<button class="opt" data-j="' + j + '"><span class="k">' + (j + 1) + '</span><span' + (q.type === 'tf' ? '' : ' class="no-i18n"') + '>' + esc(o.t) + '</span></button>').join('') + '</div>';
     }
     // Question text and answer options are content, not UI: the TH/EN switch leaves them as written.
-    $('#qbox').innerHTML = '<div class="q-kind">' + kind + ' ' + diffChip(qDiff(q)) + '</div><h1 class="q-title no-i18n">' + esc(q.q) + '</h1>' + body;
+    $('#qbox').innerHTML = '<div class="q-kind">' + kind + ' ' + diffChip(qDiff(q)) + '</div>' + qHead(q.q) + body;
+  }
+
+  // Long reading passages (TOEIC) are written as "passage\n\nquestion": show the passage in its own box
+  function qHead(text) {
+    const parts = String(text).split('\n\n');
+    const ask = parts.pop();
+    return (parts.length ? '<div class="q-passage no-i18n">' + esc(parts.join('\n\n')) + '</div>' : '') + '<h1 class="q-title no-i18n">' + esc(ask) + '</h1>';
   }
 
   function pickOption(j) {
@@ -526,8 +534,11 @@
     { id: 'bio', title: 'ชีววิทยา ม.ปลาย', th: 'เซลล์ พันธุศาสตร์ ระบบร่างกาย พืช นิเวศ และวิวัฒนาการ', icon: 'leaf', color: '#FF4B9B', dark: '#E0307F', text: '#fff', href: '#learn-bio', course: 'bio',
       items: (window.BIO_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
     { id: 'mathhs', title: 'คณิตศาสตร์ ม.ปลาย', th: 'เซต ฟังก์ชัน ตรีโกณ ลำดับ ความน่าจะเป็น สถิติ แคลคูลัส', icon: 'sigma', color: '#FF9600', dark: '#E07F00', text: '#fff', href: '#learn-math', course: 'math',
-      items: (window.MATH_UNITS || []).map((u) => ({ title: u.title, color: u.color })) }
+      items: (window.MATH_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
+    { id: 'toeic', title: 'TOEIC', th: 'Reading Part 5–7 แนวข้อสอบจริง จับเวลา', icon: 'toeic', unitLabel: 'ชุด', color: '#FF4B4B', dark: '#E03A3A', text: '#fff', href: '#learn-toeic', course: 'toeic',
+      items: (window.TOEIC_UNITS || []).map((u) => ({ title: u.title, color: u.color })) }
   ];
+  EX_ICON.toeic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 11h6M9 15h6M9 19h4"/></svg>';
   EX_ICON.sigma = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5H6l7 7-7 7h12"/></svg>';
   EX_ICON.flask = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10" /></svg>';
   EX_ICON.leaf = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M5 19C5 10 11 4 20 4c0 9-6 15-15 15z"/><path d="M5 19 13 11"/></svg>';
@@ -566,7 +577,7 @@
             '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
           // Numbers on the card: topics (units), questions, lessons passed
           '<span class="mc-nums">' +
-            '<span><b>' + COURSES[m.course].units.length + '</b><i>' + T('เรื่อง') + '</i></span>' +
+            '<span><b>' + COURSES[m.course].units.length + '</b><i>' + T(m.unitLabel || 'เรื่อง') + '</i></span>' +
             '<span><b>' + nfmt(COURSES[m.course].lessons.reduce((s, l) => s + l.questions.length, 0)) + '</b><i>' + T('ข้อ') + '</i></span>' +
             (m.id === 'pilot' ? '<span><b>' + (EXAMS.length - 1) + '</b><i>' + T('แบบทดสอบ') + '</i></span>' : '') +
           '</span>' +
@@ -696,7 +707,8 @@
       '<h4 class="course-h">ฟิสิกส์ ม.ปลาย</h4>' + unitRows(COURSES.physics.units) +
       '<h4 class="course-h">เคมี ม.ปลาย</h4>' + unitRows(COURSES.chem.units) +
       '<h4 class="course-h">ชีววิทยา ม.ปลาย</h4>' + unitRows(COURSES.bio.units) +
-      '<h4 class="course-h">คณิตศาสตร์ ม.ปลาย</h4>' + unitRows(COURSES.math.units);
+      '<h4 class="course-h">คณิตศาสตร์ ม.ปลาย</h4>' + unitRows(COURSES.math.units) +
+      (COURSES.toeic.units.length ? '<h4 class="course-h">TOEIC</h4>' + unitRows(COURSES.toeic.units) : '');
     // Accuracy by difficulty (one bar per level, value written next to it)
     const diffRows = [1, 2, 3].map((k) => {
       const x = (S.diff || {})[k] || { a: 0, c: 0 };
@@ -813,7 +825,7 @@
   };
 
   /* ---------- Router: bottom tab bar ---------- */
-  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
+  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#learn-toeic': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
     if (location.hash === '#pilot') history.replaceState(null, '', location.pathname + location.search + '#learn');   // old Pilot page → Pilot lessons
@@ -833,7 +845,7 @@
     if (aptOpen) { aptOpen = null; if (window.APT) APT.stop(); }
     const page = PAGES[location.hash] || 'hub';
     const sub = location.hash === '#pilot' ? 'pilot' : null;
-    if (page === 'learn') setCourse({ '#learn-physics': 'physics', '#learn-chem': 'chem', '#learn-bio': 'bio', '#learn-math': 'math' }[location.hash] || 'pilot');
+    if (page === 'learn') setCourse({ '#learn-physics': 'physics', '#learn-chem': 'chem', '#learn-bio': 'bio', '#learn-math': 'math', '#learn-toeic': 'toeic' }[location.hash] || 'pilot');
     show('home');
     ['hub', 'learn', 'practice', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
     // Back arrow: Pilot lessons → Pilot page, physics lessons / Pilot page → mode picker

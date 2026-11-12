@@ -312,3 +312,7 @@ body {
 .fig-parts dt { font-weight: 800; font-size: 14px; color: #8549E8; }
 .fig-parts dd { margin: 2px 0 0; font-size: 13.5px; color: var(--ink); line-height: 1.45; }
 .modal-box.wide .fig-big { max-height: none; }
+
+/* TOEIC reading passage above the question */
+.q-passage { white-space: pre-line; background: #FFFDF6; border: 2px solid var(--line); border-left: 5px solid #FF9F9F; border-radius: 14px;
+  padding: 14px 16px; margin: 6px 0 14px; font-size: 15.5px; line-height: 1.65; color: var(--ink); max-height: 46vh; overflow: auto; }
