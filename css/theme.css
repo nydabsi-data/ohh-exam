@@ -253,3 +253,12 @@ body {
 .res-badge { position: absolute; right: -8px; bottom: -4px; width: 52px; height: 52px; padding: 8px; border-radius: 50%; background: #fff; color: var(--gold); box-shadow: 0 6px 14px rgba(0,0,0,.14); }
 .res-badge svg { width: 100%; height: 100%; }
 .hub-char:not([src]) { visibility: hidden; }
+
+/* Bottom bar: picture icons, larger */
+.tabbar a { padding: 8px 4px 7px; gap: 3px; }
+.tabbar a img { width: 42px; height: 42px; object-fit: contain; opacity: .75; filter: saturate(.8); transition: transform .18s cubic-bezier(.3,1.6,.5,1), opacity .15s, filter .15s; }
+.tabbar a:hover img { opacity: .85; filter: none; }
+.tabbar a.on img { opacity: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,.14)); transform: translateY(-3px) scale(1.12); }
+.tabbar .tab-dot { top: 4px; right: calc(50% - 24px); }
+#home-view { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
+@media (max-width: 480px) { .tabbar a img { width: 36px; height: 36px; } }
