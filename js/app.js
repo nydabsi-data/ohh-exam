@@ -378,7 +378,7 @@
     const doneN = LESSONS.filter((l) => isDone(l.id)).length;
     const mode = sub && MODES.find((m) => m.id === sub);
     $('#hub-hello').textContent = mode ? 'โหมด ' + mode.title : (user ? 'สวัสดี ' + uname() : 'สวัสดีผู้เยี่ยมชม');
-    $('#hub-title').textContent = mode ? mode.title + ' · ' + mode.items.length + ' ชุด' : 'เลือกโหมดที่จะฝึก';
+    $('#hub-title').textContent = mode ? mode.title : 'เลือกโหมดที่จะฝึก';
     $('#exam-grid').classList.toggle('modes', !mode);
     if (!mode) {
       $('#exam-grid').innerHTML = MODES.map((m) =>
