@@ -1,0 +1,43 @@
+/* Ohh-Exam — Duolingo-style buttons (only buttons): flat solid color, thick bottom edge,
+   bold uppercase label, press-down on click. Sky blue = main action (no green). */
+.btn, .ex-go, .mc-go, .m-claim, .top-acct {
+  font-family: var(--font); font-weight: 800; text-transform: uppercase; letter-spacing: .8px;
+  transition: transform .06s, box-shadow .06s, filter .12s; text-shadow: none;
+}
+.btn {
+  border: 0; border-radius: 16px; padding: 13px 20px; font-size: 15px;
+  background: #1CB0F6; color: #fff; box-shadow: 0 4px 0 #1899D6;
+}
+.btn:hover:not(:disabled) { filter: brightness(1.06); }
+.btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #1899D6; }
+.btn:disabled { background: #E5E5E5; color: #AFAFAF; box-shadow: 0 4px 0 #CFCFCF; }
+
+/* Secondary: white with a 2px border and a 4px bottom border */
+.btn.ghost, .btn.danger {
+  background: #fff; border: 2px solid #E5E5E5; border-bottom-width: 4px; box-shadow: none; padding: 11px 20px 9px;
+}
+.btn.ghost { color: #1CB0F6; }
+.btn.danger { color: #FF4B4B; }
+.btn.ghost:hover:not(:disabled), .btn.danger:hover:not(:disabled) { filter: none; background: #F7F7F7; }
+.btn.ghost:active:not(:disabled), .btn.danger:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; margin-bottom: 2px; box-shadow: none; }
+
+/* Lesson footer: blue after a right answer, red after a wrong one */
+.foot.ok .btn { background: #1CB0F6; box-shadow: 0 4px 0 #1899D6; }
+.foot.bad .btn { background: #FF4B4B; box-shadow: 0 4px 0 #EA2B2B; }
+.foot.bad .btn:active { box-shadow: 0 0 0 #EA2B2B; }
+
+/* Small "Start" chips on exam cards */
+.ex-go { border: 2px solid #E5E5E5; border-bottom-width: 4px; background: #fff; color: #1CB0F6; border-radius: 14px; padding: 7px 14px 5px; font-size: 13px; }
+.exam-card:hover .ex-go { background: #1CB0F6; border-color: #1899D6; color: #fff; }
+.exam-card:active .ex-go { transform: translateY(2px); border-bottom-width: 2px; }
+
+/* "Enter" on the Pilot mode card */
+.mode-card .mc-go { background: #fff; color: var(--d); border-radius: 14px; padding: 10px 18px; font-size: 13px; box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+.mode-card:active .mc-go { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,.18); }
+
+/* Mission "+XP" claim */
+.m-claim { border-radius: 14px; padding: 10px 14px; font-size: 13px; }
+
+/* Top-bar "Sign in" */
+.top-acct:not(.in) { background: #fff; color: #1CB0F6; border: 2px solid #E5E5E5; border-bottom-width: 4px; border-radius: 14px; padding: 6px 12px 4px; font-size: 12px; }
+.top-acct:not(.in):active { transform: translateY(2px); border-bottom-width: 2px; }
