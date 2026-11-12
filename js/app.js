@@ -595,6 +595,13 @@
     { id: 'exam1', title: 'ลองทำแบบทดสอบ 1 ชุด', need: 1, get: () => S.daily.exams, xp: 10 },
     { id: 'perfect', title: 'ทำบทเรียนได้ 100%', need: 1, get: () => S.daily.perfect, xp: 25 }
   ];
+  const M_ICON = {
+    lesson1: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2zM4 20a2 2 0 0 0 2 2h13v-4"/><path d="M9 8h6"/></svg>',
+    xp50: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 2 4 14h6.5L9 22l11-13h-6.8z"/></svg>',
+    correct15: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>',
+    exam1: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4.2l2.6 1.6M9.5 2.5h5M12 2.5V6M18.5 6.5l1.5-1.5"/></svg>',
+    perfect: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 3h10v2h3.5v3A4.5 4.5 0 0 1 16.3 12.5 5 5 0 0 1 13 15.9V19h3.5v2h-9v-2H11v-3.1a5 5 0 0 1-3.3-3.4A4.5 4.5 0 0 1 3.5 8V5H7zm0 4H5.5v1A2.5 2.5 0 0 0 7 10.3zm10 0v3.3A2.5 2.5 0 0 0 18.5 8V7z"/></svg>'
+  };
   const claimable = () => MISSIONS.filter((m) => m.get() >= m.need && !S.daily.claimed[m.id]).length;
   const TAB_ICON = {
     home: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10.5V20a1 1 0 0 0 1 1h5v-6h6v6h5a1 1 0 0 0 1-1v-9.5z"/></svg>',
@@ -612,7 +619,7 @@
       MISSIONS.map((m) => {
         const v = Math.min(m.need, m.get()), full = v >= m.need, got = !!S.daily.claimed[m.id];
         return '<div class="mission' + (got ? ' got' : '') + '">' +
-          '<span class="m-ico">' + (got ? ICON.check : TAB_ICON.missions) + '</span>' +
+          '<span class="m-ico">' + (got ? ICON.check : M_ICON[m.id] || TAB_ICON.missions) + '</span>' +
           '<div class="m-body"><b>' + esc(m.title) + '</b>' +
             '<div class="m-prog"><div class="bar"><span style="width:' + (v / m.need) * 100 + '%"></span></div><i>' + v + '/' + m.need + '</i></div></div>' +
           (got ? '<span class="m-done">รับแล้ว</span>'
