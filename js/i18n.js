@@ -94,7 +94,7 @@
     'อา': 'Sun', 'จ': 'Mon', 'อ': 'Tue', 'พ': 'Wed', 'พฤ': 'Thu', 'ศ': 'Fri', 'ส': 'Sat',
     'หลักการบิน': 'Principles of Flight', 'อุตุนิยมวิทยา': 'Meteorology', 'การเดินอากาศ': 'Navigation',
     'กฎหมายการบิน': 'Air Law', 'ระบบอากาศยานและเครื่องวัด': 'Aircraft & Instruments', 'วิทยุสื่อสารและปัจจัยมนุษย์': 'Radio & Human Factors',
-    'ง่าย': 'Easy', 'ปานกลาง': 'Medium', 'ยาก': 'Hard', 'บท': 'chapters',
+    'ง่าย': 'Easy', 'ปานกลาง': 'Medium', 'ยาก': 'Hard', 'บท': 'chapters', 'เรื่อง': 'topics', 'แบบทดสอบ': 'tests', 'คณิตศาสตร์ ม.ปลาย': 'High-school maths', 'เซต ฟังก์ชัน ตรีโกณ ลำดับ ความน่าจะเป็น สถิติ แคลคูลัส': 'Sets, functions, trig, sequences, probability, statistics, calculus',
     'ฝึกฝน': 'Practice', 'ฝึกได้ไม่จำกัด · ได้ XP ตามระดับความยาก': 'Unlimited practice · XP by difficulty',
     'ฝึกข้อที่ตอบผิด': 'Practise your mistakes', 'ฝึกจุดอ่อน': 'Work on weak spots', 'ทบทวนแบบสุ่ม': 'Random review',
     'ตอบถูก 2 ครั้งแล้วข้อจะหายจากรายการ': 'A question leaves the list after 2 right answers',
@@ -133,7 +133,7 @@
     'สำเร็จ': 'Done', 'ชุดข้อสอบ': 'exam sets', 'บทเรียนผ่าน': 'Lessons passed', 'แม่นยำ': 'accuracy', 'รวม': 'Total',
     'เปลี่ยนสิทธิ์ไม่ได้:': 'Could not change role:', 'โหลดข้อมูลไม่ได้:': 'Could not load data:',
     'ระบบอากาศยานและเครื่องวัด': 'Aircraft & Instruments', 'วิทยุสื่อสารและปัจจัยมนุษย์': 'Radio & Human Factors',
-    'แบบทดสอบความถนัด': 'Aptitude tests',
+    'แบบทดสอบความถนัด': 'Aptitude tests', 'พื้นฐานเครื่องบิน': 'Aircraft Basics', 'ประวัติศาสตร์การบิน': 'Aviation History',
     'หลักการบิน': 'Principles of Flight', 'อุตุนิยมวิทยา': 'Meteorology', 'การเดินอากาศ': 'Navigation', 'กฎหมายการบิน': 'Air Law'
   })).sort((a, b) => b[0].length - a[0].length);
   const UNITS = [

@@ -33,11 +33,17 @@
   /* ---------- Data ---------- */
   // Courses: each has its own learning path. UNITS / LESSONS point at the course being viewed.
   const flatten = (units) => { const out = []; units.forEach((u) => u.lessons.forEach((l) => out.push(Object.assign({}, l, { unit: u })))); return out; };
+  const nfmt = (n) => Number(n).toLocaleString('en-US');
+  // Extra questions (data/extra/*.js) are appended to their lesson by id, so earlier question keys stay the same.
+  const XQ = window.EXTRA_Q || {};
+  [window.UNITS, window.PHYSICS_UNITS, window.CHEM_UNITS, window.BIO_UNITS, window.MATH_UNITS].forEach((us) =>
+    (us || []).forEach((u) => u.lessons.forEach((l) => { if (XQ[l.id] && !l.__xq) { l.questions = l.questions.concat(XQ[l.id]); l.__xq = true; } })));
   const COURSES = {
     pilot:   { units: window.UNITS || [], hash: '#learn', back: '#exams', note: true },
     physics: { units: window.PHYSICS_UNITS || [], hash: '#learn-physics', back: '#exams' },
     chem:    { units: window.CHEM_UNITS || [], hash: '#learn-chem', back: '#exams' },
-    bio:     { units: window.BIO_UNITS || [], hash: '#learn-bio', back: '#exams' }
+    bio:     { units: window.BIO_UNITS || [], hash: '#learn-bio', back: '#exams' },
+    math:    { units: window.MATH_UNITS || [], hash: '#learn-math', back: '#exams' }
   };
   Object.values(COURSES).forEach((c) => { c.lessons = flatten(c.units); });
   // Every question gets a stable key "<lesson id>#<index>" so wrong answers can be practised later.
@@ -300,7 +306,7 @@
   }
   // Pilot lessons are always timed (stopwatch in the lesson top bar)
   let timerId = null;
-  const isPilotRun = () => L.les.id ? !/^(phy|chem|bio)-/.test(L.les.id) : !/^(phy|chem|bio)-/.test((L.queue[0] && L.queue[0].__key) || '');
+  const isPilotRun = () => L.les.id ? !/^(phy|chem|bio|math)-/.test(L.les.id) : !/^(phy|chem|bio|math)-/.test((L.queue[0] && L.queue[0].__key) || '');
   function startTimer(on) {
     clearInterval(timerId);
     const box = $('#l-timer');
@@ -489,24 +495,29 @@
     { id: 'chem', title: 'เคมี ม.ปลาย', th: 'อะตอม พันธะ โมล กรด–เบส และอินทรีย์', icon: 'flask', color: '#FF9600', dark: '#E07F00', text: '#fff', href: '#learn-chem', course: 'chem',
       items: (window.CHEM_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
     { id: 'bio', title: 'ชีววิทยา ม.ปลาย', th: 'เซลล์ พันธุศาสตร์ ระบบร่างกาย พืช นิเวศ และวิวัฒนาการ', icon: 'leaf', color: '#FF4B9B', dark: '#E0307F', text: '#fff', href: '#learn-bio', course: 'bio',
-      items: (window.BIO_UNITS || []).map((u) => ({ title: u.title, color: u.color })) }
+      items: (window.BIO_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
+    { id: 'mathhs', title: 'คณิตศาสตร์ ม.ปลาย', th: 'เซต ฟังก์ชัน ตรีโกณ ลำดับ ความน่าจะเป็น สถิติ แคลคูลัส', icon: 'sigma', color: '#00B4E6', dark: '#0094C2', text: '#fff', href: '#learn-math', course: 'math',
+      items: (window.MATH_UNITS || []).map((u) => ({ title: u.title, color: u.color })) }
   ];
+  EX_ICON.sigma = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5H6l7 7-7 7h12"/></svg>';
   EX_ICON.flask = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10" /></svg>';
   EX_ICON.leaf = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M5 19C5 10 11 4 20 4c0 9-6 15-15 15z"/><path d="M5 19 13 11"/></svg>';
   EX_ICON.atom = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/></svg>';
   const doneIn = (c) => COURSES[c].lessons.filter((l) => isDone(l.id)).length;
 
   /* ---------- Characters (img/chars/c1..c8.png) ---------- */
+  // n = image number (img/chars/c<n>.png). The pink-shirt girl (6) and the chef (7) were removed.
   const CHARS = [
-    { th: 'นักอ่าน', bg: '#A570FF' }, { th: 'นักผจญภัย', bg: '#FFC800' }, { th: 'สายเทค', bg: '#FF4B9B' }, { th: 'คนรักดนตรี', bg: '#00C2D1' },
-    { th: 'นักคิด', bg: '#FF9600' }, { th: 'เพื่อนใจดี', bg: '#FF86D0' }, { th: 'เชฟ', bg: '#FF4B4B' }, { th: 'นักปลูก', bg: '#1CB0F6' }
+    { n: 1, th: 'นักอ่าน', bg: '#A570FF' }, { n: 2, th: 'นักผจญภัย', bg: '#FFC800' }, { n: 3, th: 'สายเทค', bg: '#FF4B9B' },
+    { n: 4, th: 'คนรักดนตรี', bg: '#00C2D1' }, { n: 5, th: 'นักคิด', bg: '#FF9600' }, { n: 8, th: 'นักปลูก', bg: '#1CB0F6' }
   ];
   const charSrc = (n) => 'img/chars/c' + n + '.png';
+  const charOf = (n) => CHARS.find((c) => c.n === n) || CHARS[0];
   function myChar() {
-    if (S.avatar >= 1 && S.avatar <= 8) return S.avatar;
+    if (CHARS.some((c) => c.n === S.avatar)) return S.avatar;
     const s = user ? uname() : 'guest';
     let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
-    return (h % 8) + 1;
+    return CHARS[h % CHARS.length].n;
   }
   function setChar(n) { S.avatar = n; S.avatarAt = Date.now(); save(); }
 
@@ -516,16 +527,22 @@
     $('#hub-hello').textContent = mode ? 'โหมด ' + mode.title : (user ? 'สวัสดี ' + uname() : 'สวัสดีผู้เยี่ยมชม');
     $('#hub-title').textContent = mode ? mode.title : 'เลือกโหมดที่จะฝึก';
     const hc = $('#hub-char');
-    if (hc) { hc.src = charSrc(myChar()); hc.alt = T(CHARS[myChar() - 1].th); }
+    if (hc) { hc.src = charSrc(myChar()); hc.alt = T(charOf(myChar()).th); }
     $('#exam-grid').classList.toggle('modes', !mode);
     if (!mode) {
-      $('#exam-grid').innerHTML = MODES.map((m) =>
+      $('#exam-grid').innerHTML = MODES.filter((m) => COURSES[m.course].units.length).map((m) =>
         '<a class="exam-card mode-card" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '">' +
           '<span class="mc-deco">' + EX_ICON[m.icon] + '</span>' +
           '<span class="mc-top"><span class="mc-ico">' + EX_ICON[m.icon] + '</span>' +
             '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
+          // Numbers on the card: topics (units), questions, lessons passed
+          '<span class="mc-nums">' +
+            '<span><b>' + COURSES[m.course].units.length + '</b><i>' + T('เรื่อง') + '</i></span>' +
+            '<span><b>' + nfmt(COURSES[m.course].lessons.reduce((s, l) => s + l.questions.length, 0)) + '</b><i>' + T('ข้อ') + '</i></span>' +
+            (m.id === 'pilot' ? '<span><b>' + (EXAMS.length - 1) + '</b><i>' + T('แบบทดสอบ') + '</i></span>' : '') +
+          '</span>' +
           '<span class="mc-foot"><span class="mc-meta">' +
-            m.items.length + ' ' + T('บท') + ' · ' + T('บทเรียนผ่าน') + ' ' + doneIn(m.course) + '/' + COURSES[m.course].lessons.length + '</span>' +
+            T('บทเรียนผ่าน') + ' ' + doneIn(m.course) + '/' + COURSES[m.course].lessons.length + '</span>' +
           '</span></a>').join('');
       return;
     }
@@ -642,7 +659,8 @@
     const units = '<h4 class="course-h">Pilot</h4>' + unitRows(COURSES.pilot.units) +
       '<h4 class="course-h">ฟิสิกส์ ม.ปลาย</h4>' + unitRows(COURSES.physics.units) +
       '<h4 class="course-h">เคมี ม.ปลาย</h4>' + unitRows(COURSES.chem.units) +
-      '<h4 class="course-h">ชีววิทยา ม.ปลาย</h4>' + unitRows(COURSES.bio.units);
+      '<h4 class="course-h">ชีววิทยา ม.ปลาย</h4>' + unitRows(COURSES.bio.units) +
+      '<h4 class="course-h">คณิตศาสตร์ ม.ปลาย</h4>' + unitRows(COURSES.math.units);
     // Accuracy by difficulty (one bar per level, value written next to it)
     const diffRows = [1, 2, 3].map((k) => {
       const x = (S.diff || {})[k] || { a: 0, c: 0 };
@@ -674,13 +692,13 @@
   function renderProfile() {
     const name = user ? uname() : T('ผู้เยี่ยมชม');
     $('#profile-body').innerHTML =
-      '<div class="profile-card"><span class="avatar char" style="--bg:' + CHARS[myChar() - 1].bg + '"><img src="' + charSrc(myChar()) + '" alt=""></span>' +
+      '<div class="profile-card"><span class="avatar char" style="--bg:' + charOf(myChar()).bg + '"><img src="' + charSrc(myChar()) + '" alt=""></span>' +
         '<div><h1>' + esc(name) + '</h1><p>' + (user ? esc(user.email || '') : 'ยังไม่ได้เข้าสู่ระบบ ความคืบหน้าเก็บในเครื่องนี้') + '</p>' +
         (isAdmin ? '<span class="role-badge">Super admin</span>' : '') + '</div></div>' +
       (isAdmin ? '<button class="admin-entry" id="open-mgmt"><span class="ae-ico">' + TAB_ICON.stats + '</span><span><b>Management</b><i>จัดการผู้ใช้และดูภาพรวมระบบ</i></span><span class="ae-go">เปิด</span></button>' : '') +
       '<div class="card"><h3>เลือกตัวละคร</h3><div class="char-grid">' +
-        CHARS.map((c, i) => '<button type="button" class="char-pick' + (myChar() === i + 1 ? ' on' : '') + '" data-char="' + (i + 1) + '" style="--bg:' + c.bg + '">' +
-          '<img src="' + charSrc(i + 1) + '" alt="" loading="lazy"></button>').join('') +
+        CHARS.map((c) => '<button type="button" class="char-pick' + (myChar() === c.n ? ' on' : '') + '" data-char="' + c.n + '" style="--bg:' + c.bg + '">' +
+          '<img src="' + charSrc(c.n) + '" alt="" loading="lazy"></button>').join('') +
       '</div></div>' +
       '<div class="card"><h3>ตั้งค่า</h3>' +
         '<label class="switch"><input type="checkbox" id="snd2"' + (S.sound ? ' checked' : '') + '> เสียงเอฟเฟกต์</label>' +
@@ -759,7 +777,7 @@
   };
 
   /* ---------- Router: bottom tab bar ---------- */
-  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
+  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
     if (location.hash === '#pilot') history.replaceState(null, '', location.pathname + location.search + '#learn');   // old Pilot page → Pilot lessons
@@ -775,7 +793,7 @@
     if (aptOpen) { aptOpen = null; if (window.APT) APT.stop(); }
     const page = PAGES[location.hash] || 'hub';
     const sub = location.hash === '#pilot' ? 'pilot' : null;
-    if (page === 'learn') setCourse({ '#learn-physics': 'physics', '#learn-chem': 'chem', '#learn-bio': 'bio' }[location.hash] || 'pilot');
+    if (page === 'learn') setCourse({ '#learn-physics': 'physics', '#learn-chem': 'chem', '#learn-bio': 'bio', '#learn-math': 'math' }[location.hash] || 'pilot');
     show('home');
     ['hub', 'learn', 'practice', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
     // Back arrow: Pilot lessons → Pilot page, physics lessons / Pilot page → mode picker

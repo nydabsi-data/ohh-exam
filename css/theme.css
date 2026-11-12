@@ -243,7 +243,7 @@ body {
 @media (max-width: 480px) { .hub-head { padding-right: 128px; min-height: 128px; } .hub-char { height: 108px; right: 8px; } }
 .avatar.char { background: color-mix(in srgb, var(--bg) 22%, #fff); border: 3px solid var(--bg); overflow: hidden; align-items: end; }
 .avatar.char img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
-.char-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .char-pick { display: grid; justify-items: center; gap: 4px; padding: 8px; border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 16px; background: #fff; cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; color: var(--muted); transition: transform .12s; }
 .char-pick img { width: 100%; max-width: 92px; aspect-ratio: 1; object-fit: contain; border-radius: 12px; background: color-mix(in srgb, var(--bg) 16%, #fff); }
 .char-pick:hover { transform: translateY(-2px); }
@@ -264,3 +264,9 @@ body {
 @media (max-width: 480px) { .tabbar a img { width: 36px; height: 36px; } }
 .lesson-card.exam-lc { text-decoration: none; color: inherit; }
 
+
+/* Home cards: topic / question counts as big numbers */
+.mode-card .mc-nums { position: relative; display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+.mode-card .mc-nums span { display: inline-flex; align-items: baseline; gap: 5px; padding: 6px 12px; border-radius: 12px; background: rgba(255,255,255,.22); }
+.mode-card .mc-nums b { font-size: 24px; font-weight: 800; line-height: 1; letter-spacing: -.3px; }
+.mode-card .mc-nums i { font-style: normal; font-size: 13px; font-weight: 700; opacity: .95; }

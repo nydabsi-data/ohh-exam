@@ -31,7 +31,7 @@
   .missions > :not(.mission) { grid-column: 1 / -1; }
   .pr-tiles { grid-template-columns: repeat(3, 1fr); }
   .pr-tile { flex-direction: column; align-items: flex-start; }
-  .char-grid { grid-template-columns: repeat(8, 1fr); }
+  .char-grid { grid-template-columns: repeat(6, 1fr); }
   .xpchart { height: 220px; }
 
   /* Lesson screen */
