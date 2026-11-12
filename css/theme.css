@@ -84,6 +84,20 @@ body {
 .mode-card .mc-meta { font-size: 13px; font-weight: 600; opacity: .95; }
 .mode-card .mc-go { flex: none; background: #fff; color: var(--d); font-weight: 800; font-size: 14px; padding: 9px 18px; border-radius: 12px; box-shadow: 0 3px 0 rgba(0,0,0,.12); }
 
+/* Difficulty chips: easy = sky, medium = orange, hard = red (no green) */
+.diff { display: inline-block; vertical-align: middle; font-size: 11px; font-weight: 800; letter-spacing: .3px; padding: 2px 8px; border-radius: 999px; line-height: 1.5; }
+.diff.d1 { background: #E3F6FF; color: #1474B5; }
+.diff.d2 { background: #FFF0D6; color: #C26A00; }
+.diff.d3 { background: #FFE5E5; color: #D33131; }
+.q-kind .diff { margin-left: 6px; }
+.node-label .diff { display: table; margin: 6px auto 0; }
+.diff-bar.d1 > span { background: linear-gradient(90deg, #1CB0F6, #7FD6FF); }
+.diff-bar.d2 > span { background: linear-gradient(90deg, #FF9600, #FFC15E); }
+.diff-bar.d3 > span { background: linear-gradient(90deg, #FF4B4B, #FF8A8A); }
+.course-h { margin: 18px 0 10px; font-size: 13px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+.course-h:first-of-type { margin-top: 4px; }
+.chip-ico b { font-size: 14px; font-weight: 800; line-height: 1; }
+
 /* TH / EN switch */
 .lang-sw { display: inline-flex; background: var(--soft); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 2px; }
 .lang-sw button { border: 0; background: none; padding: 5px 9px; border-radius: 7px; font-size: 12px; font-weight: 800; color: var(--muted); letter-spacing: .3px; }

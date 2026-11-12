@@ -31,9 +31,22 @@
   };
 
   /* ---------- Data ---------- */
-  const UNITS = window.UNITS || [];
-  const LESSONS = [];
-  UNITS.forEach((u) => u.lessons.forEach((l) => LESSONS.push(Object.assign({}, l, { unit: u }))));
+  // Courses: each has its own learning path. UNITS / LESSONS point at the course being viewed.
+  const flatten = (units) => { const out = []; units.forEach((u) => u.lessons.forEach((l) => out.push(Object.assign({}, l, { unit: u })))); return out; };
+  const COURSES = {
+    pilot:   { units: window.UNITS || [], hash: '#learn', back: '#pilot', note: true },
+    physics: { units: window.PHYSICS_UNITS || [], hash: '#learn-physics', back: '#exams' }
+  };
+  Object.values(COURSES).forEach((c) => { c.lessons = flatten(c.units); });
+  const ALL_LESSONS = [].concat(...Object.values(COURSES).map((c) => c.lessons));
+  let course = 'pilot', UNITS = COURSES.pilot.units, LESSONS = COURSES.pilot.lessons;
+  function setCourse(c) { course = COURSES[c] ? c : 'pilot'; UNITS = COURSES[course].units; LESSONS = COURSES[course].lessons; }
+
+  // Difficulty: 1 easy / 2 medium / 3 hard. Harder questions give more XP.
+  const DIFF = { 1: { th: 'ง่าย', xp: 10 }, 2: { th: 'ปานกลาง', xp: 15 }, 3: { th: 'ยาก', xp: 20 } };
+  const qDiff = (q) => q.d || (q.type === 'mc' ? 2 : 1);
+  const lessonDiff = (l) => Math.round(l.questions.reduce((s, q) => s + qDiff(q), 0) / l.questions.length);
+  const diffChip = (d) => '<span class="diff d' + d + '">' + DIFF[d].th + '</span>';
 
   /* ---------- State ---------- */
   const dayKey = (d) => { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
@@ -78,6 +91,11 @@
     if (b.hearts < a.hearts) { out.hearts = b.hearts; out.heartsAt = b.heartsAt; }
     out.hist = Object.assign({}, b.hist);
     for (const d in (a.hist || {})) out.hist[d] = Math.max(a.hist[d], out.hist[d] || 0);
+    out.diff = {};
+    [1, 2, 3].forEach((k) => {
+      const x = (a.diff || {})[k] || { a: 0, c: 0 }, y = (b.diff || {})[k] || { a: 0, c: 0 };
+      out.diff[k] = x.a >= y.a ? x : y;
+    });
     out.answered = Math.max(a.answered || 0, b.answered || 0);
     out.correctTotal = Math.max(a.correctTotal || 0, b.correctTotal || 0);
     const da = a.daily || freshDaily(), db = b.daily || freshDaily();
@@ -177,7 +195,7 @@
         html += '<div class="node-wrap" style="transform:translateX(' + OFFSETS[li % OFFSETS.length] + 'px)">' +
           (st === 'current' ? '<div class="start-tip">เริ่ม</div>' : '') +
           '<button class="node ' + st + '" data-i="' + i + '" aria-label="' + esc(l.title) + '">' + ico + '</button>' +
-          '<div class="node-label">' + esc(l.title) + '</div></div>';
+          '<div class="node-label">' + esc(l.title) + diffChip(lessonDiff(l)) + '</div></div>';
         i++;
       });
       html += '</div></section>';
@@ -205,7 +223,8 @@
       '<div class="card"><h3>ตั้งค่า</h3>' +
         '<label class="switch"><input type="checkbox" id="snd"' + (S.sound ? ' checked' : '') + '> เสียงเอฟเฟกต์</label>' +
         '<button class="linkbtn" id="reset">ล้างความคืบหน้าทั้งหมด</button></div>' +
-      '<p class="note">คำถามชุดนี้เป็นตัวอย่างสำหรับทดสอบระบบ ควรตรวจกับตำราและข้อกำหนดของ CAAT / ICAO ก่อนใช้งานจริง</p>';
+      (COURSES[course].note ? '<p class="note">คำถามชุดนี้เป็นตัวอย่างสำหรับทดสอบระบบ ควรตรวจกับตำราและข้อกำหนดของ CAAT / ICAO ก่อนใช้งานจริง</p>' : '') +
+      '<p class="note">ระดับความยาก: ง่าย +10 XP · ปานกลาง +15 XP · ยาก +20 XP ต่อข้อ</p>';
   }
 
   /* ---------- Lesson ---------- */
@@ -237,7 +256,7 @@
       kind = 'จับคู่ให้ถูกต้อง';
       const left = shuffle(q.pairs.map((p, k) => ({ t: p[0], k })));
       const right = shuffle(q.pairs.map((p, k) => ({ t: p[1], k })));
-      const col = (arr, side) => '<div class="col">' + arr.map((x) => '<button class="opt" data-side="' + side + '" data-k="' + x.k + '">' + esc(x.t) + '</button>').join('') + '</div>';
+      const col = (arr, side) => '<div class="col">' + arr.map((x) => '<button class="opt no-i18n" data-side="' + side + '" data-k="' + x.k + '">' + esc(x.t) + '</button>').join('') + '</div>';
       body = '<div class="match">' + col(left, 'l') + col(right, 'r') + '</div>';
       L.matched = 0;
     } else {
@@ -245,9 +264,10 @@
       L.opts = q.type === 'tf'
         ? [{ t: 'True — จริง', c: q.a === true }, { t: 'False — ไม่จริง', c: q.a === false }]
         : shuffle(q.o.map((t, j) => ({ t, c: j === q.a })));
-      body = '<div class="opts">' + L.opts.map((o, j) => '<button class="opt" data-j="' + j + '"><span class="k">' + (j + 1) + '</span><span>' + esc(o.t) + '</span></button>').join('') + '</div>';
+      body = '<div class="opts">' + L.opts.map((o, j) => '<button class="opt" data-j="' + j + '"><span class="k">' + (j + 1) + '</span><span' + (q.type === 'tf' ? '' : ' class="no-i18n"') + '>' + esc(o.t) + '</span></button>').join('') + '</div>';
     }
-    $('#qbox').innerHTML = '<div class="q-kind">' + kind + '</div><h1 class="q-title">' + esc(q.q) + '</h1>' + body;
+    // Question text and answer options are content, not UI: the TH/EN switch leaves them as written.
+    $('#qbox').innerHTML = '<div class="q-kind">' + kind + ' ' + diffChip(qDiff(q)) + '</div><h1 class="q-title no-i18n">' + esc(q.q) + '</h1>' + body;
   }
 
   function pickOption(j) {
@@ -284,9 +304,13 @@
         if (L.opts[j].c) b.classList.add('right'); else if (j === L.sel) b.classList.add('wrong');
       });
     }
-    if (ok) { L.correct++; L.xp += XP_PER_Q; } else { L.wrong++; loseHeart(); }
+    const d = qDiff(L.q);
+    if (ok) { L.correct++; L.xp += DIFF[d].xp; } else { L.wrong++; loseHeart(); }
     S.answered = (S.answered || 0) + 1;
     if (ok) { S.correctTotal = (S.correctTotal || 0) + 1; S.daily.correct++; }
+    S.diff = S.diff || {};
+    S.diff[d] = S.diff[d] || { a: 0, c: 0 };
+    S.diff[d].a++; if (ok) S.diff[d].c++;
     tone(ok); renderStats();
     $('#prog').style.width = (L.correct / L.total) * 100 + '%';
 
@@ -294,7 +318,7 @@
     $('#foot').className = 'foot ' + (ok ? 'ok' : 'bad');
     $('#fb').innerHTML =
       '<div class="fb-head"><span class="ico">' + (ok ? ICON.check : ICON.x) + '</span><h4>' + (ok ? pick(PRAISE) : 'ยังไม่ถูก') + '</h4></div>' +
-      (ans ? '<p><b>คำตอบที่ถูก:</b> ' + esc(ans) + '</p>' : '') +
+      (ans ? '<p><b>คำตอบที่ถูก:</b> ' + (L.q.type === 'tf' ? esc(ans) : '<span class="no-i18n">' + esc(ans) + '</span>') + '</p>' : '') +
       (L.q.ex ? '<p class="no-i18n">' + esc(L.q.ex) + '</p>' : '');
     setCheck('ไปต่อ', true);
     $('#check').focus();
@@ -371,11 +395,15 @@
 
   // Modes on the home page. Each mode groups its own exam cards (only "Pilot" for now).
   const MODES = [
-    { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#pilot', items: EXAMS }
+    { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#pilot', items: EXAMS, course: 'pilot' },
+    { id: 'physics', title: 'ฟิสิกส์ ม.ปลาย', th: 'กลศาสตร์ คลื่น ไฟฟ้า และฟิสิกส์ยุคใหม่', icon: 'atom', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#learn-physics', course: 'physics',
+      items: (window.PHYSICS_UNITS || []).map((u) => ({ title: u.title, color: u.color, sym: u.sym })) }
   ];
+  EX_ICON.atom = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/></svg>';
+  const doneIn = (c) => COURSES[c].lessons.filter((l) => isDone(l.id)).length;
 
   function renderHub(sub) {
-    const doneN = LESSONS.filter((l) => isDone(l.id)).length;
+    const doneN = doneIn('pilot');
     const mode = sub && MODES.find((m) => m.id === sub);
     $('#hub-hello').textContent = mode ? 'โหมด ' + mode.title : (user ? 'สวัสดี ' + uname() : 'สวัสดีผู้เยี่ยมชม');
     $('#hub-title').textContent = mode ? mode.title : 'เลือกโหมดที่จะฝึก';
@@ -386,14 +414,15 @@
           '<span class="mc-deco">' + EX_ICON[m.icon] + '</span>' +
           '<span class="mc-top"><span class="mc-ico">' + EX_ICON[m.icon] + '</span>' +
             '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
-          '<span class="mode-chips">' + m.items.map((x) => '<span class="chip-ico" title="' + esc(x.title) + '" style="--c:' + x.color + '">' + EX_ICON[x.icon] + '</span>').join('') + '</span>' +
-          '<span class="mc-foot"><span class="mc-meta">' + m.items.length + ' ' + T('ชุดข้อสอบ') + ' · ' + T('บทเรียนผ่าน') + ' ' + doneN + '/' + LESSONS.length + '</span>' +
+          '<span class="mode-chips">' + m.items.map((x) => '<span class="chip-ico" title="' + esc(x.title) + '" style="--c:' + x.color + '">' + (x.icon ? EX_ICON[x.icon] : '<b>' + esc(x.sym) + '</b>') + '</span>').join('') + '</span>' +
+          '<span class="mc-foot"><span class="mc-meta">' +
+            (m.id === 'pilot' ? m.items.length + ' ' + T('ชุดข้อสอบ') : m.items.length + ' ' + T('บท')) + ' · ' + T('บทเรียนผ่าน') + ' ' + doneIn(m.course) + '/' + COURSES[m.course].lessons.length + '</span>' +
           '<span class="mc-go">' + T('เข้า') + '</span></span></a>').join('');
       return;
     }
     $('#exam-grid').innerHTML = mode.items.map((x) => {
       const extra = x.id === 'learn'
-        ? '<span class="ex-prog"><span class="bar"><span style="width:' + (doneN / LESSONS.length) * 100 + '%"></span></span><b>' + doneN + '/' + LESSONS.length + '</b></span>'
+        ? '<span class="ex-prog"><span class="bar"><span style="width:' + (doneN / COURSES.pilot.lessons.length) * 100 + '%"></span></span><b>' + doneN + '/' + COURSES.pilot.lessons.length + '</b></span>'
         : '';
       return '<a class="exam-card" href="' + x.href + '" style="--c:' + x.color + ';--d:' + x.dark + ';--t:' + x.text + '">' +
         '<span class="ex-ico">' + EX_ICON[x.icon] + '</span>' +
@@ -439,7 +468,7 @@
 
   /* ---------- Score & performance (tab 3) ---------- */
   function renderPerf() {
-    const doneN = LESSONS.filter((l) => isDone(l.id)).length;
+    const doneN = ALL_LESSONS.filter((l) => isDone(l.id)).length;
     const acc = S.answered ? Math.round((S.correctTotal / S.answered) * 100) : null;
     const days = [];
     for (let k = 6; k >= 0; k--) { const d = new Date(); d.setDate(d.getDate() - k); days.push(d); }
@@ -448,12 +477,21 @@
     const bars = days.map((d, k) =>
       '<div class="col"><div class="track"><span class="v" style="height:' + (vals[k] / max) * 100 + '%" data-tip="' + vals[k] + ' XP"></span></div>' +
       '<i class="' + (k === 6 ? 'today' : '') + '">' + WD[d.getDay()] + '</i></div>').join('');
-    const units = UNITS.map((u) => {
+    const unitRows = (units) => units.map((u) => {
       const ls = u.lessons.filter((l) => isDone(l.id));
       const best = ls.length ? Math.round(ls.reduce((s, l) => s + S.done[l.id].best, 0) / ls.length) : 0;
       const pct = (ls.length / u.lessons.length) * 100;
       return '<div class="mrow"><div class="mrow-top"><b>' + esc(u.title) + '</b><span>' + ls.length + '/' + u.lessons.length + ' บท' + (ls.length ? ' · แม่นยำ ' + best + '%' : '') + '</span></div>' +
         '<div class="bar"><span style="width:' + pct + '%"></span></div></div>';
+    }).join('');
+    const units = '<h4 class="course-h">Pilot</h4>' + unitRows(COURSES.pilot.units) +
+      '<h4 class="course-h">ฟิสิกส์ ม.ปลาย</h4>' + unitRows(COURSES.physics.units);
+    // Accuracy by difficulty (one bar per level, value written next to it)
+    const diffRows = [1, 2, 3].map((k) => {
+      const x = (S.diff || {})[k] || { a: 0, c: 0 };
+      const p = x.a ? Math.round((x.c / x.a) * 100) : 0;
+      return '<div class="mrow"><div class="mrow-top"><b>' + diffChip(k) + '</b><span>' + (x.a ? p + '% · ' + x.c + '/' + x.a : '–') + '</span></div>' +
+        '<div class="bar diff-bar d' + k + '"><span style="width:' + p + '%"></span></div></div>';
     }).join('');
     const week = vals.reduce((a, b) => a + b, 0);
     $('#perf-body').innerHTML =
@@ -462,9 +500,10 @@
         '<div class="kpi"><span>XP สะสม</span><b>' + S.xp + '</b></div>' +
         '<div class="kpi"><span>ความแม่นยำ</span><b>' + (acc == null ? '–' : acc + '%') + '</b></div>' +
         '<div class="kpi"><span>เรียนต่อเนื่อง</span><b>' + S.streak + ' <small>วัน</small></b></div>' +
-        '<div class="kpi"><span>บทเรียนที่ผ่าน</span><b>' + doneN + '<small>/' + LESSONS.length + '</small></b></div>' +
+        '<div class="kpi"><span>บทเรียนที่ผ่าน</span><b>' + doneN + '<small>/' + ALL_LESSONS.length + '</small></b></div>' +
       '</div>' +
       '<div class="card"><div class="card-head"><h3>XP 7 วันล่าสุด</h3><span>รวม ' + week + ' XP</span></div><div class="xpchart" role="img" aria-label="XP 7 วันล่าสุด: ' + vals.join(', ') + '">' + bars + '</div></div>' +
+      '<div class="card"><div class="card-head"><h3>ความแม่นยำตามระดับความยาก</h3><span>ง่าย 10 · ปานกลาง 15 · ยาก 20 XP</span></div>' + diffRows + '</div>' +
       '<div class="card"><h3>ความคืบหน้ารายวิชา</h3>' + units + '</div>' +
       '<p class="note">คะแนนจากแบบทดสอบ 6 ชุด (Series Number, Math ฯลฯ) จะแสดงที่นี่ในขั้นถัดไป</p>';
   }
@@ -536,16 +575,17 @@
   }
 
   /* ---------- Router: bottom tab bar ---------- */
-  const PAGES = { '#learn': 'learn', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
+  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
     const page = PAGES[location.hash] || 'hub';
     const sub = location.hash === '#pilot' ? 'pilot' : null;
+    if (page === 'learn') setCourse(location.hash === '#learn-physics' ? 'physics' : 'pilot');
     show('home');
     ['hub', 'learn', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
-    // Back arrow: lesson path → Pilot, Pilot → mode picker
+    // Back arrow: Pilot lessons → Pilot page, physics lessons / Pilot page → mode picker
     $('#to-hub').classList.toggle('hidden', !(page === 'learn' || sub));
-    $('#to-hub').setAttribute('href', page === 'learn' ? '#pilot' : '#exams');
+    $('#to-hub').setAttribute('href', page === 'learn' ? COURSES[course].back : '#exams');
     const tab = page === 'learn' || page === 'hub' ? 'home' : page;
     $$('#tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.tab === tab));
     sync(); renderStats();

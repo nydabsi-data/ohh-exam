@@ -92,8 +92,15 @@
     'ใช้งานล่าสุด': 'Last active', 'วัน': 'days', 'ชุดข้อสอบ': 'exam sets', 'บทเรียนผ่าน': 'Lessons passed',
     'อา': 'Sun', 'จ': 'Mon', 'อ': 'Tue', 'พ': 'Wed', 'พฤ': 'Thu', 'ศ': 'Fri', 'ส': 'Sat',
     'หลักการบิน': 'Principles of Flight', 'อุตุนิยมวิทยา': 'Meteorology', 'การเดินอากาศ': 'Navigation',
-    'กฎหมายการบิน': 'Air Law', 'ระบบอากาศยานและเครื่องวัด': 'Aircraft & Instruments', 'วิทยุสื่อสารและปัจจัยมนุษย์': 'Radio & Human Factors'
+    'กฎหมายการบิน': 'Air Law', 'ระบบอากาศยานและเครื่องวัด': 'Aircraft & Instruments', 'วิทยุสื่อสารและปัจจัยมนุษย์': 'Radio & Human Factors',
+    'ง่าย': 'Easy', 'ปานกลาง': 'Medium', 'ยาก': 'Hard', 'บท': 'chapters',
+    'ความแม่นยำตามระดับความยาก': 'Accuracy by difficulty',
+    'ง่าย 10 · ปานกลาง 15 · ยาก 20 XP': 'Easy 10 · Medium 15 · Hard 20 XP',
+    'ระดับความยาก: ง่าย +10 XP · ปานกลาง +15 XP · ยาก +20 XP ต่อข้อ': 'Difficulty: Easy +10 XP · Medium +15 XP · Hard +20 XP per question'
   };
+  // Extra names registered by data files (e.g. physics units and lessons).
+  const EXTRA = window.I18N_EXTRA || {};
+  Object.assign(EXACT, EXTRA);
 
   // Whole-string patterns for sentences with values inside.
   const FULL = [
@@ -106,17 +113,17 @@
     [/^ได้รับ \+(\d+) XP$/, '+$1 XP received']
   ];
   // Phrase replacements for mixed strings (longest first), then number + unit patterns.
-  const PHRASES = Object.entries({
+  const PHRASES = Object.entries(Object.assign({}, EXTRA, {
     'ภารกิจประจำวัน': 'Daily missions', 'รีเซ็ตในอีก': 'resets in', 'เรียนต่อเนื่อง': 'Streak', 'ต่อเนื่อง': 'Streak',
     'สำเร็จ': 'Done', 'ชุดข้อสอบ': 'exam sets', 'บทเรียนผ่าน': 'Lessons passed', 'แม่นยำ': 'accuracy', 'รวม': 'Total',
     'เปลี่ยนสิทธิ์ไม่ได้:': 'Could not change role:', 'โหลดข้อมูลไม่ได้:': 'Could not load data:',
     'ระบบอากาศยานและเครื่องวัด': 'Aircraft & Instruments', 'วิทยุสื่อสารและปัจจัยมนุษย์': 'Radio & Human Factors',
     'หลักการบิน': 'Principles of Flight', 'อุตุนิยมวิทยา': 'Meteorology', 'การเดินอากาศ': 'Navigation', 'กฎหมายการบิน': 'Air Law'
-  }).sort((a, b) => b[0].length - a[0].length);
+  })).sort((a, b) => b[0].length - a[0].length);
   const UNITS = [
     [/(\d+)\/(\d+) บท/g, '$1/$2 lessons'], [/(\d+) ชม\./g, '$1 h'], [/(\d+) วัน/g, '$1 days'],
     [/(\d+) ข้อ/g, '$1 Qs'], [/(\d+) วินาที/g, '$1 sec'], [/(\d+) นาที/g, '$1 min'],
-    [/(\d+) วิชา/g, '$1 subjects'], [/(\d+) ชุด/g, '$1 sets'], [/\+1 ใน (\d+) min/g, '+1 in $1 min']
+    [/(\d+) วิชา/g, '$1 subjects'], [/(\d+) ชุด/g, '$1 sets'], [/(\d+) บท/g, '$1 chapters'], [/\+1 ใน (\d+) min/g, '+1 in $1 min']
   ];
   const THAI = /[฀-๿]/;
 
