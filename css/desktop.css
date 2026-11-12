@@ -1,0 +1,52 @@
+/* Ohh-Exam — PC / MacBook sizing (≥ 1024 px wide).
+   Phones and tablets keep the existing layout (the base for the future iPhone app). */
+@media (min-width: 1024px) {
+  .topbar-in, .hub, .home { max-width: 1200px; padding-left: 32px; padding-right: 32px; }
+  .topbar-in { padding-top: 12px; padding-bottom: 12px; }
+  .brand img { width: 42px; height: 42px; }
+  .brand { font-size: 22px; }
+
+  /* Home (mode picker) */
+  .hub { padding-top: 36px; }
+  .hub-head { padding: 36px 260px 38px 40px; min-height: 190px; border-radius: 28px; margin-bottom: 28px; }
+  .hub-head h1 { font-size: 38px; }
+  .hub-hello { font-size: 17px; }
+  .hub-char { height: 182px; right: 40px; }
+  .exam-grid { gap: 22px; grid-template-columns: repeat(3, 1fr); }
+  .exam-grid.modes { grid-template-columns: repeat(3, 1fr); }
+  .mode-card .mc-title { font-size: 30px; }
+  .mode-card .mc-sub, .mode-card .mc-meta { font-size: 14px; }
+  .mode-card .mc-ico { width: 60px; height: 60px; }
+  .mode-card .mc-ico svg { width: 34px; height: 34px; }
+
+  /* Learning path: wider column + bigger lesson cards */
+  .home { grid-template-columns: minmax(0, 1fr) 360px; gap: 36px; padding-top: 32px; }
+  .lesson-card { flex-basis: 230px; min-height: 240px; }
+
+  /* Tab pages */
+  .page { max-width: 1000px; padding: 36px 32px 48px; }
+  .page-banner { padding: 30px 34px; }
+  .page-banner h1 { font-size: 34px; }
+  .missions { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .missions > :not(.mission) { grid-column: 1 / -1; }
+  .pr-tiles { grid-template-columns: repeat(3, 1fr); }
+  .pr-tile { flex-direction: column; align-items: flex-start; }
+  .char-grid { grid-template-columns: repeat(8, 1fr); }
+  .xpchart { height: 220px; }
+
+  /* Lesson screen */
+  .l-top, .foot-in { max-width: 1100px; padding-left: 32px; padding-right: 32px; }
+  .l-body { max-width: 760px; }
+  .q-title { font-size: 26px; }
+
+  /* Bottom bar: a touch roomier */
+  .tabbar { width: 680px; }
+  #home-view { padding-bottom: 130px; }
+}
+
+/* Large MacBook / desktop screens */
+@media (min-width: 1440px) {
+  .topbar-in, .hub, .home { max-width: 1320px; }
+  .page { max-width: 1080px; }
+  .lesson-card { flex-basis: 240px; }
+}
