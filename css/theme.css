@@ -62,6 +62,15 @@ body {
 .exam-card:hover .ex-go { background: var(--pri-grad); color: #fff; }
 .ex-ico { background: linear-gradient(140deg, color-mix(in srgb, var(--c) 70%, #fff) 0%, var(--c) 75%); }
 
+/* Mode card (home): one big card per mode, mini icons of the exams inside */
+.mode-card { grid-column: 1 / -1; padding: 22px; }
+.mode-card .ex-ico { width: 76px; height: 76px; border-radius: 22px; }
+.mode-card .ex-ico svg { width: 42px; height: 42px; }
+.mode-card .ex-title { font-size: 22px; }
+.mode-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip-ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; color: #fff; background: var(--c); }
+.chip-ico svg { width: 17px; height: 17px; }
+
 /* Bars */
 .bar > span, .ex-prog .bar > span, .m-prog .bar > span, .mrow .bar > span { background: linear-gradient(90deg, var(--sky), var(--sky-l)); }
 .goal-row .bar > span { background: linear-gradient(90deg, var(--sun), var(--sun-l)); }

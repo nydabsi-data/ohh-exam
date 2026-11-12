@@ -368,10 +368,27 @@
     { id: 'multitask', title: 'Multitask', th: 'ทำหลายอย่างพร้อมกัน', icon: 'multi', color: '#FF86D0', dark: '#E865B5', text: '#fff', href: 'exams/multitask/', meta: ['5 นาที'] }
   ];
 
-  function renderHub() {
+  // Modes on the home page. Each mode groups its own exam cards (only "Pilot" for now).
+  const MODES = [
+    { id: 'pilot', title: 'Pilot', th: 'ข้อสอบนักบิน · ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#pilot', items: EXAMS }
+  ];
+
+  function renderHub(sub) {
     const doneN = LESSONS.filter((l) => isDone(l.id)).length;
-    $('#hub-hello').textContent = user ? 'สวัสดี ' + uname() : 'สวัสดีผู้เยี่ยมชม';
-    $('#exam-grid').innerHTML = EXAMS.map((x) => {
+    const mode = sub && MODES.find((m) => m.id === sub);
+    $('#hub-hello').textContent = mode ? 'โหมด ' + mode.title : (user ? 'สวัสดี ' + uname() : 'สวัสดีผู้เยี่ยมชม');
+    $('#hub-title').textContent = mode ? mode.title + ' · ' + mode.items.length + ' ชุด' : 'เลือกโหมดที่จะฝึก';
+    if (!mode) {
+      $('#exam-grid').innerHTML = MODES.map((m) =>
+        '<a class="exam-card mode-card" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + ';--t:' + m.text + '">' +
+          '<span class="ex-ico">' + EX_ICON[m.icon] + '</span>' +
+          '<span class="ex-body"><b class="ex-title">' + esc(m.title) + '</b><span class="ex-th">' + esc(m.th) + '</span>' +
+            '<span class="mode-chips">' + m.items.map((x) => '<span class="chip-ico" title="' + esc(x.title) + '" style="--c:' + x.color + '">' + EX_ICON[x.icon] + '</span>').join('') + '</span>' +
+            '<span class="ex-meta"><i>' + m.items.length + ' ชุดข้อสอบ</i><i>บทเรียนผ่าน ' + doneN + '/' + LESSONS.length + '</i></span></span>' +
+          '<span class="ex-go">เข้า</span></a>').join('');
+      return;
+    }
+    $('#exam-grid').innerHTML = mode.items.map((x) => {
       const extra = x.id === 'learn'
         ? '<span class="ex-prog"><span class="bar"><span style="width:' + (doneN / LESSONS.length) * 100 + '%"></span></span><b>' + doneN + '/' + LESSONS.length + '</b></span>'
         : '';
@@ -520,9 +537,12 @@
   function route() {
     if (L) return;
     const page = PAGES[location.hash] || 'hub';
+    const sub = location.hash === '#pilot' ? 'pilot' : null;
     show('home');
     ['hub', 'learn', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
-    $('#to-hub').classList.toggle('hidden', page !== 'learn');
+    // Back arrow: lesson path → Pilot, Pilot → mode picker
+    $('#to-hub').classList.toggle('hidden', !(page === 'learn' || sub));
+    $('#to-hub').setAttribute('href', page === 'learn' ? '#pilot' : '#exams');
     const tab = page === 'learn' || page === 'hub' ? 'home' : page;
     $$('#tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.tab === tab));
     sync(); renderStats();
@@ -530,7 +550,7 @@
     else if (page === 'missions') renderMissions();
     else if (page === 'stats') renderPerf();
     else if (page === 'profile') renderProfile();
-    else renderHub();
+    else renderHub(sub);
     $('#tab-dot').classList.toggle('hidden', !claimable());
   }
   window.addEventListener('hashchange', () => { if (!L) route(); });
