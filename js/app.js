@@ -463,7 +463,6 @@
           '<span class="mc-deco">' + EX_ICON[m.icon] + '</span>' +
           '<span class="mc-top"><span class="mc-ico">' + EX_ICON[m.icon] + '</span>' +
             '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
-          '<span class="mode-chips">' + m.items.map((x) => '<span class="chip-ico" title="' + esc(x.title) + '" style="--c:' + x.color + '">' + (x.icon ? EX_ICON[x.icon] : '<b>' + esc(x.sym) + '</b>') + '</span>').join('') + '</span>' +
           '<span class="mc-foot"><span class="mc-meta">' +
             (m.id === 'pilot' ? m.items.length + ' ' + T('ชุดข้อสอบ') : m.items.length + ' ' + T('บท')) + ' · ' + T('บทเรียนผ่าน') + ' ' + doneIn(m.course) + '/' + COURSES[m.course].lessons.length + '</span>' +
           '</span></a>').join('');
