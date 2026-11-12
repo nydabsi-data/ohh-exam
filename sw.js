@@ -1,6 +1,6 @@
 /* Service worker: network first, cache as offline fallback. */
-const CACHE = 'ohh-exam-v30';
-const SHELL = ['./', './index.html', './login.html', './js/login.js', './js/i18n.js', './css/style.css', './css/pages.css', './css/theme.css', './css/buttons.css', './css/desktop.css', './js/aptitude.js', './css/aptitude.css', './js/app.js', './js/config.js', './data/questions.js', './data/physics.js', './data/more.js', './icon.svg', './img/logo.png', './img/clock.png', './img/tabs/home.png', './img/tabs/missions.png', './img/tabs/practice.png', './img/tabs/stats.png', './img/tabs/profile.png', './img/chars/c1.png', './img/chars/c2.png', './img/chars/c3.png', './img/chars/c4.png', './img/chars/c5.png', './img/chars/c6.png', './img/chars/c7.png', './img/chars/c8.png', './manifest.webmanifest'];
+const CACHE = 'ohh-exam-v31';
+const SHELL = ['./', './index.html', './login.html', './js/login.js', './js/i18n.js', './css/style.css', './css/pages.css', './css/theme.css', './css/buttons.css', './css/desktop.css', './js/aptitude.js', './css/aptitude.css', './js/app.js', './js/config.js', './data/questions.js', './data/physics.js', './data/more.js', './data/chemistry.js', './data/biology.js', './icon.svg', './img/logo.png', './img/clock.png', './img/tabs/home.png', './img/tabs/missions.png', './img/tabs/practice.png', './img/tabs/stats.png', './img/tabs/profile.png', './img/chars/c1.png', './img/chars/c2.png', './img/chars/c3.png', './img/chars/c4.png', './img/chars/c5.png', './img/chars/c6.png', './img/chars/c7.png', './img/chars/c8.png', './manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

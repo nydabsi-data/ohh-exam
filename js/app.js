@@ -35,7 +35,9 @@
   const flatten = (units) => { const out = []; units.forEach((u) => u.lessons.forEach((l) => out.push(Object.assign({}, l, { unit: u })))); return out; };
   const COURSES = {
     pilot:   { units: window.UNITS || [], hash: '#learn', back: '#exams', note: true },
-    physics: { units: window.PHYSICS_UNITS || [], hash: '#learn-physics', back: '#exams' }
+    physics: { units: window.PHYSICS_UNITS || [], hash: '#learn-physics', back: '#exams' },
+    chem:    { units: window.CHEM_UNITS || [], hash: '#learn-chem', back: '#exams' },
+    bio:     { units: window.BIO_UNITS || [], hash: '#learn-bio', back: '#exams' }
   };
   Object.values(COURSES).forEach((c) => { c.lessons = flatten(c.units); });
   // Every question gets a stable key "<lesson id>#<index>" so wrong answers can be practised later.
@@ -298,7 +300,7 @@
   }
   // Pilot lessons are always timed (stopwatch in the lesson top bar)
   let timerId = null;
-  const isPilotRun = () => L.les.id ? !/^phy-/.test(L.les.id) : !/^phy-/.test((L.queue[0] && L.queue[0].__key) || '');
+  const isPilotRun = () => L.les.id ? !/^(phy|chem|bio)-/.test(L.les.id) : !/^(phy|chem|bio)-/.test((L.queue[0] && L.queue[0].__key) || '');
   function startTimer(on) {
     clearInterval(timerId);
     const box = $('#l-timer');
@@ -483,8 +485,14 @@
     { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#learn', course: 'pilot',
       items: (window.UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
     { id: 'physics', title: 'ฟิสิกส์ ม.ปลาย', th: 'กลศาสตร์ คลื่น ไฟฟ้า และฟิสิกส์ยุคใหม่', icon: 'atom', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#learn-physics', course: 'physics',
-      items: (window.PHYSICS_UNITS || []).map((u) => ({ title: u.title, color: u.color, sym: u.sym })) }
+      items: (window.PHYSICS_UNITS || []).map((u) => ({ title: u.title, color: u.color, sym: u.sym })) },
+    { id: 'chem', title: 'เคมี ม.ปลาย', th: 'อะตอม พันธะ โมล กรด–เบส และอินทรีย์', icon: 'flask', color: '#FF9600', dark: '#E07F00', text: '#fff', href: '#learn-chem', course: 'chem',
+      items: (window.CHEM_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
+    { id: 'bio', title: 'ชีววิทยา ม.ปลาย', th: 'เซลล์ พันธุศาสตร์ ระบบร่างกาย พืช นิเวศ และวิวัฒนาการ', icon: 'leaf', color: '#FF4B9B', dark: '#E0307F', text: '#fff', href: '#learn-bio', course: 'bio',
+      items: (window.BIO_UNITS || []).map((u) => ({ title: u.title, color: u.color })) }
   ];
+  EX_ICON.flask = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10" /></svg>';
+  EX_ICON.leaf = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M5 19C5 10 11 4 20 4c0 9-6 15-15 15z"/><path d="M5 19 13 11"/></svg>';
   EX_ICON.atom = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/></svg>';
   const doneIn = (c) => COURSES[c].lessons.filter((l) => isDone(l.id)).length;
 
@@ -632,7 +640,9 @@
         '<div class="bar"><span style="width:' + pct + '%"></span></div></div>';
     }).join('');
     const units = '<h4 class="course-h">Pilot</h4>' + unitRows(COURSES.pilot.units) +
-      '<h4 class="course-h">ฟิสิกส์ ม.ปลาย</h4>' + unitRows(COURSES.physics.units);
+      '<h4 class="course-h">ฟิสิกส์ ม.ปลาย</h4>' + unitRows(COURSES.physics.units) +
+      '<h4 class="course-h">เคมี ม.ปลาย</h4>' + unitRows(COURSES.chem.units) +
+      '<h4 class="course-h">ชีววิทยา ม.ปลาย</h4>' + unitRows(COURSES.bio.units);
     // Accuracy by difficulty (one bar per level, value written next to it)
     const diffRows = [1, 2, 3].map((k) => {
       const x = (S.diff || {})[k] || { a: 0, c: 0 };
@@ -749,7 +759,7 @@
   };
 
   /* ---------- Router: bottom tab bar ---------- */
-  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
+  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
     if (location.hash === '#pilot') history.replaceState(null, '', location.pathname + location.search + '#learn');   // old Pilot page → Pilot lessons
@@ -765,7 +775,7 @@
     if (aptOpen) { aptOpen = null; if (window.APT) APT.stop(); }
     const page = PAGES[location.hash] || 'hub';
     const sub = location.hash === '#pilot' ? 'pilot' : null;
-    if (page === 'learn') setCourse(location.hash === '#learn-physics' ? 'physics' : 'pilot');
+    if (page === 'learn') setCourse({ '#learn-physics': 'physics', '#learn-chem': 'chem', '#learn-bio': 'bio' }[location.hash] || 'pilot');
     show('home');
     ['hub', 'learn', 'practice', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
     // Back arrow: Pilot lessons → Pilot page, physics lessons / Pilot page → mode picker
