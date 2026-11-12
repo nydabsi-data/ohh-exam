@@ -440,7 +440,7 @@
       (L.q.ex ? '<p class="no-i18n">' + esc(L.q.ex) + '</p>' : '');
     // A labelled picture for this topic (data/figs.js), shown under the question after answering
     const fig = figFor(L.q);
-    if (fig) $('#qbox').insertAdjacentHTML('beforeend', '<figure class="q-fig no-i18n"><figcaption>ภาพประกอบ: ' + fig.title + '</figcaption>' + fig.svg + '</figure>');
+    if (fig) $('#qbox').insertAdjacentHTML('beforeend', '<figure class="q-fig no-i18n"><figcaption>ภาพประกอบ: ' + fig.title + '</figcaption>' + fig.svg + figParts(fig) + '</figure>');
     setCheck('ไปต่อ', true);
     $('#check').focus();
   }
@@ -886,11 +886,12 @@
     const k = Object.keys(FIGS).find((id) => FIGS[id].course === c && FIGS[id].keys.test(text));
     return k ? FIGS[k] : null;
   }
+  const figParts = (f) => !f.parts ? '' : '<dl class="fig-parts">' + f.parts.map((p) => '<div><dt>' + esc(p[0]) + '</dt><dd>' + esc(p[1]) + '</dd></div>').join('') + '</dl>';
   function openFig(id) {
     const f = (window.FIGS || {})[id]; if (!f) return;
     const box = $('#modal-box');
     box.classList.add('wide');
-    box.innerHTML = '<button class="mx" id="mx" aria-label="ปิด">' + ICON.x + '</button><h3>' + f.title + '</h3><div class="fig-big no-i18n">' + f.svg + '</div>';
+    box.innerHTML = '<button class="mx" id="mx" aria-label="ปิด">' + ICON.x + '</button><h3>' + f.title + '</h3><div class="fig-big no-i18n">' + f.svg + figParts(f) + '</div>';
     $('#modal').classList.remove('hidden');
     modalOutside = null;
     modalGuard = () => confirm(T('ปิดภาพนี้?'));   // outside click / Esc asks first; × closes directly

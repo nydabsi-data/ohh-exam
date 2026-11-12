@@ -304,3 +304,11 @@ body {
 .mx:hover { background: var(--line); color: var(--ink); }
 .mx svg { width: 20px; height: 20px; }
 .modal-box { position: relative; }
+
+/* Picture parts: name + what it does */
+.fig-parts { display: grid; gap: 6px; margin: 12px 0 0; text-align: left; }
+@media (min-width: 640px) { .fig-parts { grid-template-columns: 1fr 1fr; } }
+.fig-parts div { background: #fff; border: 1px solid #E6DAFF; border-radius: 12px; padding: 8px 12px; }
+.fig-parts dt { font-weight: 800; font-size: 14px; color: #8549E8; }
+.fig-parts dd { margin: 2px 0 0; font-size: 13.5px; color: var(--ink); line-height: 1.45; }
+.modal-box.wide .fig-big { max-height: none; }
