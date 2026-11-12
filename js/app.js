@@ -630,7 +630,7 @@
       (isAdmin ? '<button class="admin-entry" id="open-mgmt"><span class="ae-ico">' + TAB_ICON.stats + '</span><span><b>Management</b><i>จัดการผู้ใช้และดูภาพรวมระบบ</i></span><span class="ae-go">เปิด</span></button>' : '') +
       '<div class="card"><h3>เลือกตัวละคร</h3><div class="char-grid">' +
         CHARS.map((c, i) => '<button type="button" class="char-pick' + (myChar() === i + 1 ? ' on' : '') + '" data-char="' + (i + 1) + '" style="--bg:' + c.bg + '">' +
-          '<img src="' + charSrc(i + 1) + '" alt="" loading="lazy"><span>' + c.th + '</span></button>').join('') +
+          '<img src="' + charSrc(i + 1) + '" alt="" loading="lazy"></button>').join('') +
       '</div></div>' +
       '<div class="card"><h3>ตั้งค่า</h3>' +
         '<label class="switch"><input type="checkbox" id="snd2"' + (S.sound ? ' checked' : '') + '> เสียงเอฟเฟกต์</label>' +
