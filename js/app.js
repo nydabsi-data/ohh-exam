@@ -16,6 +16,7 @@
   const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
   const fmtTime = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  const T = (s) => (window.I18N ? window.I18N.t(s) : s);   // for strings outside the DOM (confirm boxes)
 
   const ICON = {
     flame: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3.5-1.5 5-1.5 7.5 0 1.4 1 2.5 2.3 2.5 1.4 0 2.2-1 2.2-2.4 0-.7-.2-1.3-.5-1.9C17 9.4 19 12 19 15a7 7 0 0 1-14 0c0-4.6 4.2-7.6 7-13z"/></svg>',
@@ -294,7 +295,7 @@
     $('#fb').innerHTML =
       '<div class="fb-head"><span class="ico">' + (ok ? ICON.check : ICON.x) + '</span><h4>' + (ok ? pick(PRAISE) : 'ยังไม่ถูก') + '</h4></div>' +
       (ans ? '<p><b>คำตอบที่ถูก:</b> ' + esc(ans) + '</p>' : '') +
-      (L.q.ex ? '<p>' + esc(L.q.ex) + '</p>' : '');
+      (L.q.ex ? '<p class="no-i18n">' + esc(L.q.ex) + '</p>' : '');
     setCheck('ไปต่อ', true);
     $('#check').focus();
   }
@@ -370,7 +371,7 @@
 
   // Modes on the home page. Each mode groups its own exam cards (only "Pilot" for now).
   const MODES = [
-    { id: 'pilot', title: 'Pilot', th: 'ข้อสอบนักบิน · ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#pilot', items: EXAMS }
+    { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#pilot', items: EXAMS }
   ];
 
   function renderHub(sub) {
@@ -378,14 +379,16 @@
     const mode = sub && MODES.find((m) => m.id === sub);
     $('#hub-hello').textContent = mode ? 'โหมด ' + mode.title : (user ? 'สวัสดี ' + uname() : 'สวัสดีผู้เยี่ยมชม');
     $('#hub-title').textContent = mode ? mode.title + ' · ' + mode.items.length + ' ชุด' : 'เลือกโหมดที่จะฝึก';
+    $('#exam-grid').classList.toggle('modes', !mode);
     if (!mode) {
       $('#exam-grid').innerHTML = MODES.map((m) =>
-        '<a class="exam-card mode-card" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + ';--t:' + m.text + '">' +
-          '<span class="ex-ico">' + EX_ICON[m.icon] + '</span>' +
-          '<span class="ex-body"><b class="ex-title">' + esc(m.title) + '</b><span class="ex-th">' + esc(m.th) + '</span>' +
-            '<span class="mode-chips">' + m.items.map((x) => '<span class="chip-ico" title="' + esc(x.title) + '" style="--c:' + x.color + '">' + EX_ICON[x.icon] + '</span>').join('') + '</span>' +
-            '<span class="ex-meta"><i>' + m.items.length + ' ชุดข้อสอบ</i><i>บทเรียนผ่าน ' + doneN + '/' + LESSONS.length + '</i></span></span>' +
-          '<span class="ex-go">เข้า</span></a>').join('');
+        '<a class="exam-card mode-card" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '">' +
+          '<span class="mc-deco">' + EX_ICON[m.icon] + '</span>' +
+          '<span class="mc-top"><span class="mc-ico">' + EX_ICON[m.icon] + '</span>' +
+            '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
+          '<span class="mode-chips">' + m.items.map((x) => '<span class="chip-ico" title="' + esc(x.title) + '" style="--c:' + x.color + '">' + EX_ICON[x.icon] + '</span>').join('') + '</span>' +
+          '<span class="mc-foot"><span class="mc-meta">' + m.items.length + ' ' + T('ชุดข้อสอบ') + ' · ' + T('บทเรียนผ่าน') + ' ' + doneN + '/' + LESSONS.length + '</span>' +
+          '<span class="mc-go">' + T('เข้า') + '</span></span></a>').join('');
       return;
     }
     $('#exam-grid').innerHTML = mode.items.map((x) => {
@@ -469,7 +472,7 @@
   /* ---------- Profile (tab 4) ---------- */
   let isAdmin = false;
   function renderProfile() {
-    const name = user ? uname() : 'ผู้เยี่ยมชม';
+    const name = user ? uname() : T('ผู้เยี่ยมชม');
     $('#profile-body').innerHTML =
       '<div class="profile-card"><span class="avatar">' + esc(name.charAt(0).toUpperCase()) + '</span>' +
         '<div><h1>' + esc(name) + '</h1><p>' + (user ? esc(user.email || '') : 'ยังไม่ได้เข้าสู่ระบบ ความคืบหน้าเก็บในเครื่องนี้') + '</p>' +
@@ -491,7 +494,7 @@
       '<div id="mg-body" class="mg-body"><p class="note">กำลังโหลด...</p></div>';
     $('#modal').classList.remove('hidden');
     modalOutside = null;
-    modalGuard = () => confirm('ออกจากหน้า Management?');
+    modalGuard = () => confirm(T('ออกจากหน้า Management?'));
     $('#mx').onclick = closeModal;
     const { data, error } = await sb.rpc('admin_list_users');
     if (error) {
@@ -499,7 +502,7 @@
       return;
     }
     const users = data || [];
-    const fmt = (t) => t ? new Date(t).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '–';
+    const fmt = (t) => t ? new Date(t).toLocaleDateString(window.I18N && window.I18N.lang === 'en' ? 'en-GB' : 'th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '–';
     const today = dayKey();
     const views = {
       users: () => '<div class="mg-table-wrap"><table class="mg-table"><thead><tr><th>ผู้ใช้</th><th>XP</th><th>สมัครเมื่อ</th><th>ใช้งานล่าสุด</th><th>สิทธิ์</th></tr></thead><tbody>' +
@@ -554,6 +557,7 @@
     $('#tab-dot').classList.toggle('hidden', !claimable());
   }
   window.addEventListener('hashchange', () => { if (!L) route(); });
+  window.addEventListener('langchange', () => { if (!L) route(); });
 
   $('#mission-list').addEventListener('click', (e) => {
     const b = e.target.closest('.m-claim'); if (!b || b.disabled) return;
