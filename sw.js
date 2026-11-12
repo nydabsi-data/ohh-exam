@@ -1,6 +1,6 @@
 /* Service worker: network first, cache as offline fallback. */
-const CACHE = 'ohh-exam-v2';
-const SHELL = ['./', './index.html', './css/style.css', './js/app.js', './js/config.js', './data/questions.js', './icon.svg', './manifest.webmanifest'];
+const CACHE = 'ohh-exam-v3';
+const SHELL = ['./', './index.html', './login.html', './js/login.js', './css/style.css', './js/app.js', './js/config.js', './data/questions.js', './icon.svg', './manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spatial Jigsaw (Free Version)</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">Checklist for Success</span>
+          <h1>Spatial Jigsaw <span>Free Version</span></h1>
+        </div>
+        <div class="topbar-stats">
+          <span class="time-display">03:00</span>
+          <span class="status-dot">Practice Mode</span>
+        </div>
+      </header>
+
+      <section id="home-screen" class="screen active">
+        <div class="home-page">
+          <section class="intro-column">
+            <a class="brand-card" href="https://www.facebook.com/Checklistforsuccess" target="_blank" rel="noreferrer">
+              <img src="../shared/checklist-logo.png" alt="Checklist for Success logo" class="brand-logo" />
+              <span>
+                <strong>Checklist for Success</strong>
+                <small>Student Pilot Academy by P'Tung</small>
+              </span>
+            </a>
+            <span class="section-label eyebrow">Free version practice</span>
+            <h2>Spatial Jigsaw (Free Version)</h2>
+            <p class="lead">ฝึกเลือกชิ้นส่วน key ที่สวมลงล็อกกับโจทย์ได้พอดี เพื่อเติมรูปให้สมบูรณ์</p>
+            <button id="start-btn" class="primary-btn">Start</button>
+          </section>
+
+          <section class="instruction-column">
+            <span class="section-label eyebrow">Test Rules</span>
+            <ol class="instructions">
+              <li><span>1</span><p>ข้อสอบจำนวน 10 ข้อ เวลาทำ 3 นาที</p></li>
+              <li><span>2</span><p>เลือกข้อสอบที่ถูกที่สุด</p></li>
+              <li><span>3</span><p>สามารถข้ามข้อได้</p></li>
+              <li><span>4</span><p>กด Submit หรือรอเวลาหมดเพื่อดูคะแนน เฉลย และระดับผลลัพธ์</p></li>
+            </ol>
+          </section>
+          <p class="home-note">กด Start เพื่อเริ่มจับเวลา ระบบจะสุ่มข้อสอบใหม่ทุกครั้งจากชุดฝึก Spatial Jigsaw แบบพื้นฐาน</p>
+        </div>
+      </section>
+
+      <section id="quiz-screen" class="screen">
+        <header class="quiz-topbar">
+          <div>
+            <p class="eyebrow">Spatial Jigsaw (Free Version)</p>
+            <h2>Choose the best key</h2>
+          </div>
+          <div class="timer-card">
+            <span>Time Left</span>
+            <strong id="timer">03:00</strong>
+          </div>
+        </header>
+
+        <div class="progress-wrap">
+          <div class="progress-meta">
+            <span id="question-count">Question 1 of 10</span>
+            <span id="answered-count">0 answered</span>
+          </div>
+          <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+        </div>
+
+        <form id="quiz-form" class="question-list"></form>
+
+        <div class="quiz-actions">
+          <button id="submit-btn" class="primary-btn" type="button">Submit Answers</button>
+        </div>
+      </section>
+
+      <section id="result-screen" class="screen">
+        <header class="result-header">
+          <img src="../shared/checklist-logo.png" alt="Checklist for Success logo" class="result-logo" />
+          <div>
+            <p class="eyebrow">Your result</p>
+            <h2 id="result-title">Excellent</h2>
+            <p id="result-icon" class="result-icon" aria-hidden="true">★★★★★</p>
+          </div>
+        </header>
+
+        <section class="score-panel">
+          <div class="score-ring">
+            <span id="score-percent">0%</span>
+            <small id="score-detail">0 / 10 correct</small>
+          </div>
+          <div class="score-copy">
+            <p id="result-message">ดูคะแนน เฉลย และทบทวนจุดที่ควรฝึกเพิ่มเติมได้ด้านล่าง</p>
+            <p class="page-followup">ติดตามข้อมูลการฝึกเพิ่มเติม เทคนิคการเตรียมสอบ และคอร์สฝึกทำข้อสอบได้ที่ Checklist for Success</p>
+            <a href="https://www.facebook.com/Checklistforsuccess" target="_blank" rel="noreferrer">
+              Checklist for Success Facebook Page
+            </a>
+          </div>
+        </section>
+
+        <section class="review-panel">
+          <h3>Answer Review</h3>
+          <div id="review-list" class="review-list"></div>
+        </section>
+
+        <div class="result-actions">
+          <button id="back-btn" class="secondary-btn" type="button">Back</button>
+          <button id="restart-btn" class="primary-btn" type="button">Restart</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="question-bank.js"></script>
+    <script src="script.js"></script>
+    <a href="../../#exams" class="ohh-back" style="position:fixed;left:12px;bottom:12px;z-index:99999;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:12px;background:#58CC02;color:#fff;font:800 14px/1 Nunito,system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 0 #58A700">&larr; Ohh-Exam</a>
+</body>
+</html>

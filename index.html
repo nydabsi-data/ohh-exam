@@ -6,28 +6,43 @@
   <title>Ohh-Exam</title>
   <meta name="description" content="ฝึกทำข้อสอบนักบินทีละบทสั้นๆ แบบเกม">
   <meta name="theme-color" content="#58CC02">
+  <script>
+    /* Not signed in and not a guest → login page first */
+    try {
+      if (!Object.keys(localStorage).some(function (k) { return /^sb-.+-auth-token$/.test(k); }) &&
+          !localStorage.getItem('ohh_guest')) location.replace('login.html');
+    } catch (e) {}
+  </script>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Noto+Sans+Thai:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
 
-  <!-- Home: learning path -->
+  <!-- Home: exam hub (#exams) and learning path (#learn) -->
   <div id="home-view">
     <header class="topbar">
       <div class="topbar-in">
-        <div class="brand"><img src="icon.svg" alt=""><span>Ohh-Exam</span></div>
+        <a class="top-back hidden" id="to-hub" href="#exams" aria-label="กลับไปเลือกข้อสอบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+        <a class="brand" href="#exams"><img src="icon.svg" alt=""><span>Ohh-Exam</span></a>
         <div class="stat streak" data-stat="streak"></div>
         <div class="stat xp" data-stat="xp"></div>
         <div class="stat hearts" data-stat="hearts"></div>
         <button class="top-acct hidden" id="top-acct"></button>
       </div>
     </header>
-    <main class="home">
+    <main class="hub" id="hub">
+      <div class="hub-head">
+        <p class="hub-hello" id="hub-hello"></p>
+        <h1>เลือกข้อสอบที่จะฝึก</h1>
+      </div>
+      <div class="exam-grid" id="exam-grid"></div>
+    </main>
+    <main class="home hidden" id="learn">
       <div id="path"></div>
       <aside class="aside" id="aside"></aside>
     </main>
@@ -56,8 +71,8 @@
   <div id="toast" class="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <script src="js/config.js?v=2"></script>
-  <script src="data/questions.js?v=2"></script>
-  <script src="js/app.js?v=2"></script>
+  <script src="js/config.js?v=3"></script>
+  <script src="data/questions.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
 </body>
 </html>

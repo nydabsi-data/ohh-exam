@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>เข้าสู่ระบบ · Ohh-Exam</title>
+  <meta name="description" content="ฝึกทำข้อสอบนักบินทีละบทสั้นๆ แบบเกม">
+  <meta name="theme-color" content="#58CC02">
+  <script>
+    /* Already signed in → straight to the app (unless coming back from a password-reset link) */
+    try {
+      if (!/type=recovery/.test(location.hash) &&
+          Object.keys(localStorage).some(function (k) { return /^sb-.+-auth-token$/.test(k); })) location.replace('./');
+    } catch (e) {}
+  </script>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Noto+Sans+Thai:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=3">
+</head>
+<body class="auth-body">
+
+  <main class="auth">
+    <section class="auth-hero">
+      <img src="icon.svg" class="auth-logo" alt="">
+      <h1>Ohh-Exam</h1>
+      <p class="auth-tag">ฝึกข้อสอบนักบินวันละไม่กี่นาที สนุกเหมือนเล่นเกม</p>
+      <ul class="auth-points">
+        <li><span class="pt gold"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 2 4 14h7l-1.5 8L19 10h-7z"/></svg></span>บทเรียนสั้น ทำจบได้ในไม่กี่นาที</li>
+        <li><span class="pt red"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 2.9 4.5 6.6 4.5c2.1 0 3.6 1.2 5.4 3.2 1.8-2 3.3-3.2 5.4-3.2 3.7 0 5.7 4 4.2 7.3C19.5 16.4 12 21 12 21z"/></svg></span>มีหัวใจ XP และ streak ให้อยากกลับมาทุกวัน</li>
+        <li><span class="pt green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>เฉลยพร้อมคำอธิบายภาษาไทยทุกข้อ</li>
+      </ul>
+    </section>
+
+    <section class="auth-card">
+      <div class="tabs" id="tabs" role="tablist">
+        <button type="button" data-mode="in" class="on" role="tab">เข้าสู่ระบบ</button>
+        <button type="button" data-mode="up" role="tab">สมัครสมาชิก</button>
+      </div>
+      <h2 class="auth-title hidden" id="title"></h2>
+      <p class="auth-sub hidden" id="sub"></p>
+
+      <form id="f" class="form" novalidate>
+        <label id="email-wrap">อีเมล
+          <input type="email" id="email" autocomplete="email" placeholder="you@example.com">
+        </label>
+        <label id="pw-wrap">รหัสผ่าน
+          <span class="pw">
+            <input type="password" id="pw" autocomplete="current-password" placeholder="อย่างน้อย 6 ตัว">
+            <button type="button" class="eye" id="eye">แสดง</button>
+          </span>
+        </label>
+        <label id="pw2-wrap" class="hidden">ยืนยันรหัสผ่าน
+          <input type="password" id="pw2" autocomplete="new-password" placeholder="พิมพ์รหัสผ่านอีกครั้ง">
+        </label>
+        <button type="button" class="linkbtn forgot" id="forgot">ลืมรหัสผ่าน?</button>
+        <div class="form-msg" id="msg" role="status"></div>
+        <button class="btn block" id="submit" type="submit">เข้าสู่ระบบ</button>
+        <button type="button" class="linkbtn back hidden" id="back">กลับไปหน้าเข้าสู่ระบบ</button>
+      </form>
+
+      <div id="guest-box">
+        <div class="or"><span>หรือ</span></div>
+        <button type="button" class="btn ghost block" id="guest">ลองใช้งานโดยไม่ต้องสมัคร</button>
+        <p class="note center">ถ้าไม่เข้าสู่ระบบ ความคืบหน้าจะเก็บไว้ในเครื่องนี้เท่านั้น</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js?v=3"></script>
+  <script src="js/login.js?v=3"></script>
+</body>
+</html>

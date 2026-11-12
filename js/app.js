@@ -80,7 +80,7 @@
     if (error) { console.warn('load failed', error.message); return; }
     if (data && data.state) S = merge(S, data.state);
     save(); pushRemote();
-    if (!L) renderHome();
+    if (!L) route();
   }
 
   function sync() {
@@ -136,7 +136,7 @@
       el.title = { streak: 'เรียนต่อเนื่อง ' + S.streak + ' วัน', xp: 'XP สะสม ' + S.xp, hearts: 'หัวใจ ' + S.hearts + '/' + MAX_HEARTS }[k];
     });
     const ta = $('#top-acct');
-    ta.classList.toggle('hidden', !sb);
+    ta.classList.remove('hidden');
     ta.classList.toggle('in', !!user);
     ta.textContent = user ? (user.email || '?').charAt(0).toUpperCase() : 'เข้าสู่ระบบ';
     ta.title = user ? user.email : 'เข้าสู่ระบบเพื่อบันทึกความคืบหน้า';
@@ -174,7 +174,7 @@
     const doneN = LESSONS.filter((l) => isDone(l.id)).length;
     const pct = Math.min(100, (S.todayXp / DAILY_GOAL) * 100);
     const next = minsToNextHeart();
-    const acct = !sb ? '' : user
+    const acct = user
       ? '<div class="card"><h3>บัญชี</h3><p class="acct">' + esc(user.email || '') + '</p><p class="note flat">ความคืบหน้าซิงก์อัตโนมัติ ใช้ได้ทุกอุปกรณ์</p><button class="linkbtn" id="logout">ออกจากระบบ</button></div>'
       : '<div class="card"><h3>บันทึกความคืบหน้า</h3><p class="note flat">เข้าสู่ระบบเพื่อเก็บ XP และบทเรียนไว้ในบัญชี ใช้ต่อได้ทุกอุปกรณ์</p><button class="btn block" id="login">เข้าสู่ระบบ / สมัคร</button></div>';
     $('#aside').innerHTML = acct +
@@ -326,7 +326,53 @@
     $('#cont').focus();
   }
 
-  function goHome() { L = null; show('home'); renderHome(); }
+  function goHome() { L = null; show('home'); route(); }
+
+  /* ---------- Exam hub (card picker after login) ---------- */
+  const EX_ICON = {
+    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2zM4 20a2 2 0 0 0 2 2h13v-4"/></svg>',
+    series: '<svg viewBox="0 0 24 24"><text x="12" y="16.5" text-anchor="middle" font-size="11" font-weight="900" font-family="Nunito,sans-serif" fill="currentColor">123</text></svg>',
+    stick: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 17h14a2 2 0 0 1 2 2v2H3v-2a2 2 0 0 1 2-2z"/><rect x="10.8" y="8" width="2.4" height="9" rx="1"/><circle cx="12" cy="6" r="4"/></svg>',
+    multi: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2" opacity=".5"/></svg>',
+    plane: ICON.plane,
+    puzzle: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3a2 2 0 0 1 4 0v2h4a1 1 0 0 1 1 1v4h-1a2 2 0 0 0 0 4h1v4a1 1 0 0 1-1 1h-4v-1a2 2 0 0 0-4 0v1H6a1 1 0 0 1-1-1v-4h1a2 2 0 0 0 0-4H5V6a1 1 0 0 1 1-1h4z"/></svg>',
+    math: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 7h6M8 4v6M14 7h6M5.5 15.5l5 5M10.5 15.5l-5 5M14 16h6M14 20h6"/></svg>'
+  };
+  const EXAMS = [
+    { id: 'learn', title: 'Pilot Knowledge', th: 'ความรู้นักบิน แบบบทเรียนสั้น', icon: 'book', color: '#58CC02', dark: '#58A700', href: '#learn', meta: ['6 วิชา', 'XP · Streak'] },
+    { id: 'series', title: 'Series Number', th: 'หาตัวเลขถัดไปในอนุกรม', icon: 'series', color: '#1CB0F6', dark: '#1899D6', href: 'exams/series/', meta: ['15 ข้อ', '6 นาที'] },
+    { id: 'math', title: 'Math Test', th: 'คณิตศาสตร์สำหรับนักบิน', icon: 'math', color: '#FF9600', dark: '#CC7800', href: 'exams/math/', meta: ['20 ข้อ', '30 นาที'] },
+    { id: 'rotation', title: 'Aircraft Rotation', th: 'อ่านทิศทางและการหมุนของเครื่องบิน', icon: 'plane', color: '#CE82FF', dark: '#A568CC', href: 'exams/rotation/', meta: ['12 ข้อ', '3 นาที'] },
+    { id: 'jigsaw', title: 'Spatial Jigsaw', th: 'มิติสัมพันธ์ ประกอบชิ้นส่วนภาพ', icon: 'puzzle', color: '#FF4B4B', dark: '#EA2B2B', href: 'exams/jigsaw/', meta: ['10 ข้อ', '3 นาที'] },
+    { id: 'joystick', title: 'Joy Stick', th: 'ควบคุมและความแม่นยำ', icon: 'stick', color: '#2B70C9', dark: '#1F5AA6', href: 'exams/joystick/', meta: ['90 วินาที'] },
+    { id: 'multitask', title: 'Multitask', th: 'ทำหลายอย่างพร้อมกัน', icon: 'multi', color: '#00B8A9', dark: '#00968A', href: 'exams/multitask/', meta: ['5 นาที'] }
+  ];
+
+  function renderHub() {
+    const doneN = LESSONS.filter((l) => isDone(l.id)).length;
+    $('#hub-hello').textContent = user ? 'สวัสดี ' + (user.email || '').split('@')[0] : 'สวัสดีผู้เยี่ยมชม';
+    $('#exam-grid').innerHTML = EXAMS.map((x) => {
+      const extra = x.id === 'learn'
+        ? '<span class="ex-prog"><span class="bar"><span style="width:' + (doneN / LESSONS.length) * 100 + '%"></span></span><b>' + doneN + '/' + LESSONS.length + '</b></span>'
+        : '';
+      return '<a class="exam-card" href="' + x.href + '" style="--c:' + x.color + ';--d:' + x.dark + '">' +
+        '<span class="ex-ico">' + EX_ICON[x.icon] + '</span>' +
+        '<span class="ex-body"><b class="ex-title">' + esc(x.title) + '</b><span class="ex-th">' + esc(x.th) + '</span>' +
+        '<span class="ex-meta">' + x.meta.map((m) => '<i>' + esc(m) + '</i>').join('') + '</span>' + extra + '</span>' +
+        '<span class="ex-go">เริ่ม</span></a>';
+    }).join('');
+  }
+
+  function route() {
+    if (L) return;
+    const learn = location.hash === '#learn';
+    show('home');
+    $('#hub').classList.toggle('hidden', learn);
+    $('#learn').classList.toggle('hidden', !learn);
+    $('#to-hub').classList.toggle('hidden', !learn);
+    if (learn) renderHome(); else { sync(); renderStats(); renderHub(); }
+  }
+  window.addEventListener('hashchange', () => { if (!L) route(); });
 
   /* ---------- Modal & toast ---------- */
   let modalOutside = null, modalGuard = null;
@@ -350,60 +396,21 @@
     const f = modalOutside; closeModal(); if (f) f();
   }
 
-  const AUTH_ERR = {
-    'Invalid login credentials': 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
-    'Email not confirmed': 'ยังไม่ได้ยืนยันอีเมล กรุณากดลิงก์ในอีเมลก่อน',
-    'User already registered': 'อีเมลนี้สมัครไว้แล้ว ลองเข้าสู่ระบบแทน'
-  };
-
-  function openAuth(mode) {
-    const isIn = mode !== 'up';
-    $('#modal-box').innerHTML =
-      '<button class="mx" id="mx" aria-label="ปิด">' + ICON.x + '</button>' +
-      '<h3>' + (isIn ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก') + '</h3>' +
-      '<p>บันทึกความคืบหน้าไว้ในบัญชี ใช้ต่อได้ทุกอุปกรณ์</p>' +
-      '<form id="authf" class="form" novalidate>' +
-        '<input type="email" id="ae" placeholder="อีเมล" autocomplete="email" required>' +
-        '<input type="password" id="ap" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)" minlength="6" autocomplete="' + (isIn ? 'current-password' : 'new-password') + '" required>' +
-        '<div class="form-msg" id="amsg"></div>' +
-        '<button class="btn block" type="submit" id="asubmit">' + (isIn ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก') + '</button>' +
-      '</form>' +
-      '<button class="linkbtn alt" id="aswitch">' + (isIn ? 'ยังไม่มีบัญชี? สมัครสมาชิก' : 'มีบัญชีแล้ว? เข้าสู่ระบบ') + '</button>';
-    $('#modal').classList.remove('hidden');
-    modalOutside = null;
-    modalGuard = () => !($('#ae').value || $('#ap').value) || confirm('ปิดหน้าต่างนี้? ข้อมูลที่กรอกจะหายไป');
-    $('#ae').focus();
-    $('#mx').onclick = closeModal;
-    $('#aswitch').onclick = () => openAuth(isIn ? 'up' : 'in');
-    $('#authf').onsubmit = async (e) => {
-      e.preventDefault();
-      const email = $('#ae').value.trim(), password = $('#ap').value, msg = $('#amsg'), btn = $('#asubmit');
-      msg.className = 'form-msg';
-      if (!/^\S+@\S+\.\S+$/.test(email)) { msg.textContent = 'กรุณากรอกอีเมลให้ถูกต้อง'; msg.classList.add('err'); return; }
-      if (password.length < 6) { msg.textContent = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว'; msg.classList.add('err'); return; }
-      btn.disabled = true; msg.textContent = 'กำลังดำเนินการ...';
-      const res = isIn
-        ? await sb.auth.signInWithPassword({ email, password })
-        : await sb.auth.signUp({ email, password, options: { emailRedirectTo: location.origin + location.pathname } });
-      btn.disabled = false;
-      if (res.error) { msg.textContent = AUTH_ERR[res.error.message] || res.error.message; msg.classList.add('err'); return; }
-      if (!isIn && !res.data.session) {
-        msg.textContent = 'ส่งลิงก์ยืนยันไปที่ ' + email + ' แล้ว กดยืนยันในอีเมล แล้วกลับมาเข้าสู่ระบบ';
-        msg.classList.add('ok'); $('#ap').value = ''; return;
-      }
-      closeModal(); toast(isIn ? 'เข้าสู่ระบบแล้ว' : 'สมัครสมาชิกเรียบร้อย');
-    };
-  }
+  const gotoLogin = () => { location.href = 'login.html'; };
 
   function openAccount() {
-    if (!user) return openAuth('in');
+    if (!user) return gotoLogin();
     modal({
       title: 'บัญชีของคุณ',
       body: esc(user.email || '') + '<br>ความคืบหน้าซิงก์อัตโนมัติ',
       actions: [{ label: 'ปิด' }, { label: 'ออกจากระบบ', cls: 'danger', fn: signOut }]
     });
   }
-  async function signOut() { await sb.auth.signOut(); toast('ออกจากระบบแล้ว ความคืบหน้ายังอยู่ในเครื่องนี้'); }
+  async function signOut() {
+    try { if (sb) await sb.auth.signOut(); } catch (e) { /* offline */ }
+    try { localStorage.removeItem('ohh_guest'); } catch (e) { /* ignore */ }
+    location.replace('login.html');
+  }
 
   function askQuit() {
     modal({
@@ -438,7 +445,7 @@
 
   $('#top-acct').addEventListener('click', openAccount);
   $('#aside').addEventListener('click', (e) => {
-    if (e.target.id === 'login') return openAuth('in');
+    if (e.target.id === 'login') return gotoLogin();
     if (e.target.id === 'logout') return signOut();
     if (e.target.id === 'reset') {
       modal({
@@ -480,10 +487,14 @@
       const changed = (u && u.id) !== (user && user.id);
       user = u;
       if (changed && user) setTimeout(pullRemote, 0);   // don't call Supabase inside the callback
-      renderStats();
-      if (!$('#home-view').classList.contains('hidden')) renderAside();
+      // Session gone (signed out elsewhere / expired) and not a guest → back to the login page
+      if (!user && ev === 'INITIAL_SESSION') {
+        let guest = false; try { guest = !!localStorage.getItem('ohh_guest'); } catch (e) { /* ignore */ }
+        if (!guest) return location.replace('login.html');
+      }
+      if (!L) route();
     });
   }
 
-  renderHome();
+  route();
 })();

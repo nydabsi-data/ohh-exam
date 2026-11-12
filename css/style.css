@@ -173,6 +173,74 @@ svg { display: block; }
 .form-msg.ok { color: var(--green-d); }
 .linkbtn.alt { margin-top: 16px; color: var(--blue); }
 
+/* ---------- Exam hub ---------- */
+.brand { text-decoration: none; }
+.top-back { color: var(--faint); display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; margin-right: -8px; }
+.top-back:hover { background: var(--soft); color: var(--muted); }
+.top-back svg { width: 24px; height: 24px; }
+.hub { max-width: 1080px; margin: 0 auto; padding: 28px 16px 80px; }
+.hub-head { margin-bottom: 22px; }
+.hub-hello { margin: 0; color: var(--muted); font-weight: 800; }
+.hub-head h1 { margin: 4px 0 0; font-size: 30px; font-weight: 900; }
+@media (max-width: 480px) { .hub-head h1 { font-size: 24px; } }
+.exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+@media (max-width: 360px) { .exam-grid { grid-template-columns: 1fr; } }
+.exam-card { display: flex; align-items: center; gap: 16px; padding: 18px; background: #fff; border: 2px solid var(--line); border-bottom-width: 5px; border-radius: 20px; color: var(--ink); text-decoration: none; transition: transform .08s, border-color .15s; }
+.exam-card:hover { border-color: var(--c); }
+.exam-card:active { transform: translateY(3px); border-bottom-width: 2px; margin-bottom: 3px; }
+.exam-card:focus-visible { outline: 3px solid #84D8FF; outline-offset: 3px; }
+.ex-ico { flex: none; width: 64px; height: 64px; border-radius: 18px; background: var(--c); box-shadow: 0 4px 0 var(--d); color: #fff; display: grid; place-items: center; }
+.ex-ico svg { width: 36px; height: 36px; }
+.ex-body { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.ex-title { font-size: 18px; font-weight: 900; }
+.ex-th { color: var(--muted); font-weight: 700; font-size: 14px; }
+.ex-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.ex-meta i { font-style: normal; font-size: 12px; font-weight: 800; color: var(--d); background: color-mix(in srgb, var(--c) 14%, #fff); padding: 3px 9px; border-radius: 999px; }
+.ex-prog { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.ex-prog .bar { height: 10px; }
+.ex-prog .bar > span { background: var(--c); }
+.ex-prog b { font-size: 12px; color: var(--muted); }
+.ex-go { flex: none; align-self: center; font-weight: 900; font-size: 14px; color: var(--c); border: 2px solid var(--line); border-radius: 12px; padding: 8px 12px; }
+.exam-card:hover .ex-go { background: var(--c); border-color: var(--c); color: #fff; }
+
+/* ---------- Login page ---------- */
+.auth-body { background: var(--soft); }
+.auth { min-height: 100vh; min-height: 100dvh; max-width: 1000px; margin: 0 auto; padding: 32px 16px; display: grid; grid-template-columns: 1fr 440px; gap: 56px; align-items: center; }
+@media (max-width: 900px) { .auth { grid-template-columns: 1fr; gap: 24px; align-content: start; padding-top: 28px; } }
+.auth-logo { width: 88px; height: 88px; border-radius: 24px; box-shadow: 0 6px 0 var(--green-d); }
+.auth-hero h1 { margin: 20px 0 6px; font-size: 44px; font-weight: 900; color: var(--green); letter-spacing: -.5px; }
+.auth-tag { margin: 0 0 26px; font-size: 20px; font-weight: 800; line-height: 1.5; }
+.auth-points { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.auth-points li { display: flex; align-items: center; gap: 14px; font-weight: 700; font-size: 16px; color: var(--muted); }
+.pt { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; }
+.pt svg { width: 22px; height: 22px; }
+.pt.gold { background: #FFF4CC; color: var(--gold-d); }
+.pt.red { background: var(--bad-bg); color: var(--red); }
+.pt.green { background: var(--ok-bg); color: var(--green-d); }
+@media (max-width: 900px) {
+  .auth-hero { text-align: center; }
+  .auth-logo { width: 72px; height: 72px; }
+  .auth-hero h1 { font-size: 36px; margin-top: 14px; }
+  .auth-tag { font-size: 17px; margin-bottom: 0; }
+  .auth-points { display: none; }
+}
+.auth-card { background: #fff; border: 2px solid var(--line); border-radius: 24px; padding: 24px; }
+@media (max-width: 480px) { .auth-card { padding: 20px 16px; } }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--soft); border-radius: 14px; padding: 4px; margin-bottom: 22px; }
+.tabs button { border: 0; background: none; border-radius: 11px; padding: 11px 8px; font-weight: 900; font-size: 15px; color: var(--muted); }
+.tabs button.on { background: #fff; color: var(--blue-d); box-shadow: 0 2px 0 var(--line); }
+.auth-title { margin: 0 0 6px; font-size: 24px; font-weight: 900; }
+.auth-sub { margin: 0 0 20px; color: var(--muted); line-height: 1.6; }
+.form label { display: grid; gap: 7px; font-weight: 800; font-size: 14px; color: var(--muted); }
+.pw { position: relative; display: block; }
+.pw input { padding-right: 72px; }
+.eye { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--blue); font-weight: 900; font-size: 14px; padding: 6px 8px; }
+.linkbtn.forgot { justify-self: end; color: var(--blue); font-size: 14px; margin-top: -4px; }
+.linkbtn.back { justify-self: center; color: var(--blue); margin-top: 4px; }
+.or { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--faint); font-weight: 800; font-size: 14px; }
+.or::before, .or::after { content: ''; flex: 1; height: 2px; background: var(--line); }
+.note.center { text-align: center; margin: 12px 0 0; }
+
 /* ---------- Modal & toast ---------- */
 .modal { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.45); display: grid; place-items: center; padding: 16px; }
 .modal-box { background: #fff; border-radius: 20px; padding: 28px 24px 24px; max-width: 400px; width: 100%; text-align: center; animation: pop .18s ease-out; }
