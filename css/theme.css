@@ -264,6 +264,3 @@ body {
 @media (max-width: 480px) { .tabbar a img { width: 36px; height: 36px; } }
 .lesson-card.exam-lc { text-decoration: none; color: inherit; }
 
-/* Pilot lesson stopwatch */
-.l-timer { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px 5px 6px; border-radius: 999px; background: #fff; border: 2px solid var(--line); border-bottom-width: 4px; font-weight: 800; font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
-.l-timer img { width: 26px; height: 26px; }

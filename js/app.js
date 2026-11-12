@@ -104,6 +104,8 @@
     out.miss = Object.assign({}, b.miss);
     for (const k in (a.miss || {})) { const x = a.miss[k], y = out.miss[k]; out.miss[k] = !y || x.at >= y.at ? x : y; }
     if ((b.avatarAt || 0) > (a.avatarAt || 0)) { out.avatar = b.avatar; out.avatarAt = b.avatarAt; }
+    out.apt = Object.assign({}, b.apt);
+    for (const k in (a.apt || {})) { const x = a.apt[k], y = out.apt[k]; out.apt[k] = !y ? x : { best: Math.max(x.best, y.best), last: (x.at >= y.at ? x : y).last, n: Math.max(x.n || 0, y.n || 0), at: Math.max(x.at || 0, y.at || 0) }; }
     out.answered = Math.max(a.answered || 0, b.answered || 0);
     out.correctTotal = Math.max(a.correctTotal || 0, b.correctTotal || 0);
     const da = a.daily || freshDaily(), db = b.daily || freshDaily();
@@ -165,7 +167,7 @@
 
   /* ---------- Views ---------- */
   function show(view) {
-    ['home', 'lesson', 'result'].forEach((v) => $('#' + v + '-view').classList.toggle('hidden', v !== view));
+    ['home', 'lesson', 'result', 'apt'].forEach((v) => $('#' + v + '-view').classList.toggle('hidden', v !== view));
     window.scrollTo(0, 0);
   }
 
@@ -185,6 +187,7 @@
   }
 
   const isDone = (id) => !!S.done[id];
+  const aptBest = (id) => (S.apt && S.apt[id] ? S.apt[id].best : null);
   let isAdmin = false;   // super admin: every lesson unlocked
   const isUnlocked = (i) => isAdmin || i === 0 || isDone(LESSONS[i - 1].id);
   const OFFSETS = [0, -70, -40, 40, 70, 0];
@@ -220,7 +223,7 @@
     });
     // Pilot: the 6 aptitude tests as one more unit, same card style (always open)
     if (course === 'pilot') {
-      const tests = EXAMS.filter((x) => x.href.charAt(0) !== '#');
+      const tests = EXAMS.filter((x) => x.id !== 'learn');
       html += '<section class="unit" style="--c:#FF4B4B;--d:#E03A3A;--t:#fff">' +
         '<header class="unit-head"><div><small>Unit ' + (UNITS.length + 1) + ' · แบบทดสอบความถนัด</small><h2>Aptitude tests</h2></div>' +
         '<span class="unit-tools"><span class="unit-count">' + tests.length + ' ' + T('ชุด') + '</span>' +
@@ -232,7 +235,9 @@
           '<span class="lc-ico">' + EX_ICON[x.icon] + '</span>' +
           '<span class="lc-title">' + esc(x.title) + '</span>' +
           '<span class="lc-meta">' + x.meta.map(esc).join(' · ') + '</span>' +
-          '<span class="lc-foot"><span class="lc-go">เริ่ม</span></span></a>').join('') +
+          '<span class="lc-foot">' + (aptBest(x.id) != null
+            ? '<span class="lc-state done">' + ICON.check + '<span>ดีที่สุด ' + aptBest(x.id) + '%</span></span>'
+            : '<span class="lc-go">เริ่ม</span>') + '</span></a>').join('') +
         '</div></section>';
     }
     $('#path').innerHTML = html;
@@ -465,12 +470,12 @@
   };
   const EXAMS = [
     { id: 'learn', title: 'Pilot Knowledge', th: 'ความรู้นักบิน แบบบทเรียนสั้น', icon: 'book', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#learn', meta: ['6 วิชา', 'XP · Streak'] },
-    { id: 'series', title: 'Series Number', th: 'หาตัวเลขถัดไปในอนุกรม', icon: 'series', color: '#FF4B4B', dark: '#E03A3A', text: '#fff', href: 'exams/series/', meta: ['15 ข้อ', '6 นาที'] },
-    { id: 'math', title: 'Math Test', th: 'คณิตศาสตร์สำหรับนักบิน', icon: 'math', color: '#FF9600', dark: '#E07F00', text: '#fff', href: 'exams/math/', meta: ['20 ข้อ', '30 นาที'] },
-    { id: 'rotation', title: 'Aircraft Rotation', th: 'อ่านทิศทางและการหมุนของเครื่องบิน', icon: 'plane', color: '#A570FF', dark: '#8549E8', text: '#fff', href: 'exams/rotation/', meta: ['12 ข้อ', '3 นาที'] },
-    { id: 'jigsaw', title: 'Spatial Jigsaw', th: 'มิติสัมพันธ์ ประกอบชิ้นส่วนภาพ', icon: 'puzzle', color: '#E5279B', dark: '#C21A80', text: '#fff', href: 'exams/jigsaw/', meta: ['10 ข้อ', '3 นาที'] },
-    { id: 'joystick', title: 'Joy Stick', th: 'ควบคุมและความแม่นยำ', icon: 'stick', color: '#00B4E6', dark: '#0094C2', text: '#fff', href: 'exams/joystick/', meta: ['90 วินาที'] },
-    { id: 'multitask', title: 'Multitask', th: 'ทำหลายอย่างพร้อมกัน', icon: 'multi', color: '#FF86D0', dark: '#E865B5', text: '#fff', href: 'exams/multitask/', meta: ['5 นาที'] }
+    { id: 'series', title: 'Series Number', th: 'หาตัวเลขถัดไปในอนุกรม', icon: 'series', color: '#FF4B4B', dark: '#E03A3A', text: '#fff', href: '#apt-series', meta: ['15 ข้อ', '6 นาที'] },
+    { id: 'math', title: 'Math Test', th: 'คณิตคิดเร็วสำหรับนักบิน', icon: 'math', color: '#FF9600', dark: '#E07F00', text: '#fff', href: '#apt-math', meta: ['20 ข้อ', '8 นาที'] },
+    { id: 'rotation', title: 'Aircraft Rotation', th: 'การหมุนและทิศทางของเครื่องบิน', icon: 'plane', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#apt-rotation', meta: ['15 ข้อ', '4 นาที'] },
+    { id: 'jigsaw', title: 'Spatial Jigsaw', th: 'มิติสัมพันธ์ ประกอบชิ้นส่วน', icon: 'puzzle', color: '#E5279B', dark: '#C21A80', text: '#fff', href: '#apt-jigsaw', meta: ['12 ข้อ', '5 นาที'] },
+    { id: 'joystick', title: 'Joy Stick', th: 'ควบคุมและความแม่นยำ', icon: 'stick', color: '#00B4E6', dark: '#0094C2', text: '#fff', href: '#apt-joystick', meta: ['60 วินาที'] },
+    { id: 'multitask', title: 'Multitask', th: 'ทำหลายอย่างพร้อมกัน', icon: 'multi', color: '#FF86D0', dark: '#E865B5', text: '#fff', href: '#apt-multitask', meta: ['90 วินาที'] }
   ];
 
   // Modes on the home page. Each mode groups its own exam cards (only "Pilot" for now).
@@ -647,7 +652,12 @@
       '<div class="card"><div class="card-head"><h3>XP 7 วันล่าสุด</h3><span>รวม ' + week + ' XP</span></div><div class="xpchart" role="img" aria-label="XP 7 วันล่าสุด: ' + vals.join(', ') + '">' + bars + '</div></div>' +
       '<div class="card"><div class="card-head"><h3>ความแม่นยำตามระดับความยาก</h3><span>ง่าย 10 · ปานกลาง 15 · ยาก 20 XP</span></div>' + diffRows + '</div>' +
       '<div class="card"><h3>ความคืบหน้ารายวิชา</h3>' + units + '</div>' +
-      '<p class="note">คะแนนจากแบบทดสอบ 6 ชุด (Series Number, Math ฯลฯ) จะแสดงที่นี่ในขั้นถัดไป</p>';
+      '<div class="card"><div class="card-head"><h3>แบบทดสอบความถนัด</h3><span>คะแนนดีที่สุด · ล่าสุด</span></div>' +
+        EXAMS.filter((x) => x.id !== 'learn').map((x) => {
+          const a = (S.apt || {})[x.id];
+          return '<div class="mrow"><div class="mrow-top"><b>' + esc(x.title) + '</b><span>' + (a ? a.best + '% · ' + T('ล่าสุด') + ' ' + a.last + '% · ' + a.n + ' ' + T('ครั้ง') : T('ยังไม่ได้ทำ')) + '</span></div>' +
+            '<div class="bar"><span style="width:' + (a ? a.best : 0) + '%"></span></div></div>';
+        }).join('') + '</div>';
   }
 
   /* ---------- Profile (tab 4) ---------- */
@@ -719,11 +729,40 @@
     showMg('users');
   }
 
+  /* ---------- Aptitude tests (js/aptitude.js) ---------- */
+  let aptOpen = null;
+  window.APT_ICON = { series: EX_ICON.series, math: EX_ICON.math, rotation: EX_ICON.plane, jigsaw: EX_ICON.puzzle, joystick: EX_ICON.stick, multitask: EX_ICON.multi };
+  const APT_HOST = {
+    back: '#learn',
+    best: (id) => aptBest(id),
+    finish(id, pct) {
+      S.apt = S.apt || {};
+      const p = S.apt[id] || { best: 0, n: 0 };
+      S.apt[id] = { best: Math.max(p.best || 0, pct), last: pct, n: (p.n || 0) + 1, at: Date.now() };
+      const xp = 5 + Math.round(pct / 10);
+      sync(); S.xp += xp; S.todayXp += xp; S.hist[dayKey()] = (S.hist[dayKey()] || 0) + xp;
+      S.daily.exams++;
+      if (S.lastDay !== dayKey()) { S.streak = (S.lastDay === yesterday() ? S.streak : 0) + 1; S.lastDay = dayKey(); }
+      save(); tone(pct >= 60);
+      toast(T('ได้รับ +' + xp + ' XP'));
+    }
+  };
+
   /* ---------- Router: bottom tab bar ---------- */
   const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
     if (location.hash === '#pilot') history.replaceState(null, '', location.pathname + location.search + '#learn');   // old Pilot page → Pilot lessons
+    // Aptitude tests (#apt-<id>) run in their own full-screen view
+    const aptId = /^#apt-(\w+)$/.exec(location.hash);
+    if (aptId && window.APT && APT.TESTS[aptId[1]]) {
+      if (aptOpen === aptId[1]) return;          // already open (e.g. language switch) — don't restart
+      aptOpen = aptId[1]; setCourse('pilot');
+      show('apt');
+      APT.open(aptOpen, APT_HOST);
+      return;
+    }
+    if (aptOpen) { aptOpen = null; if (window.APT) APT.stop(); }
     const page = PAGES[location.hash] || 'hub';
     const sub = location.hash === '#pilot' ? 'pilot' : null;
     if (page === 'learn') setCourse(location.hash === '#learn-physics' ? 'physics' : 'pilot');
@@ -849,7 +888,7 @@
       return;
     }
     const ex = e.target.closest('a.exam-lc');
-    if (ex) { S.daily.exams++; save(); return; }   // aptitude test link: let the browser follow it
+    if (ex) return;   // aptitude test link: the router opens it
     const n = e.target.closest('.lesson-card'); if (!n) return;
     if (n.classList.contains('locked')) return toast('ผ่านบทเรียนก่อนหน้าก่อน แล้วบทนี้จะปลดล็อก');
     startLesson(+n.dataset.i);
