@@ -44,7 +44,10 @@
     chem:    { units: window.CHEM_UNITS || [], hash: '#learn-chem', back: '#exams' },
     bio:     { units: window.BIO_UNITS || [], hash: '#learn-bio', back: '#exams' },
     math:    { units: window.MATH_UNITS || [], hash: '#learn-math', back: '#exams' },
-    toeic:   { units: (window.TOEIC_UNITS || []).slice().sort((a, b) => (a.n || 0) - (b.n || 0)), hash: '#learn-toeic', back: '#exams' }
+    // English: TOEIC books + Grammar + Vocabulary, opened from the "English" card (#english)
+    toeic:   { units: (window.TOEIC_UNITS || []).slice().sort((a, b) => (a.n || 0) - (b.n || 0)), hash: '#learn-toeic', back: '#english' },
+    grammar: { units: window.GRAMMAR_UNITS || [], hash: '#learn-grammar', back: '#english' },
+    vocab:   { units: window.VOCAB_UNITS || [], hash: '#learn-vocab', back: '#english' }
   };
   Object.values(COURSES).forEach((c) => { c.lessons = flatten(c.units); });
   // Every question gets a stable key "<lesson id>#<index>" so wrong answers can be practised later.
@@ -535,9 +538,20 @@
       items: (window.BIO_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
     { id: 'mathhs', title: 'คณิตศาสตร์ ม.ปลาย', th: 'เซต ฟังก์ชัน ตรีโกณ ลำดับ ความน่าจะเป็น สถิติ แคลคูลัส', icon: 'sigma', color: '#FF9600', dark: '#E07F00', text: '#fff', href: '#learn-math', course: 'math',
       items: (window.MATH_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
-    { id: 'toeic', title: 'TOEIC', th: 'Reading Part 5–7 แนวข้อสอบจริง จับเวลา', icon: 'toeic', unitLabel: 'ชุด', color: '#FF4B4B', dark: '#E03A3A', text: '#fff', href: '#learn-toeic', course: 'toeic',
-      items: (window.TOEIC_UNITS || []).map((u) => ({ title: u.title, color: u.color })) }
+    // English groups three courses; its card opens #english, which lists them
+    { id: 'english', title: 'English', th: 'TOEIC ไวยากรณ์ และคำศัพท์', icon: 'english', unitLabel: 'คอร์ส', color: '#FF4B4B', dark: '#E03A3A', text: '#fff', href: '#english', courses: ['toeic', 'grammar', 'vocab'],
+      items: [
+        { id: 'toeic', course: 'toeic', title: 'TOEIC', th: 'Reading Part 5–7 แนวข้อสอบจริง จับเวลา', icon: 'toeic', color: '#FF4B4B', dark: '#E03A3A', text: '#fff', href: '#learn-toeic' },
+        { id: 'grammar', course: 'grammar', title: 'Grammar', th: 'ไวยากรณ์ที่ออกสอบ TOEIC', icon: 'grammar', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#learn-grammar' },
+        { id: 'vocab', course: 'vocab', title: 'Vocabulary', th: 'คำศัพท์ TOEIC จับคู่การ์ด เติมคำ', icon: 'vocab', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#learn-vocab' }
+      ] }
   ];
+  // a mode's courses (English has three, the others one)
+  const modeCourses = (m) => (m.courses || [m.course]).filter((c) => COURSES[c] && COURSES[c].units.length);
+  const sumOf = (cs, f) => cs.reduce((s, c) => s + f(COURSES[c]), 0);
+  EX_ICON.english = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M4 5h9a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H4z"/><path d="M20 5h-1M20 9h-2M7 9h5M7 13h4"/></svg>';
+  EX_ICON.grammar = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M4 19 9 5h1l5 14M6 14h7"/><path d="M17 9l2 2 3-4"/></svg>';
+  EX_ICON.vocab = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="6" width="11" height="14" rx="2"/><path d="M8 6V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5"/></svg>';
   EX_ICON.toeic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 11h6M9 15h6M9 19h4"/></svg>';
   EX_ICON.sigma = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5H6l7 7-7 7h12"/></svg>';
   EX_ICON.flask = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10" /></svg>';
@@ -570,26 +584,31 @@
     if (hc) { hc.src = charSrc(myChar()); hc.alt = T(charOf(myChar()).th); }
     $('#exam-grid').classList.toggle('modes', !mode);
     if (!mode) {
-      $('#exam-grid').innerHTML = MODES.filter((m) => COURSES[m.course].units.length).map((m) =>
-        '<a class="exam-card mode-card' + (m.cls ? ' ' + m.cls : '') + '" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '">' +
+      $('#exam-grid').innerHTML = MODES.filter((m) => modeCourses(m).length).map((m) => { const cs = modeCourses(m);
+        return '<a class="exam-card mode-card' + (m.cls ? ' ' + m.cls : '') + '" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '">' +
           '<span class="mc-deco">' + EX_ICON[m.icon] + '</span>' +
           '<span class="mc-top"><span class="mc-ico">' + EX_ICON[m.icon] + '</span>' +
             '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
-          // Numbers on the card: topics (units), questions, lessons passed
+          // Numbers on the card: topics (units) — or courses for English — questions, lessons passed
           '<span class="mc-nums">' +
-            '<span><b>' + COURSES[m.course].units.length + '</b><i>' + T(m.unitLabel || 'เรื่อง') + '</i></span>' +
-            '<span><b>' + nfmt(COURSES[m.course].lessons.reduce((s, l) => s + l.questions.length, 0)) + '</b><i>' + T('ข้อ') + '</i></span>' +
+            '<span><b>' + (m.courses ? cs.length : sumOf(cs, (c) => c.units.length)) + '</b><i>' + T(m.unitLabel || 'เรื่อง') + '</i></span>' +
+            '<span><b>' + nfmt(sumOf(cs, (c) => c.lessons.reduce((s, l) => s + l.questions.length, 0))) + '</b><i>' + T('ข้อ') + '</i></span>' +
             (m.id === 'pilot' ? '<span><b>' + (EXAMS.length - 1) + '</b><i>' + T('แบบทดสอบ') + '</i></span>' : '') +
           '</span>' +
           '<span class="mc-foot"><span class="mc-meta">' +
-            T('บทเรียนผ่าน') + ' ' + doneIn(m.course) + '/' + COURSES[m.course].lessons.length + '</span>' +
-          '</span></a>').join('');
+            T('บทเรียนผ่าน') + ' ' + cs.reduce((s, c) => s + doneIn(c), 0) + '/' + sumOf(cs, (c) => c.lessons.length) + '</span>' +
+          '</span></a>'; }).join('');
       return;
     }
-    $('#exam-grid').innerHTML = mode.items.map((x) => {
-      const extra = x.id === 'learn'
+    $('#exam-grid').innerHTML = mode.items.filter((x) => !x.course || (COURSES[x.course] && COURSES[x.course].units.length)).map((x) => {
+      if (x.course) {   // a course card (English): units, questions and lessons passed
+        const C = COURSES[x.course], dn = doneIn(x.course);
+        x = Object.assign({}, x, { meta: [C.units.length + ' ' + T(x.course === 'toeic' ? 'ชุด' : 'บท'), nfmt(C.lessons.reduce((s, l) => s + l.questions.length, 0)) + ' ' + T('ข้อ')],
+          prog: '<span class="ex-prog"><span class="bar"><span style="width:' + (dn / C.lessons.length) * 100 + '%"></span></span><b>' + dn + '/' + C.lessons.length + '</b></span>' });
+      }
+      const extra = x.prog || (x.id === 'learn'
         ? '<span class="ex-prog"><span class="bar"><span style="width:' + (doneN / COURSES.pilot.lessons.length) * 100 + '%"></span></span><b>' + doneN + '/' + COURSES.pilot.lessons.length + '</b></span>'
-        : '';
+        : '');
       return '<a class="exam-card" href="' + x.href + '" style="--c:' + x.color + ';--d:' + x.dark + ';--t:' + x.text + '">' +
         '<span class="ex-ico">' + EX_ICON[x.icon] + '</span>' +
         '<span class="ex-body"><b class="ex-title">' + esc(x.title) + '</b><span class="ex-th">' + esc(x.th) + '</span>' +
@@ -708,7 +727,9 @@
       '<h4 class="course-h">เคมี ม.ปลาย</h4>' + unitRows(COURSES.chem.units) +
       '<h4 class="course-h">ชีววิทยา ม.ปลาย</h4>' + unitRows(COURSES.bio.units) +
       '<h4 class="course-h">คณิตศาสตร์ ม.ปลาย</h4>' + unitRows(COURSES.math.units) +
-      (COURSES.toeic.units.length ? '<h4 class="course-h">TOEIC</h4>' + unitRows(COURSES.toeic.units) : '');
+      (COURSES.toeic.units.length ? '<h4 class="course-h">TOEIC</h4>' + unitRows(COURSES.toeic.units) : '') +
+      (COURSES.grammar.units.length ? '<h4 class="course-h">English Grammar</h4>' + unitRows(COURSES.grammar.units) : '') +
+      (COURSES.vocab.units.length ? '<h4 class="course-h">English Vocabulary</h4>' + unitRows(COURSES.vocab.units) : '');
     // Accuracy by difficulty (one bar per level, value written next to it)
     const diffRows = [1, 2, 3].map((k) => {
       const x = (S.diff || {})[k] || { a: 0, c: 0 };
@@ -825,7 +846,7 @@
   };
 
   /* ---------- Router: bottom tab bar ---------- */
-  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#learn-toeic': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
+  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#learn-toeic': 'learn', '#learn-grammar': 'learn', '#learn-vocab': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
     if (location.hash === '#pilot') history.replaceState(null, '', location.pathname + location.search + '#learn');   // old Pilot page → Pilot lessons
@@ -844,8 +865,8 @@
     }
     if (aptOpen) { aptOpen = null; if (window.APT) APT.stop(); }
     const page = PAGES[location.hash] || 'hub';
-    const sub = location.hash === '#pilot' ? 'pilot' : null;
-    if (page === 'learn') setCourse({ '#learn-physics': 'physics', '#learn-chem': 'chem', '#learn-bio': 'bio', '#learn-math': 'math', '#learn-toeic': 'toeic' }[location.hash] || 'pilot');
+    const sub = location.hash === '#pilot' ? 'pilot' : location.hash === '#english' ? 'english' : null;
+    if (page === 'learn') setCourse({ '#learn-physics': 'physics', '#learn-chem': 'chem', '#learn-bio': 'bio', '#learn-math': 'math', '#learn-toeic': 'toeic', '#learn-grammar': 'grammar', '#learn-vocab': 'vocab' }[location.hash] || 'pilot');
     show('home');
     ['hub', 'learn', 'practice', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
     // Back arrow: Pilot lessons → Pilot page, physics lessons / Pilot page → mode picker
