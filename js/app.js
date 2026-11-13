@@ -360,7 +360,7 @@
     if (!L.queue.length) return finishLesson();
     L.q = L.queue[0]; L.state = 'answer'; L.sel = null; L.opts = null;
     $('#foot').className = 'foot'; $('#fb').innerHTML = '';
-    setCheck('ตรวจคำตอบ', false);
+    setCheck('เลือกคำตอบ', false);
 
     const q = L.q;
     let kind, body;
