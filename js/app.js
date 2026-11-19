@@ -278,6 +278,12 @@
           '<button class="fig-card no-i18n" data-fig="' + k + '">' + FIGS[k].svg + '<span>' + FIGS[k].title + '</span></button>').join('') +
         '</div></section>' + html;
     }
+    // Pilot: aviation vocabulary (glossary page)
+    if (course === 'pilot' && aviaTerms().length) {
+      html = '<a class="glossary-entry" href="#glossary"><span class="ge-ico">' + EX_ICON.book + '</span>' +
+        '<span class="ge-body"><b>คำศัพท์การบิน</b><i>' + nfmt(aviaTerms().length) + ' คำ พร้อมความหมายและคำอธิบาย · ค้นหาและทดสอบได้</i></span>' +
+        '<span class="lc-go">เปิด</span></a>' + html;
+    }
     $('#path').innerHTML = html;
     // Bring the next lesson to do into view in its row
     const curCard = $('#path .lesson-card.current');
@@ -845,8 +851,68 @@
     }
   };
 
+  /* ---------- Aviation vocabulary (data/avia/*.js → window.AVIA_TERMS) ---------- */
+  // Entry: [term, abbreviation, Thai meaning, Thai explanation, category]
+  const AVIA_CATS = { aircraft: 'เครื่องบินและระบบ', aero: 'อากาศพลศาสตร์และสมรรถนะ', met: 'อุตุนิยมวิทยา', nav: 'การเดินอากาศ', atc: 'ATC ห้วงอากาศ กฎหมาย', ops: 'สนามบิน ปฏิบัติการ ความปลอดภัย' };
+  let AVIA = null;
+  function aviaTerms() {
+    if (AVIA) return AVIA;
+    const seen = new Set();
+    AVIA = (window.AVIA_TERMS || []).filter((t) => {
+      const k = (t[0] + '|' + t[1]).toLowerCase();
+      if (!t[0] || seen.has(k)) return false;
+      seen.add(k); return true;
+    }).sort((a, b) => a[0].localeCompare(b[0], 'en', { sensitivity: 'base' }));
+    return AVIA;
+  }
+  const G = { q: '', cat: 'all', limit: 60 };
+  function glossaryList() {
+    const q = G.q.trim().toLowerCase();
+    return aviaTerms().filter((t) => (G.cat === 'all' || t[4] === G.cat) &&
+      (!q || t[0].toLowerCase().includes(q) || t[1].toLowerCase().includes(q) || t[2].includes(q) || t[3].includes(q)));
+  }
+  function renderGlossaryList() {
+    const list = glossaryList();
+    $('#g-count').textContent = nfmt(list.length) + ' ' + T('คำ');
+    $('#g-list').innerHTML = list.slice(0, G.limit).map((t) =>
+      '<article class="g-item no-i18n"><header><b>' + esc(t[0]) + '</b>' + (t[1] ? '<span class="g-abbr">' + esc(t[1]) + '</span>' : '') +
+      '<span class="g-cat">' + esc(AVIA_CATS[t[4]] || t[4]) + '</span></header>' +
+      '<p class="g-th">' + esc(t[2]) + '</p><p class="g-ex">' + esc(t[3]) + '</p></article>').join('') ||
+      '<p class="note">' + T('ไม่พบคำที่ค้นหา') + '</p>';
+    $('#g-more').classList.toggle('hidden', list.length <= G.limit);
+  }
+  function renderGlossary() {
+    const all = aviaTerms(), counts = {};
+    all.forEach((t) => { counts[t[4]] = (counts[t[4]] || 0) + 1; });
+    $('#glossary-body').innerHTML =
+      '<div class="page-banner"><p>' + T('คำศัพท์ที่นักบินต้องรู้ พร้อมคำแปลและคำอธิบาย') + '</p><h1>' + T('คำศัพท์การบิน') + '</h1>' +
+        '<div class="banner-row"><span>' + nfmt(all.length) + ' ' + T('คำ') + '</span><span>' + Object.keys(counts).length + ' ' + T('หมวด') + '</span></div></div>' +
+      '<div class="g-tools"><input id="g-search" class="g-search" type="search" placeholder="' + T('ค้นหาคำศัพท์ เช่น METAR, flap, มุมปะทะ') + '" value="' + esc(G.q) + '">' +
+        '<button class="btn" id="g-quiz">' + T('ทดสอบ 10 คำ') + '</button></div>' +
+      '<div class="g-chips">' + ['all'].concat(Object.keys(AVIA_CATS).filter((k) => counts[k])).map((k) =>
+        '<button class="g-chip' + (G.cat === k ? ' on' : '') + '" data-cat="' + k + '">' + (k === 'all' ? T('ทั้งหมด') : AVIA_CATS[k]) +
+        ' <small>' + nfmt(k === 'all' ? all.length : counts[k]) + '</small></button>').join('') + '</div>' +
+      '<p class="g-count" id="g-count"></p><div class="g-list" id="g-list"></div>' +
+      '<button class="btn ghost block hidden" id="g-more">' + T('ดูเพิ่มเติม') + '</button>';
+    renderGlossaryList();
+  }
+  // Quiz from the glossary: meaning ↔ term, multiple choice (practice mode: no lesson progress)
+  function glossaryQuiz() {
+    const pool = glossaryList().length >= 4 ? glossaryList() : aviaTerms();
+    if (pool.length < 4) return toast(T('ยังไม่มีคำศัพท์ให้ทดสอบ'));
+    const pickN = (arr, n, not) => shuffle(arr.filter((x) => x !== not)).slice(0, n);
+    const qs = pickN(pool, 10).map((t, i) => {
+      const others = pickN(pool.filter((x) => x[2] !== t[2] && x[0] !== t[0]), 3);
+      const name = t[0] + (t[1] ? ' (' + t[1] + ')' : '');
+      return i % 2 === 0
+        ? { type: 'mc', d: 2, q: '"' + name + '" หมายถึงอะไร', o: [t[2]].concat(others.map((x) => x[2])), a: 0, ex: t[3] }
+        : { type: 'mc', d: 2, q: 'คำใดหมายถึง "' + t[2] + '"', o: [name].concat(others.map((x) => x[0] + (x[1] ? ' (' + x[1] + ')' : ''))), a: 0, ex: t[3] };
+    });
+    startPractice(qs, T('คำศัพท์การบิน'));
+  }
+
   /* ---------- Router: bottom tab bar ---------- */
-  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#learn-toeic': 'learn', '#learn-grammar': 'learn', '#learn-vocab': 'learn', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
+  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#learn-toeic': 'learn', '#learn-grammar': 'learn', '#learn-vocab': 'learn', '#glossary': 'glossary', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
     if (location.hash === '#pilot') history.replaceState(null, '', location.pathname + location.search + '#learn');   // old Pilot page → Pilot lessons
@@ -868,11 +934,11 @@
     const sub = location.hash === '#pilot' ? 'pilot' : location.hash === '#english' ? 'english' : null;
     if (page === 'learn') setCourse({ '#learn-physics': 'physics', '#learn-chem': 'chem', '#learn-bio': 'bio', '#learn-math': 'math', '#learn-toeic': 'toeic', '#learn-grammar': 'grammar', '#learn-vocab': 'vocab' }[location.hash] || 'pilot');
     show('home');
-    ['hub', 'learn', 'practice', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
+    ['hub', 'learn', 'glossary', 'practice', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
     // Back arrow: Pilot lessons → Pilot page, physics lessons / Pilot page → mode picker
-    $('#to-hub').classList.toggle('hidden', !(page === 'learn' || sub));
-    $('#to-hub').setAttribute('href', page === 'learn' ? COURSES[course].back : '#exams');
-    const tab = page === 'learn' || page === 'hub' ? 'home' : page;
+    $('#to-hub').classList.toggle('hidden', !(page === 'learn' || page === 'glossary' || sub));
+    $('#to-hub').setAttribute('href', page === 'glossary' ? '#learn' : page === 'learn' ? COURSES[course].back : '#exams');
+    const tab = page === 'learn' || page === 'hub' || page === 'glossary' ? 'home' : page;
     $$('#tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.tab === tab));
     sync(); renderStats();
     if (page === 'learn') renderHome();
@@ -880,12 +946,25 @@
     else if (page === 'stats') renderPerf();
     else if (page === 'profile') renderProfile();
     else if (page === 'practice') renderPractice();
+    else if (page === 'glossary') renderGlossary();
     else renderHub(sub);
     $('#tab-dot').classList.toggle('hidden', !claimable());
     $('#tab-dot-p').classList.toggle('hidden', !Object.keys(S.miss || {}).some((k) => QBANK[k]));
   }
   window.addEventListener('hashchange', () => { if (!L) route(); });
   window.addEventListener('langchange', () => { if (!L) route(); });
+
+  // Glossary: search as you type, category chips, "show more", quiz
+  $('#glossary').addEventListener('input', (e) => {
+    if (e.target.id !== 'g-search') return;
+    G.q = e.target.value; G.limit = 60; renderGlossaryList();
+  });
+  $('#glossary').addEventListener('click', (e) => {
+    const chip = e.target.closest('.g-chip');
+    if (chip) { G.cat = chip.dataset.cat; G.limit = 60; $$('#glossary .g-chip').forEach((c) => c.classList.toggle('on', c === chip)); return renderGlossaryList(); }
+    if (e.target.closest('#g-more')) { G.limit += 60; return renderGlossaryList(); }
+    if (e.target.closest('#g-quiz')) glossaryQuiz();
+  });
 
   $('#practice').addEventListener('click', (e) => {
     const t = e.target.closest('.pr-tile');

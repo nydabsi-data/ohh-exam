@@ -322,3 +322,33 @@ body {
 .auth-wordmark { margin: 0; line-height: 0; }
 .auth-wordmark img { height: 84px; width: auto; max-width: 100%; }
 @media (max-width: 900px) { .auth-wordmark img { height: 64px; } }
+
+/* Aviation vocabulary (glossary) */
+.glossary-entry { display: flex; align-items: center; gap: 14px; margin: 0 0 22px; padding: 16px 18px; border-radius: 20px; text-decoration: none; color: #5A3E00;
+  background: linear-gradient(120deg, #FFF6DD, #FFE7A6); box-shadow: 0 10px 24px rgba(217,162,60,.22); transition: transform .15s; }
+.glossary-entry:hover { transform: translateY(-2px); }
+.glossary-entry .ge-ico { flex: none; width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: #fff; color: #D9A23C; }
+.glossary-entry .ge-ico svg { width: 26px; height: 26px; }
+.glossary-entry .ge-body { flex: 1; display: grid; }
+.glossary-entry b { font-size: 18px; font-weight: 800; }
+.glossary-entry i { font-style: normal; font-size: 13px; font-weight: 600; opacity: .85; }
+#glossary .page-banner { background: radial-gradient(260px 200px at 82% 18%, rgba(255,255,255,.5), rgba(255,255,255,0) 70%), linear-gradient(120deg, #FFE7A6, #F2C66D); }
+#glossary .page-banner h1, #glossary .page-banner p { color: #5A3E00; }
+.g-tools { display: flex; gap: 10px; margin-bottom: 12px; }
+.g-search { flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 13px 16px; border: 2px solid var(--line); border-radius: 14px; background: #fff; color: var(--ink); }
+.g-search:focus { outline: none; border-color: var(--sky-l); box-shadow: 0 0 0 4px var(--sky-50); }
+.g-tools .btn { flex: none; }
+.g-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; }
+.g-chip { flex: none; font: inherit; font-size: 13px; font-weight: 700; padding: 8px 12px; border-radius: 999px; border: 2px solid var(--line); background: #fff; color: var(--muted); cursor: pointer; }
+.g-chip small { opacity: .7; }
+.g-chip.on { border-color: #D9A23C; background: #FFF4D6; color: #5A3E00; }
+.g-count { margin: 4px 0 10px; color: var(--muted); font-weight: 700; font-size: 13px; }
+.g-list { display: grid; gap: 10px; margin-bottom: 14px; }
+@media (min-width: 900px) { .g-list { grid-template-columns: 1fr 1fr; } }
+.g-item { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; box-shadow: var(--shadow); }
+.g-item header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 8px; }
+.g-item header b { font-size: 16px; font-weight: 800; color: var(--ink); }
+.g-abbr { font-size: 12px; font-weight: 800; color: #fff; background: var(--sky-d); padding: 2px 8px; border-radius: 999px; }
+.g-cat { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--faint); }
+.g-th { margin: 4px 0 2px; font-weight: 700; color: #8549E8; }
+.g-ex { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.5; }
