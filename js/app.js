@@ -581,6 +581,20 @@
   }
   function setChar(n) { S.avatar = n; S.avatarAt = Date.now(); save(); }
 
+  // A character on each Home card (image numbers from CHARS)
+  const MODE_CHAR = { pilot: 2, physics: 5, chem: 3, bio: 8, mathhs: 4, english: 1 };
+  // Home search: filters the subject cards as you type; Enter searches the aviation vocabulary
+  function hubSearch(q) {
+    q = q.trim().toLowerCase();
+    let shown = 0;
+    $$('#exam-grid .mode-card').forEach((c) => { const ok = !q || c.dataset.text.includes(q); c.classList.toggle('hidden', !ok); if (ok) shown++; });
+    const none = $('#hub-none');
+    if (!shown && q) {
+      const html = '<p class="note" id="hub-none">' + T('ไม่พบวิชาที่ตรงกัน') + (aviaTerms().length ? ' — <a href="#glossary" id="hub-to-g">' + T('ค้นหาในคำศัพท์การบิน') + '</a>' : '') + '</p>';
+      if (none) none.outerHTML = html; else $('#exam-grid').insertAdjacentHTML('afterend', html);
+    } else if (none) none.remove();
+  }
+
   function renderHub(sub) {
     const doneN = doneIn('pilot');
     const mode = sub && MODES.find((m) => m.id === sub);
@@ -589,12 +603,25 @@
     const hc = $('#hub-char');
     if (hc) { hc.src = charSrc(myChar()); hc.alt = T(charOf(myChar()).th); }
     $('#exam-grid').classList.toggle('modes', !mode);
+    // Home extras: stats card in the banner, search bar, section heading (main picker only)
+    $('#hub-stats').classList.toggle('hidden', !!mode);
+    $('#hub-search-wrap').classList.toggle('hidden', !!mode);
+    $('#hub-sec').classList.toggle('hidden', !!mode);
+    if (!mode) {
+      const passed = Object.keys(COURSES).reduce((s, c) => s + doneIn(c), 0);
+      $('#hub-stats').innerHTML =
+        '<span><i class="hs-ico xp">' + ICON.bolt + '</i><span><small>' + T('XP สะสม') + '</small><b>' + nfmt(S.xp) + '</b></span></span>' +
+        '<span><i class="hs-ico st">' + ICON.flame + '</i><span><small>' + T('เรียนต่อเนื่อง') + '</small><b>' + S.streak + ' ' + T('วัน') + '</b></span></span>' +
+        '<span><i class="hs-ico ok">' + ICON.check + '</i><span><small>' + T('บทเรียนผ่าน') + '</small><b>' + passed + '</b></span></span>';
+    }
     if (!mode) {
       $('#exam-grid').innerHTML = MODES.filter((m) => modeCourses(m).length).map((m) => { const cs = modeCourses(m);
-        return '<a class="exam-card mode-card' + (m.cls ? ' ' + m.cls : '') + '" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '">' +
+        return '<a class="exam-card mode-card' + (m.cls ? ' ' + m.cls : '') + '" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '"' +
+            ' data-text="' + esc((m.title + ' ' + m.th).toLowerCase()) + '">' +
           '<span class="mc-deco">' + EX_ICON[m.icon] + '</span>' +
+          (MODE_CHAR[m.id] ? '<img class="mc-char" src="' + charSrc(MODE_CHAR[m.id]) + '" alt="" loading="lazy">' : '') +
           '<span class="mc-top"><span class="mc-ico">' + EX_ICON[m.icon] + '</span>' +
-            '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
+            '<span><small class="mc-kick">' + T('เริ่ม') + '</small><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
           // Numbers on the card: topics (units) — or courses for English — questions, lessons passed
           '<span class="mc-nums">' +
             '<span><b>' + (m.courses ? cs.length : sumOf(cs, (c) => c.units.length)) + '</b><i>' + T(m.unitLabel || 'เรื่อง') + '</i></span>' +
@@ -888,7 +915,7 @@
       '<div class="page-banner"><p>' + T('คำศัพท์ที่นักบินต้องรู้ พร้อมคำแปลและคำอธิบาย') + '</p><h1>' + T('คำศัพท์การบิน') + '</h1>' +
         '<div class="banner-row"><span>' + nfmt(all.length) + ' ' + T('คำ') + '</span><span>' + Object.keys(counts).length + ' ' + T('หมวด') + '</span></div></div>' +
       '<div class="g-tools"><input id="g-search" class="g-search" type="search" placeholder="' + T('ค้นหาคำศัพท์ เช่น METAR, flap, มุมปะทะ') + '" value="' + esc(G.q) + '">' +
-        '<button class="btn" id="g-quiz">' + T('ทดสอบ 10 คำ') + '</button></div>' +
+        '<button class="btn" id="g-quiz">' + T('การ์ดคำศัพท์ 3 วิ') + '</button></div>' +
       '<div class="g-chips">' + ['all'].concat(Object.keys(AVIA_CATS).filter((k) => counts[k])).map((k) =>
         '<button class="g-chip' + (G.cat === k ? ' on' : '') + '" data-cat="' + k + '">' + (k === 'all' ? T('ทั้งหมด') : AVIA_CATS[k]) +
         ' <small>' + nfmt(k === 'all' ? all.length : counts[k]) + '</small></button>').join('') + '</div>' +
@@ -896,19 +923,52 @@
       '<button class="btn ghost block hidden" id="g-more">' + T('ดูเพิ่มเติม') + '</button>';
     renderGlossaryList();
   }
-  // Quiz from the glossary: meaning ↔ term, multiple choice (practice mode: no lesson progress)
-  function glossaryQuiz() {
+  /* Flash cards: every word in the current filter, shuffled; 3 seconds per card; when all are done a new
+     shuffled round starts, and it keeps going until "หยุด". +2 XP per right answer. */
+  const FC_SECS = 3;
+  let FC = null;
+  function fcStop() { if (FC) { clearInterval(FC.timer); clearTimeout(FC.next); FC.on = false; } }
+  function startFlash() {
+    fcStop();
     const pool = glossaryList().length >= 4 ? glossaryList() : aviaTerms();
     if (pool.length < 4) return toast(T('ยังไม่มีคำศัพท์ให้ทดสอบ'));
-    const pickN = (arr, n, not) => shuffle(arr.filter((x) => x !== not)).slice(0, n);
-    const qs = pickN(pool, 10).map((t, i) => {
-      const others = pickN(pool.filter((x) => x[2] !== t[2] && x[0] !== t[0]), 3);
-      const name = t[0] + (t[1] ? ' (' + t[1] + ')' : '');
-      return i % 2 === 0
-        ? { type: 'mc', d: 2, q: '"' + name + '" หมายถึงอะไร', o: [t[2]].concat(others.map((x) => x[2])), a: 0, ex: t[3] }
-        : { type: 'mc', d: 2, q: 'คำใดหมายถึง "' + t[2] + '"', o: [name].concat(others.map((x) => x[0] + (x[1] ? ' (' + x[1] + ')' : ''))), a: 0, ex: t[3] };
-    });
-    startPractice(qs, T('คำศัพท์การบิน'));
+    FC = { on: true, pool, deck: shuffle(pool.slice()), i: 0, round: 1, right: 0, wrong: 0, streak: 0 };
+    fcCard();
+  }
+  function fcCard() {
+    if (!FC || !FC.on) return;
+    if (FC.i >= FC.deck.length) { FC.deck = shuffle(FC.pool.slice()); FC.i = 0; FC.round++; toast(T('เริ่มรอบใหม่ สุ่มลำดับใหม่')); }
+    const t = FC.deck[FC.i];
+    const others = shuffle(FC.pool.filter((x) => x[2] !== t[2])).slice(0, 3);
+    FC.opts = shuffle([{ s: t[2], c: true }].concat(others.map((x) => ({ s: x[2], c: false }))));
+    FC.t = t; FC.done = false; FC.start = Date.now();
+    $('#glossary-body').innerHTML =
+      '<div class="fc-wrap">' +
+        '<div class="fc-top"><span>' + T('รอบที่') + ' ' + FC.round + ' · ' + T('คำที่') + ' ' + (FC.i + 1) + '/' + nfmt(FC.deck.length) + '</span>' +
+          '<span class="fc-score"><b class="ok">✓ ' + FC.right + '</b> <b class="bad">✗ ' + FC.wrong + '</b>' + (FC.streak > 2 ? ' <b class="st">🔥 ' + FC.streak + '</b>' : '') + '</span></div>' +
+        '<div class="fc-bar"><span id="fc-time"></span></div>' +
+        '<div class="fc-card no-i18n">' + (t[1] ? '<small>' + esc(t[1]) + '</small>' : '') + '<b>' + esc(t[0]) + '</b><i>' + esc(AVIA_CATS[t[4]] || '') + '</i></div>' +
+        '<div class="fc-opts no-i18n">' + FC.opts.map((o, k) => '<button class="fc-opt" data-k="' + k + '"><span class="k">' + (k + 1) + '</span>' + esc(o.s) + '</button>').join('') + '</div>' +
+        '<p class="fc-ex no-i18n" id="fc-ex"></p>' +
+        '<div class="fc-actions"><button class="btn ghost" id="fc-back">' + T('หยุด') + '</button></div>' +
+      '</div>';
+    FC.timer = setInterval(() => {
+      const left = FC_SECS - (Date.now() - FC.start) / 1000, bar = $('#fc-time');
+      if (bar) { bar.style.width = Math.max(0, left / FC_SECS * 100) + '%'; bar.classList.toggle('low', left < 1); }
+      if (left <= 0) fcAnswer(-1);   // time is up
+    }, 50);
+  }
+  function fcAnswer(k) {
+    if (!FC || FC.done) return;
+    FC.done = true; clearInterval(FC.timer);
+    const ok = k >= 0 && FC.opts[k].c;
+    if (ok) { FC.right++; FC.streak++; S.xp += 2; S.todayXp += 2; S.hist[dayKey()] = (S.hist[dayKey()] || 0) + 2; S.daily.correct++; save(); }
+    else { FC.wrong++; FC.streak = 0; }
+    tone(ok);
+    $$('#glossary .fc-opt').forEach((b, j) => { b.disabled = true; if (FC.opts[j].c) b.classList.add('right'); else if (j === k) b.classList.add('wrong'); });
+    $('#fc-ex').innerHTML = (k < 0 ? '<b>' + T('หมดเวลา') + '</b> · ' : '') + esc(FC.t[3]);
+    FC.i++;
+    FC.next = setTimeout(fcCard, ok ? 1100 : 2400);   // a little longer to read the explanation after a miss
   }
 
   /* ---------- Router: bottom tab bar ---------- */
@@ -941,12 +1001,13 @@
     const tab = page === 'learn' || page === 'hub' || page === 'glossary' ? 'home' : page;
     $$('#tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.tab === tab));
     sync(); renderStats();
+    if (page !== 'glossary') fcStop();   // leaving the flash cards stops their timer
     if (page === 'learn') renderHome();
     else if (page === 'missions') renderMissions();
     else if (page === 'stats') renderPerf();
     else if (page === 'profile') renderProfile();
     else if (page === 'practice') renderPractice();
-    else if (page === 'glossary') renderGlossary();
+    else if (page === 'glossary') { if (!(FC && FC.on)) renderGlossary(); }
     else renderHub(sub);
     $('#tab-dot').classList.toggle('hidden', !claimable());
     $('#tab-dot-p').classList.toggle('hidden', !Object.keys(S.miss || {}).some((k) => QBANK[k]));
@@ -954,16 +1015,31 @@
   window.addEventListener('hashchange', () => { if (!L) route(); });
   window.addEventListener('langchange', () => { if (!L) route(); });
 
-  // Glossary: search as you type, category chips, "show more", quiz
+  // Home search
+  $('#hub').addEventListener('input', (e) => { if (e.target.id === 'hub-q') hubSearch(e.target.value); });
+  $('#hub').addEventListener('keydown', (e) => {
+    if (e.target.id !== 'hub-q' || e.key !== 'Enter' || !aviaTerms().length) return;
+    const shown = $$('#exam-grid .mode-card:not(.hidden)').length;
+    if (!shown || e.target.value.trim()) { G.q = e.target.value; G.cat = 'all'; G.limit = 60; if (!shown) location.hash = '#glossary'; }
+  });
+  $('#hub').addEventListener('click', (e) => { if (e.target.closest('#hub-to-g')) { G.q = $('#hub-q').value; G.cat = 'all'; G.limit = 60; } });
+
+  // Glossary: search as you type, category chips, "show more", flash cards
   $('#glossary').addEventListener('input', (e) => {
     if (e.target.id !== 'g-search') return;
     G.q = e.target.value; G.limit = 60; renderGlossaryList();
   });
   $('#glossary').addEventListener('click', (e) => {
+    if (FC && FC.on) {
+      const o = e.target.closest('.fc-opt'); if (o) return fcAnswer(+o.dataset.k);
+      if (e.target.closest('#fc-again')) return startFlash();
+      if (e.target.closest('#fc-back')) { fcStop(); return renderGlossary(); }
+      return;
+    }
     const chip = e.target.closest('.g-chip');
     if (chip) { G.cat = chip.dataset.cat; G.limit = 60; $$('#glossary .g-chip').forEach((c) => c.classList.toggle('on', c === chip)); return renderGlossaryList(); }
     if (e.target.closest('#g-more')) { G.limit += 60; return renderGlossaryList(); }
-    if (e.target.closest('#g-quiz')) glossaryQuiz();
+    if (e.target.closest('#g-quiz')) startFlash();
   });
 
   $('#practice').addEventListener('click', (e) => {
@@ -1126,6 +1202,7 @@
 
   document.addEventListener('keydown', (e) => {
     if (!$('#modal').classList.contains('hidden')) { if (e.key === 'Escape') dismissModal(); return; }
+    if (FC && FC.on && /^[1-4]$/.test(e.key)) return fcAnswer(+e.key - 1);   // flash cards: keys 1–4
     if (!L) return;
     if (e.key === 'Escape') return askQuit();
     if (e.key === 'Enter') { e.preventDefault(); if (!$('#check').disabled) onCheck(); return; }
