@@ -425,3 +425,27 @@ body {
 .foot.ok .btn { background: linear-gradient(180deg, #E2B04B, #C58E20) !important; box-shadow: 0 3px 0 #9E7116 !important; }
 .fc-opt.right { border-color: #C58E20; background: #FBF1DC; color: #7A5410; }
 .fc-score .ok { color: #B5821C; }
+
+/* Home cards: no characters (only the banner keeps one) — let the content use the full width */
+.mode-card .mc-nums, .mode-card .mc-foot { max-width: none; }
+
+/* ===== Course page: topic buttons + lesson cards with a big icon and a round play button ===== */
+.topic-head { display: flex; justify-content: space-between; align-items: baseline; margin: 4px 2px 10px; }
+.topic-head h3 { margin: 0; font-size: 18px; font-weight: 800; color: var(--ink); }
+.topic-head span { font-size: 13px; font-weight: 700; color: var(--muted); }
+.topic-row { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 12px; margin-bottom: 14px; scroll-snap-type: x proximity; }
+.topic-btn { flex: 0 0 auto; width: 84px; display: grid; justify-items: center; align-content: start; gap: 6px; padding: 0; border: 0; background: none; cursor: pointer; font: inherit; scroll-snap-align: start; }
+.topic-btn .tb-ico { width: 60px; height: 60px; border-radius: 18px; display: grid; place-items: center; color: var(--d);
+  background: color-mix(in srgb, var(--c) 18%, #fff); border: 2px solid color-mix(in srgb, var(--c) 30%, #fff); transition: transform .12s, background .12s; }
+.topic-btn .tb-ico svg { width: 28px; height: 28px; }
+.topic-btn:hover .tb-ico { transform: translateY(-2px); background: color-mix(in srgb, var(--c) 28%, #fff); }
+.topic-btn .tb-lab { font-size: 12px; font-weight: 700; color: var(--ink); text-align: center; line-height: 1.25; max-width: 84px; }
+
+.lesson-card { position: relative; padding-bottom: 58px; }
+.lesson-card .lc-ico { width: 72px; height: 72px; border-radius: 22px; margin: 8px auto 6px; }
+.lesson-card .lc-ico svg { width: 36px; height: 36px; }
+.lesson-card .lc-foot { position: absolute; left: 14px; right: 14px; bottom: 12px; display: flex; align-items: center; justify-content: flex-end; min-height: 40px; }
+.lesson-card .lc-foot .lc-state { margin-right: auto; }
+.lc-go { width: 40px; height: 40px; padding: 0 !important; border-radius: 50% !important; display: grid; place-items: center; font-size: 0;
+  background: linear-gradient(180deg, #D9947B, #CA6B48) !important; color: #fff; box-shadow: 0 3px 0 #A34E2F; }
+.lc-go svg { width: 18px; height: 18px; margin-left: 2px; }

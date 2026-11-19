@@ -198,6 +198,51 @@
     ta.title = user ? uname() : 'เข้าสู่ระบบเพื่อบันทึกความคืบหน้า';
   }
 
+  // Lesson-card icon that matches the unit's topic (falls back to the star)
+  const TI = (d, fill) => '<svg viewBox="0 0 24 24" ' + (fill ? 'fill="currentColor"' : 'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"') + '>' + d + '</svg>';
+  const TOPIC_ICONS = [
+    [/^basic/, TI('<path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>', true)],          // aeroplane
+    [/^hist/, TI('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')],                                                                    // clock
+    [/^pof|^aero/, TI('<path d="M3 14c5-6 13-6 18-2"/><path d="M8 9V4M12 8V3M16 9V5"/><path d="m6 6 2-2 2 2M10 5l2-2 2 2M14 7l2-2 2 2"/>')],     // lift arrows over a wing
+    [/^met/, TI('<path d="M7 18a4 4 0 0 1-.6-7.96A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9z"/>')],                                                     // cloud
+    [/^nav/, TI('<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>')],                                                          // compass
+    [/^law/, TI('<path d="M12 3v18M5 7h14M7 21h10"/><path d="M5 7 2 13a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0z"/>')],                           // scales
+    [/^agk/, TI('<path d="M4 18a8 8 0 1 1 16 0"/><path d="m12 18 4-6"/><circle cx="12" cy="18" r="1.4" fill="currentColor"/>')],                // gauge
+    [/^hfr/, TI('<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>')], // headset
+    [/^phy-kin/, TI('<path d="M3 12h13M12 7l5 5-5 5M20 5v14"/>')],
+    [/^phy-force/, TI('<path d="M2 12h7M15 12h7M6 9l3 3-3 3M18 9l-3 3 3 3"/><rect x="9" y="9" width="6" height="6" rx="1"/>')],
+    [/^phy-energy|^chem-redox/, TI('<path d="M13.5 2 4 14h6.5L9 22l11-13h-6.8z"/>', true)],
+    [/^phy-motion/, TI('<ellipse cx="12" cy="12" rx="9" ry="5"/><circle cx="20" cy="10" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="2"/>')],
+    [/^phy-wave/, TI('<path d="M2 12c2.5-6 5-6 7.5 0s5 6 7.5 0 3.5-4 5-2"/>')],
+    [/^phy-elec/, TI('<path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0zM12 17v5"/>')],
+    [/^phy-mag/, TI('<path d="M6 3v8a6 6 0 0 0 12 0V3h-4v8a2 2 0 0 1-4 0V3z"/>')],
+    [/^phy-heat/, TI('<path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"/><path d="M12 9v7"/>')],
+    [/^phy-modern|^chem-atom/, TI('<ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/>')],
+    [/^chem-bond/, TI('<circle cx="6" cy="12" r="3.5"/><circle cx="18" cy="12" r="3.5"/><path d="M9.5 11h5M9.5 13h5"/>')],
+    [/^chem-mole/, TI('<path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10"/>')],
+    [/^chem-rate/, TI('<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4.2l2.6 1.6M9.5 2.5h5"/>')],
+    [/^chem-acid/, TI('<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>')],
+    [/^chem-org/, TI('<path d="M12 3l7.8 4.5v9L12 21l-7.8-4.5v-9z"/>')],
+    [/^bio-cell/, TI('<circle cx="12" cy="12" r="9"/><circle cx="13" cy="11" r="3.5"/><circle cx="7.5" cy="15" r="1" fill="currentColor"/>')],
+    [/^bio-mol|^bio-gen/, TI('<path d="M7 3c0 6 10 6 10 12s-10 6-10 6M17 3c0 6-10 6-10 12s10 6 10 6M8.5 7h7M8.5 17h7"/>')],
+    [/^bio-body/, TI('<path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 2.9 4.5 6.6 4.5c2.1 0 3.6 1.2 5.4 3.2 1.8-2 3.3-3.2 5.4-3.2 3.7 0 5.7 4 4.2 7.3C19.5 16.4 12 21 12 21z"/>', true)],
+    [/^bio-plant/, TI('<path d="M5 19C5 10 11 4 20 4c0 9-6 15-15 15z"/><path d="M5 19 13 11"/>')],
+    [/^bio-eco/, TI('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>')],
+    [/^math-set/, TI('<circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/>')],
+    [/^math-real/, TI('<path d="M3 13h3l3 7 5-17h7"/>')],
+    [/^math-func|^math-explog/, TI('<path d="M4 4v16h16"/><path d="M6 17c4 0 6-10 13-11"/>')],
+    [/^math-trig/, TI('<path d="M4 20h16L4 6z"/><path d="M4 16h4v4"/>')],
+    [/^math-seq/, TI('<path d="M18 5H6l7 7-7 7h12"/>')],
+    [/^math-prob/, TI('<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/><circle cx="15" cy="9" r="1.3" fill="currentColor"/><circle cx="9" cy="15" r="1.3" fill="currentColor"/>')],
+    [/^math-stat/, TI('<path d="M4 20h16M7 20v-6M12 20V8M17 20v-10"/>')],
+    [/^math-calc/, TI('<path d="M14 4c-2-1-4 0-4 3v10c0 3-2 4-4 3"/>')],
+    [/^wind/, TI('<path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/>')],
+    [/^geo/, TI('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>')],
+    [/^toeic|^eg-|^ev-/, TI('<path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2zM4 20a2 2 0 0 0 2 2h13v-4"/><path d="M8 8h7M8 12h5"/>')]
+  ];
+  const topicIcon = (unitId) => { const t = TOPIC_ICONS.find((x) => x[0].test(unitId || '')); return t ? t[1] : ICON.star; };
+  const PLAY_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
+
   const isDone = (id) => !!S.done[id];
   const aptBest = (id) => (S.apt && S.apt[id] ? S.apt[id].best : null);
   let isAdmin = false;   // super admin: every lesson unlocked
@@ -219,7 +264,7 @@
     let html = '', i = 0;
     UNITS.forEach((u, ui) => {
       const doneN = u.lessons.filter((l) => isDone(l.id)).length;
-      html += '<section class="unit" style="--c:' + u.color + ';--d:' + u.dark + ';--t:' + (u.text || '#fff') + '">' +
+      html += '<section class="unit" id="unit-' + ui + '" style="--c:' + u.color + ';--d:' + u.dark + ';--t:' + (u.text || '#fff') + '">' +
         '<header class="unit-head"><div><small>Unit ' + (ui + 1) + ' · ' + esc(u.th) + '</small><h2>' + esc(u.title) + '</h2></div>' +
         '<span class="unit-tools"><span class="unit-count">' + doneN + '/' + u.lessons.length + '</span>' +
           '<button class="row-arrow" data-dir="-1" aria-label="ก่อนหน้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>' +
@@ -233,10 +278,10 @@
         const foot = st === 'done' ? '<span class="lc-state done">' + ICON.check + '<span>ผ่านแล้ว ' + best + '%</span></span>'
           : gl ? '<span class="lc-state locked">' + ICON.lock + '<span>สมัครเพื่อปลดล็อก</span></span>'
           : st === 'locked' ? '<span class="lc-state locked">' + ICON.lock + '<span>ล็อก</span></span>'
-          : '<span class="lc-go">เริ่ม</span>';
+          : '<span class="lc-go" aria-label="เริ่ม">' + PLAY_ICON + '</span>';
         html += '<button class="lesson-card ' + st + (gl ? ' guest' : '') + '" data-i="' + i + '" aria-label="' + esc(l.title) + '">' +
           '<span class="lc-top"><span class="lc-num">บทที่ ' + (li + 1) + '</span>' + diffChip(lessonDiff(l)) + '</span>' +
-          '<span class="lc-ico">' + (st === 'done' ? ICON.check : st === 'locked' ? ICON.lock : ICON.star) + '</span>' +
+          '<span class="lc-ico">' + (st === 'done' ? ICON.check : st === 'locked' ? ICON.lock : topicIcon(u.id)) + '</span>' +
           '<span class="lc-title">' + esc(l.title) + '</span>' +
           '<span class="lc-meta">' + l.questions.length + ' ข้อ</span>' +
           '<span class="lc-foot">' + foot + '</span></button>';
@@ -247,7 +292,7 @@
     // Pilot: the 6 aptitude tests as one more unit, same card style (always open)
     if (course === 'pilot') {
       const tests = EXAMS.filter((x) => x.id !== 'learn');
-      html += '<section class="unit" style="--c:#CB7F89;--d:#BD5D6A;--t:#fff">' +
+      html += '<section class="unit" id="unit-apt" style="--c:#CB7F89;--d:#BD5D6A;--t:#fff">' +
         '<header class="unit-head"><div><small>Unit ' + (UNITS.length + 1) + ' · แบบทดสอบความถนัด</small><h2>Aptitude tests</h2></div>' +
         '<span class="unit-tools"><span class="unit-count">' + tests.length + ' ' + T('ชุด') + '</span>' +
           '<button class="row-arrow" data-dir="-1" aria-label="ก่อนหน้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>' +
@@ -265,8 +310,17 @@
           '<span class="lc-meta">' + x.meta.map(esc).join(' · ') + '</span>' +
           '<span class="lc-foot">' + (aptBest(x.id) != null
             ? '<span class="lc-state done">' + ICON.check + '<span>ดีที่สุด ' + aptBest(x.id) + '%</span></span>'
-            : '<span class="lc-go">เริ่ม</span>') + '</span></a>')).join('') +
+            : '<span class="lc-go" aria-label="เริ่ม">' + PLAY_ICON + '</span>') + '</span></a>')).join('') +
         '</div></section>';
+    }
+    // Topic buttons: one square icon tile per unit (tap to jump to it)
+    if (UNITS.length > 1) {
+      const tiles = UNITS.map((u, ui) => ({ id: 'unit-' + ui, c: u.color, d: u.dark, icon: topicIcon(u.id), label: u.th || u.title }));
+      if (course === 'pilot') tiles.push({ id: 'unit-apt', c: '#CB7F89', d: '#BD5D6A', icon: EX_ICON.stick, label: 'แบบทดสอบ' });
+      html = '<div class="topic-head"><h3>' + T('หัวข้อ') + '</h3><span>' + tiles.length + ' ' + T('หัวข้อ') + '</span></div>' +
+        '<div class="topic-row">' + tiles.map((t) =>
+          '<button class="topic-btn" data-go="' + t.id + '" style="--c:' + t.c + ';--d:' + t.d + '"><span class="tb-ico">' + t.icon + '</span><span class="tb-lab">' + esc(t.label) + '</span></button>').join('') +
+        '</div>' + html;
     }
     // Picture cards for this course (tap to enlarge)
     const figs = Object.keys(window.FIGS || {}).filter((k) => FIGS[k].course === course);
@@ -282,7 +336,7 @@
     if (course === 'pilot' && aviaTerms().length) {
       html = '<a class="glossary-entry" href="#glossary"><span class="ge-ico">' + EX_ICON.book + '</span>' +
         '<span class="ge-body"><b>คำศัพท์การบิน</b><i>' + nfmt(aviaTerms().length) + ' คำ พร้อมความหมายและคำอธิบาย · ค้นหาและทดสอบได้</i></span>' +
-        '<span class="lc-go">เปิด</span></a>' + html;
+        '<span class="lc-go" aria-label="เปิด">' + PLAY_ICON + '</span></a>' + html;
     }
     $('#path').innerHTML = html;
     // Bring the next lesson to do into view in its row
@@ -619,7 +673,6 @@
         return '<a class="exam-card mode-card' + (m.cls ? ' ' + m.cls : '') + '" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '"' +
             ' data-text="' + esc((m.title + ' ' + m.th).toLowerCase()) + '">' +
           '<span class="mc-deco">' + EX_ICON[m.icon] + '</span>' +
-          (MODE_CHAR[m.id] ? '<img class="mc-char" src="' + charSrc(MODE_CHAR[m.id]) + '" alt="" loading="lazy">' : '') +
           '<span class="mc-top"><span class="mc-ico">' + EX_ICON[m.icon] + '</span>' +
             '<span><small class="mc-kick">' + T('เริ่ม') + '</small><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
           // Numbers on the card: topics (units) — or courses for English — questions, lessons passed
@@ -1164,6 +1217,8 @@
       row.scrollBy({ left: +arrow.dataset.dir * (row.clientWidth * 0.8), behavior: 'smooth' });
       return;
     }
+    const tb = e.target.closest('.topic-btn');
+    if (tb) { const sec = document.getElementById(tb.dataset.go); if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     const fc = e.target.closest('.fig-card');
     if (fc) return openFig(fc.dataset.fig);
     if (e.target.closest('.lesson-card.guest')) return askSignup();
