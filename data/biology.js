@@ -5,7 +5,7 @@
   const mc = (d, q, o, ex) => ({ type: 'mc', d, q, o, a: 0, ex });
   const tf = (d, q, a, ex) => ({ type: 'tf', d, q, a, ex });
   window.BIO_UNITS = [
-    { id: 'bio-cell', title: 'The cell', th: 'เซลล์และการแบ่งเซลล์', en: 'Cells and cell division', sym: '◎', color: '#1CB0F6', dark: '#1899D6', text: '#fff',
+    { id: 'bio-cell', title: 'The cell', th: 'เซลล์และการแบ่งเซลล์', en: 'Cells and cell division', sym: '◎', color: '#CA6B48', dark: '#B85836', text: '#fff',
       lessons: [
         { id: 'bio-cell-1', title: 'โครงสร้างและการลำเลียงผ่านเซลล์', en: 'Cell structure and transport', questions: [
           mc(1, 'ออร์แกเนลล์ใดเป็นแหล่งสร้าง ATP หลักของเซลล์', ['ไมโทคอนเดรีย', 'ไรโบโซม', 'กอลจิคอมเพล็กซ์', 'ไลโซโซม'], 'ไมโทคอนเดรียเป็นที่เกิดการหายใจระดับเซลล์แบบใช้ออกซิเจน ได้ ATP มากที่สุด'),
@@ -22,7 +22,7 @@
           mc(2, 'ระยะใดของไมโทซิสที่โครโมโซมมาเรียงตัวอยู่กลางเซลล์', ['เมทาเฟส', 'โพรเฟส', 'แอนาเฟส', 'เทโลเฟส'], 'เมทาเฟส: โครโมโซมเรียงแนวกลางเซลล์ แอนาเฟส: โครมาทิดแยกไปคนละขั้ว')
         ] }
       ] },
-    { id: 'bio-mol', title: 'Biomolecules', th: 'สารชีวโมเลกุลและเอนไซม์', en: 'Biomolecules and enzymes', sym: '⌬', color: '#A570FF', dark: '#8549E8', text: '#fff',
+    { id: 'bio-mol', title: 'Biomolecules', th: 'สารชีวโมเลกุลและเอนไซม์', en: 'Biomolecules and enzymes', sym: '⌬', color: '#DFA590', dark: '#D17E60', text: '#fff',
       lessons: [
         { id: 'bio-mol-1', title: 'คาร์โบไฮเดรต โปรตีน ลิพิด เอนไซม์', en: 'Carbohydrates, proteins, lipids, enzymes', questions: [
           mc(1, 'หน่วยย่อยของโปรตีนคืออะไร', ['กรดอะมิโน', 'กลูโคส', 'กรดไขมัน', 'นิวคลีโอไทด์'], 'โปรตีนเป็นพอลิเมอร์ของกรดอะมิโน'),
@@ -32,7 +32,7 @@
           mc(2, 'พันธะที่เชื่อมระหว่างกรดอะมิโนคือพันธะอะไร', ['พันธะเพปไทด์', 'พันธะไกลโคซิดิก', 'พันธะเอสเทอร์', 'พันธะไฮโดรเจน'], 'หมู่คาร์บอกซิลของกรดอะมิโนตัวหนึ่งต่อกับหมู่อะมิโนของอีกตัว เกิดพันธะเพปไทด์และน้ำ')
         ] }
       ] },
-    { id: 'bio-gen', title: 'Genetics', th: 'พันธุศาสตร์', en: 'Genetics', sym: 'Aa', color: '#FF9600', dark: '#E07F00', text: '#fff',
+    { id: 'bio-gen', title: 'Genetics', th: 'พันธุศาสตร์', en: 'Genetics', sym: 'Aa', color: '#B54A58', dark: '#9F414E', text: '#fff',
       lessons: [
         { id: 'bio-gen-1', title: 'การถ่ายทอดลักษณะของเมนเดล', en: "Mendel's inheritance", questions: [
           mc(2, 'ผสม Aa × Aa (A ข่ม a สมบูรณ์) ลูกมีลักษณะด้อยในสัดส่วนเท่าใด', ['1/4', '1/2', '3/4', '0'], 'ลูกเป็น AA : Aa : aa = 1 : 2 : 1 ลักษณะด้อยคือ aa = 1/4'),
@@ -49,7 +49,7 @@
           mc(2, 'สาย DNA 5′-ATGC-3′ มีสายคู่สมตามข้อใด', ['3′-TACG-5′', '5′-TACG-3′', '3′-UACG-5′', '3′-ATGC-5′'], 'คู่เบส A–T, T–A, G–C, C–G และสายคู่สมวางตัวสวนทิศ (3′ → 5′)')
         ] }
       ] },
-    { id: 'bio-body', title: 'Human body', th: 'ระบบในร่างกายมนุษย์', en: 'Human body systems', sym: '♥', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    { id: 'bio-body', title: 'Human body', th: 'ระบบในร่างกายมนุษย์', en: 'Human body systems', sym: '♥', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
       lessons: [
         { id: 'bio-body-1', title: 'ย่อยอาหาร หายใจ หมุนเวียนเลือด', en: 'Digestion, breathing, circulation', questions: [
           mc(2, 'การย่อยโปรตีนเริ่มต้นที่อวัยวะใด', ['กระเพาะอาหาร', 'ปาก', 'ลำไส้ใหญ่', 'หลอดอาหาร'], 'เพปซินในกระเพาะอาหารเริ่มย่อยโปรตีน (ปากย่อยแป้งด้วยอะไมเลส)'),
@@ -66,7 +66,7 @@
           mc(2, 'สมองส่วนใดควบคุมการทรงตัวและการประสานงานของกล้ามเนื้อ', ['ซีรีเบลลัม', 'ซีรีบรัม', 'ไฮโปทาลามัส', 'เมดัลลาออบลองกาตา'], 'ซีรีเบลลัม (สมองน้อย) ควบคุมการทรงตัว ส่วนเมดัลลาฯ ควบคุมการหายใจและการเต้นของหัวใจ')
         ] }
       ] },
-    { id: 'bio-plant', title: 'Plants', th: 'พืช', en: 'Plants', sym: '✿', color: '#E5279B', dark: '#C21A80', text: '#fff',
+    { id: 'bio-plant', title: 'Plants', th: 'พืช', en: 'Plants', sym: '✿', color: '#B95361', dark: '#9C404C', text: '#fff',
       lessons: [
         { id: 'bio-plant-1', title: 'สังเคราะห์ด้วยแสงและการลำเลียง', en: 'Photosynthesis and transport', questions: [
           mc(1, 'การสังเคราะห์ด้วยแสงเกิดขึ้นที่ออร์แกเนลล์ใด', ['คลอโรพลาสต์', 'ไมโทคอนเดรีย', 'แวคิวโอล', 'นิวเคลียส'], 'คลอโรพลาสต์มีคลอโรฟิลล์สำหรับดูดกลืนแสง'),
@@ -76,7 +76,7 @@
           mc(2, 'ฮอร์โมนพืชชนิดใดเร่งการสุกของผลไม้', ['เอทิลีน', 'ออกซิน', 'ไซโทไคนิน', 'จิบเบอเรลลิน'], 'เอทิลีนเป็นแก๊ส ใช้บ่มผลไม้ให้สุกเร็ว')
         ] }
       ] },
-    { id: 'bio-eco', title: 'Ecology & evolution', th: 'นิเวศวิทยาและวิวัฒนาการ', en: 'Ecology and evolution', sym: '∞', color: '#00B4E6', dark: '#0094C2', text: '#fff',
+    { id: 'bio-eco', title: 'Ecology & evolution', th: 'นิเวศวิทยาและวิวัฒนาการ', en: 'Ecology and evolution', sym: '∞', color: '#B25534', dark: '#96482C', text: '#fff',
       lessons: [
         { id: 'bio-eco-1', title: 'ระบบนิเวศและความสัมพันธ์', en: 'Ecosystems and relationships', questions: [
           mc(1, 'ในระบบนิเวศ สิ่งมีชีวิตใดเป็นผู้ผลิต', ['พืชสีเขียว', 'กระต่าย', 'เห็ดรา', 'เสือ'], 'ผู้ผลิตสร้างอาหารเองได้ด้วยการสังเคราะห์ด้วยแสง'),

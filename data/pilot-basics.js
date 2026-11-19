@@ -3,7 +3,7 @@
 (function () {
   const UNITS = [
     {
-      id: 'basic', title: 'Aircraft Basics', th: 'พื้นฐานเครื่องบิน', color: '#00B4E6', dark: '#0094C2', text: '#fff',
+      id: 'basic', title: 'Aircraft Basics', th: 'พื้นฐานเครื่องบิน', color: '#B25534', dark: '#96482C', text: '#fff',
       lessons: [
         {
           id: 'basic-1', title: 'Types of aircraft',
@@ -143,7 +143,7 @@
       ]
     },
     {
-      id: 'hist', title: 'Aviation History', th: 'ประวัติศาสตร์การบิน', color: '#FFC800', dark: '#E5A800', text: '#3A2A00',
+      id: 'hist', title: 'Aviation History', th: 'ประวัติศาสตร์การบิน', color: '#DB9E24', dark: '#C58E20', text: '#322408',
       lessons: [
         {
           id: 'hist-1', title: 'Pioneers of flight',

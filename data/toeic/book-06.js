@@ -14,7 +14,7 @@
 
   window.TOEIC_UNITS = window.TOEIC_UNITS || [];
   window.TOEIC_UNITS.push({
-    id: 'toeic-b06', n: 6, title: 'Book 06', th: 'ชุดที่ 06', en: 'Book 06', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    id: 'toeic-b06', n: 6, title: 'Book 06', th: 'ชุดที่ 06', en: 'Book 06', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
     lessons: [
       { id: 'toeic-b06-p5', title: 'Part 5 · Incomplete Sentences', questions: [
         mc(1, "The clinic's new online system has made it much _____ for patients to schedule appointments.",

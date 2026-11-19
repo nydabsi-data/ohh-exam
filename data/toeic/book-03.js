@@ -14,7 +14,7 @@
 
   window.TOEIC_UNITS = window.TOEIC_UNITS || [];
   window.TOEIC_UNITS.push({
-    id: 'toeic-b03', n: 3, title: 'Book 03', th: 'ชุดที่ 03', en: 'Book 03', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    id: 'toeic-b03', n: 3, title: 'Book 03', th: 'ชุดที่ 03', en: 'Book 03', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
     lessons: [
       { id: 'toeic-b03-p5', title: 'Part 5 · Incomplete Sentences', questions: [
         mc(1, "Please handle the fragile items _____ when loading them onto the truck.",

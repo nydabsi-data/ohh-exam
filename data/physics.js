@@ -5,7 +5,7 @@
    Use g = 10 m/s² unless a question says otherwise. Lesson ids must stay stable. */
 window.PHYSICS_UNITS = [
   {
-    id: 'phy-kin', title: 'Kinematics', th: 'การเคลื่อนที่แนวตรง', en: 'Linear motion', sym: 'v', color: '#1CB0F6', dark: '#1899D6', text: '#fff',
+    id: 'phy-kin', title: 'Kinematics', th: 'การเคลื่อนที่แนวตรง', en: 'Linear motion', sym: 'v', color: '#CA6B48', dark: '#B85836', text: '#fff',
     lessons: [
       { id: 'phy-kin-1', title: 'ระยะทาง การกระจัด ความเร็ว', en: 'Distance, displacement, velocity', questions: [
         { type: 'mc', d: 1, q: 'รถคันหนึ่งวิ่งไปทางทิศตะวันออก 300 m แล้ววกกลับมาทางทิศตะวันตก 100 m ระยะทางและการกระจัดเป็นเท่าใด',
@@ -37,7 +37,7 @@ window.PHYSICS_UNITS = [
     ]
   },
   {
-    id: 'phy-force', title: "Newton's laws", th: 'แรงและกฎการเคลื่อนที่', en: "Force and Newton's laws", sym: 'F', color: '#A570FF', dark: '#8549E8', text: '#fff',
+    id: 'phy-force', title: "Newton's laws", th: 'แรงและกฎการเคลื่อนที่', en: "Force and Newton's laws", sym: 'F', color: '#DFA590', dark: '#D17E60', text: '#fff',
     lessons: [
       { id: 'phy-force-1', title: 'กฎของนิวตัน', en: "Newton's laws", questions: [
         { type: 'mc', d: 1, q: 'แรงลัพธ์ 20 N กระทำต่อวัตถุมวล 4 kg วัตถุจะมีความเร่งเท่าใด', o: ['5 m/s²', '80 m/s²', '0.2 m/s²', '16 m/s²'], a: 0,
@@ -66,7 +66,7 @@ window.PHYSICS_UNITS = [
     ]
   },
   {
-    id: 'phy-energy', title: 'Work, energy, momentum', th: 'งาน พลังงาน โมเมนตัม', en: 'Work, energy and momentum', sym: 'E', color: '#FF9600', dark: '#E07F00', text: '#fff',
+    id: 'phy-energy', title: 'Work, energy, momentum', th: 'งาน พลังงาน โมเมนตัม', en: 'Work, energy and momentum', sym: 'E', color: '#B54A58', dark: '#9F414E', text: '#fff',
     lessons: [
       { id: 'phy-energy-1', title: 'งานและพลังงาน', en: 'Work and energy', questions: [
         { type: 'mc', d: 1, q: 'ออกแรง 10 N ลากวัตถุไปตามแนวแรงได้ระยะ 5 m งานที่ทำเป็นเท่าใด', o: ['50 J', '2 J', '15 J', '0.5 J'], a: 0,
@@ -97,7 +97,7 @@ window.PHYSICS_UNITS = [
     ]
   },
   {
-    id: 'phy-motion', title: 'Projectile, circular, SHM', th: 'การเคลื่อนที่แบบต่าง ๆ', en: 'Other kinds of motion', sym: '↻', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    id: 'phy-motion', title: 'Projectile, circular, SHM', th: 'การเคลื่อนที่แบบต่าง ๆ', en: 'Other kinds of motion', sym: '↻', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
     lessons: [
       { id: 'phy-motion-1', title: 'โพรเจกไทล์ วงกลม และ SHM', en: 'Projectile, circular motion, SHM', questions: [
         { type: 'mc', d: 3, q: 'ขว้างลูกบอลในแนวระดับด้วยความเร็ว 10 m/s จากที่สูง 5 m ลูกบอลตกห่างจากฐานในแนวระดับกี่เมตร', o: ['10 m', '5 m', '20 m', '50 m'], a: 0,
@@ -116,7 +116,7 @@ window.PHYSICS_UNITS = [
     ]
   },
   {
-    id: 'phy-wave', title: 'Waves, sound, light', th: 'คลื่น เสียง และแสง', en: 'Waves, sound and light', sym: 'λ', color: '#E5279B', dark: '#C21A80', text: '#fff',
+    id: 'phy-wave', title: 'Waves, sound, light', th: 'คลื่น เสียง และแสง', en: 'Waves, sound and light', sym: 'λ', color: '#B95361', dark: '#9C404C', text: '#fff',
     lessons: [
       { id: 'phy-wave-1', title: 'คลื่นและเสียง', en: 'Waves and sound', questions: [
         { type: 'mc', d: 1, q: 'คลื่นมีความถี่ 50 Hz และความยาวคลื่น 2 m มีอัตราเร็วเท่าใด', o: ['100 m/s', '25 m/s', '52 m/s', '0.04 m/s'], a: 0,
@@ -145,7 +145,7 @@ window.PHYSICS_UNITS = [
     ]
   },
   {
-    id: 'phy-elec', title: 'Electricity', th: 'ไฟฟ้าสถิตและไฟฟ้ากระแส', en: 'Electrostatics and circuits', sym: 'Ω', color: '#00B4E6', dark: '#0094C2', text: '#fff',
+    id: 'phy-elec', title: 'Electricity', th: 'ไฟฟ้าสถิตและไฟฟ้ากระแส', en: 'Electrostatics and circuits', sym: 'Ω', color: '#B25534', dark: '#96482C', text: '#fff',
     lessons: [
       { id: 'phy-elec-1', title: 'ไฟฟ้าสถิต', en: 'Electrostatics', questions: [
         { type: 'mc', d: 2, q: 'ประจุสองตัวห่างกัน r ออกแรงต่อกัน F ถ้าระยะห่างเพิ่มเป็น 2r แรงจะเป็นเท่าใด', o: ['F/4', 'F/2', '2F', '4F'], a: 0,
@@ -175,7 +175,7 @@ window.PHYSICS_UNITS = [
     ]
   },
   {
-    id: 'phy-mag', title: 'Electromagnetism', th: 'แม่เหล็กไฟฟ้า', en: 'Electromagnetism', sym: 'B', color: '#FFC800', dark: '#E5A800', text: '#3A2A00',
+    id: 'phy-mag', title: 'Electromagnetism', th: 'แม่เหล็กไฟฟ้า', en: 'Electromagnetism', sym: 'B', color: '#DB9E24', dark: '#C58E20', text: '#322408',
     lessons: [
       { id: 'phy-mag-1', title: 'แม่เหล็กและการเหนี่ยวนำ', en: 'Magnetism and induction', questions: [
         { type: 'mc', d: 2, q: 'ลวดยาว 0.5 m มีกระแส 2 A วางตั้งฉากกับสนามแม่เหล็ก 0.4 T จะได้รับแรงเท่าใด', o: ['0.4 N', '1.6 N', '4 N', '0.1 N'], a: 0,
@@ -192,7 +192,7 @@ window.PHYSICS_UNITS = [
     ]
   },
   {
-    id: 'phy-heat', title: 'Heat and fluids', th: 'ความร้อนและของไหล', en: 'Heat and fluids', sym: 'Q', color: '#FF86D0', dark: '#E865B5', text: '#fff',
+    id: 'phy-heat', title: 'Heat and fluids', th: 'ความร้อนและของไหล', en: 'Heat and fluids', sym: 'Q', color: '#DCA9B0', dark: '#CC818B', text: '#fff',
     lessons: [
       { id: 'phy-heat-1', title: 'ความร้อน แก๊ส และของไหล', en: 'Heat, gases and fluids', questions: [
         { type: 'mc', d: 2, q: 'น้ำมวล 2 kg (c = 4200 J/kg·K) ร้อนขึ้น 10 K ต้องใช้ความร้อนเท่าใด', o: ['84,000 J', '8,400 J', '42,000 J', '840 J'], a: 0,
@@ -207,7 +207,7 @@ window.PHYSICS_UNITS = [
     ]
   },
   {
-    id: 'phy-modern', title: 'Modern physics', th: 'ฟิสิกส์อะตอมและนิวเคลียร์', en: 'Atomic and nuclear physics', sym: 'N', color: '#1CB0F6', dark: '#1899D6', text: '#fff',
+    id: 'phy-modern', title: 'Modern physics', th: 'ฟิสิกส์อะตอมและนิวเคลียร์', en: 'Atomic and nuclear physics', sym: 'N', color: '#CA6B48', dark: '#B85836', text: '#fff',
     lessons: [
       { id: 'phy-modern-1', title: 'อะตอม นิวเคลียส กัมมันตภาพรังสี', en: 'Atoms, nuclei, radioactivity', questions: [
         { type: 'mc', d: 2, q: 'สารกัมมันตรังสีมีครึ่งชีวิต 2 วัน เมื่อผ่านไป 6 วัน จะเหลือสารเดิมกี่ส่วน', o: ['1/8', '1/3', '1/6', '1/4'], a: 0,

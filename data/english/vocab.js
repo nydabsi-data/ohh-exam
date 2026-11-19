@@ -4,7 +4,7 @@
    Word fields: [word, part of speech, Thai meaning, English definition, example sentence]. */
 (function () {
   const DECKS = [
-    { id: 'office', title: 'In the office', th: 'ในออฟฟิศ', color: '#1CB0F6', dark: '#1899D6', w: [
+    { id: 'office', title: 'In the office', th: 'ในออฟฟิศ', color: '#CA6B48', dark: '#B85836', w: [
       ['agenda', 'n.', 'วาระการประชุม', 'a list of things to talk about at a meeting', 'The budget is the first item on the agenda.'],
       ['deadline', 'n.', 'กำหนดส่ง', 'the latest time by which something must be done', 'The deadline for the report is Friday.'],
       ['colleague', 'n.', 'เพื่อนร่วมงาน', 'a person you work with', 'I had lunch with a colleague from sales.'],
@@ -15,7 +15,7 @@
       ['cabinet', 'n.', 'ตู้เก็บของ', 'a piece of furniture with shelves or drawers', 'The files are in the cabinet by the door.'],
       ['schedule', 'n.', 'ตารางเวลา', 'a plan of when things will happen', 'Please check the schedule for next week.'],
       ['copier', 'n.', 'เครื่องถ่ายเอกสาร', 'a machine that makes copies of documents', 'The copier on this floor is out of order.']] },
-    { id: 'hr', title: 'Jobs & hiring', th: 'งานและการรับสมัคร', color: '#A570FF', dark: '#8549E8', w: [
+    { id: 'hr', title: 'Jobs & hiring', th: 'งานและการรับสมัคร', color: '#DFA590', dark: '#D17E60', w: [
       ['applicant', 'n.', 'ผู้สมัคร', 'a person who asks for a job in writing', 'We received forty applicants for the job.'],
       ['resume', 'n.', 'ประวัติย่อ', 'a document that lists your education and work experience', 'Please send your resume by e-mail.'],
       ['qualified', 'adj.', 'มีคุณสมบัติเหมาะสม', 'having the skills or training needed for a job', 'She is highly qualified for the position.'],
@@ -26,7 +26,7 @@
       ['benefits', 'n.', 'สวัสดิการ', 'extra things an employer gives, such as health insurance', 'Benefits include a free gym membership.'],
       ['intern', 'n.', 'นักศึกษาฝึกงาน', 'a student who works for a short time to gain experience', 'Our intern helps with social media.'],
       ['retire', 'v.', 'เกษียณ', 'to stop working because of your age', 'Ms. Park will retire next year.']] },
-    { id: 'money', title: 'Money & finance', th: 'การเงิน', color: '#FF9600', dark: '#E07F00', w: [
+    { id: 'money', title: 'Money & finance', th: 'การเงิน', color: '#B54A58', dark: '#9F414E', w: [
       ['invoice', 'n.', 'ใบแจ้งหนี้', 'a document that asks for payment for goods or services', 'Please pay the invoice within 30 days.'],
       ['budget', 'n.', 'งบประมาณ', 'the amount of money planned for a purpose', 'The project is over budget.'],
       ['expense', 'n.', 'ค่าใช้จ่าย', 'money spent on something', 'The company will pay every travel expense.'],
@@ -37,7 +37,7 @@
       ['quarterly', 'adj.', 'รายไตรมาส', 'happening every three months', 'The quarterly report is due in April.'],
       ['estimate', 'n.', 'ราคาประเมิน', 'a guess of a cost or amount', 'The builder gave us an estimate of $5,000.'],
       ['refund', 'n.', 'เงินคืน', 'money given back to a customer', 'You can get a full refund within 14 days.']] },
-    { id: 'travel', title: 'Travel', th: 'การเดินทาง', color: '#00C2D1', dark: '#00A3B0', w: [
+    { id: 'travel', title: 'Travel', th: 'การเดินทาง', color: '#A24E2F', dark: '#884128', w: [
       ['itinerary', 'n.', 'กำหนดการเดินทาง', 'a plan of a trip with times and places', 'Your itinerary is attached to this e-mail.'],
       ['boarding pass', 'n.', 'บัตรขึ้นเครื่อง', 'a card that lets you get on a plane', 'Show your boarding pass at the gate.'],
       ['delay', 'n.', 'ความล่าช้า', 'a time when something happens later than planned', 'There was a one-hour delay because of fog.'],
@@ -48,7 +48,7 @@
       ['complimentary', 'adj.', 'ฟรี ไม่คิดเงิน', 'given free of charge', 'Guests enjoy a complimentary breakfast.'],
       ['shuttle', 'n.', 'รถรับส่ง', 'a bus that goes back and forth between two places', 'A shuttle runs to the airport every hour.'],
       ['destination', 'n.', 'จุดหมายปลายทาง', 'the place you are traveling to', 'Bangkok is a popular destination.']] },
-    { id: 'ship', title: 'Orders & shipping', th: 'สั่งซื้อและขนส่ง', color: '#FF4B9B', dark: '#E0307F', w: [
+    { id: 'ship', title: 'Orders & shipping', th: 'สั่งซื้อและขนส่ง', color: '#CB7F89', dark: '#BA5663', w: [
       ['shipment', 'n.', 'สินค้าที่ส่ง', 'a load of goods sent together', 'The shipment will arrive on Monday.'],
       ['warehouse', 'n.', 'คลังสินค้า', 'a large building where goods are stored', 'Extra stock is kept in the warehouse.'],
       ['supplier', 'n.', 'ผู้จัดหาสินค้า', 'a company that provides goods to another company', 'We changed our paper supplier.'],
@@ -59,7 +59,7 @@
       ['warranty', 'n.', 'การรับประกัน', 'a promise to repair a product for a period of time', 'The laptop has a two-year warranty.'],
       ['bulk', 'n.', 'จำนวนมาก', 'a large amount bought at one time', 'Buying in bulk lowers the price.'],
       ['order', 'v.', 'สั่งซื้อ', 'to ask for goods to be sent to you', 'We need to order more paper.']] },
-    { id: 'event', title: 'Meetings & events', th: 'ประชุมและงานอีเวนต์', color: '#E5279B', dark: '#C21A80', w: [
+    { id: 'event', title: 'Meetings & events', th: 'ประชุมและงานอีเวนต์', color: '#B95361', dark: '#9C404C', w: [
       ['venue', 'n.', 'สถานที่จัดงาน', 'the place where an event happens', 'The venue holds 300 people.'],
       ['attendee', 'n.', 'ผู้เข้าร่วม', 'a person who goes to an event', 'Each attendee will receive a name badge.'],
       ['postpone', 'v.', 'เลื่อนออกไป', 'to move an event to a later time', 'They had to postpone the launch until June.'],
@@ -70,7 +70,7 @@
       ['reschedule', 'v.', 'เปลี่ยนเวลานัด', 'to change the time of a planned event', 'Can we reschedule our call to Thursday?'],
       ['conference', 'n.', 'การประชุมใหญ่', 'a large formal meeting over one or more days', 'The conference is in Singapore this year.'],
       ['catering', 'n.', 'บริการจัดอาหาร', 'providing food and drinks for an event', 'Catering is included in the room price.']] },
-    { id: 'verbs', title: 'Business verbs', th: 'กริยาธุรกิจ', color: '#FF4B4B', dark: '#E03A3A', w: [
+    { id: 'verbs', title: 'Business verbs', th: 'กริยาธุรกิจ', color: '#CB7F89', dark: '#BD5D6A', w: [
       ['launch', 'v.', 'เปิดตัว', 'to start selling a new product', 'They will launch the new phone in May.'],
       ['expand', 'v.', 'ขยาย', 'to make something bigger', 'The company plans to expand into Vietnam.'],
       ['negotiate', 'v.', 'เจรจาต่อรอง', 'to discuss in order to reach an agreement', 'We tried to negotiate a lower price.'],
@@ -81,7 +81,7 @@
       ['coordinate', 'v.', 'ประสานงาน', 'to organize people to work well together', 'She will coordinate the training program.'],
       ['merge', 'v.', 'ควบรวม', 'to join two companies into one', 'The two banks will merge next year.'],
       ['renovate', 'v.', 'ปรับปรุง ซ่อมแซม', 'to repair and improve a building', 'The hotel plans to renovate its lobby.']] },
-    { id: 'adj', title: 'Useful adjectives', th: 'คุณศัพท์ที่ออกบ่อย', color: '#8549E8', dark: '#6A35C2', w: [
+    { id: 'adj', title: 'Useful adjectives', th: 'คุณศัพท์ที่ออกบ่อย', color: '#D17E60', dark: '#BF5C38', w: [
       ['mandatory', 'adj.', 'บังคับ', 'required by a rule', 'Safety training is mandatory for all staff.'],
       ['temporary', 'adj.', 'ชั่วคราว', 'lasting only for a short time', 'The office is in a temporary location.'],
       ['efficient', 'adj.', 'มีประสิทธิภาพ', 'working well without wasting time or energy', 'The new system is more efficient.'],

@@ -126,20 +126,20 @@
 
   /* ---------- 3. Aircraft Rotation ---------- */
   const PLANE =
-    '<path d="M0,-46 C5,-41 6,-31 6,-18 L6,30 C6,38 3,44 0,47 C-3,44 -6,38 -6,30 L-6,-18 C-6,-31 -5,-41 0,-46Z" fill="#1CB0F6"/>' +
-    '<path d="M-6,-6 L-46,9 L-46,16 L-6,10Z M6,-6 L46,9 L46,16 L6,10Z" fill="#4A9FEA"/>' +
-    '<path d="M-5,29 L-20,39 L-20,44 L-5,40Z M5,29 L20,39 L20,44 L5,40Z" fill="#4A9FEA"/>' +
+    '<path d="M0,-46 C5,-41 6,-31 6,-18 L6,30 C6,38 3,44 0,47 C-3,44 -6,38 -6,30 L-6,-18 C-6,-31 -5,-41 0,-46Z" fill="#CA6B48"/>' +
+    '<path d="M-6,-6 L-46,9 L-46,16 L-6,10Z M6,-6 L46,9 L46,16 L6,10Z" fill="#D28062"/>' +
+    '<path d="M-5,29 L-20,39 L-20,44 L-5,40Z M5,29 L20,39 L20,44 L5,40Z" fill="#D28062"/>' +
     '<ellipse cx="0" cy="-30" rx="3.4" ry="6.5" fill="#fff"/>' +
-    '<circle cx="-40" cy="12" r="5.5" fill="#FF4B4B" stroke="#fff" stroke-width="1.5"/>' +
-    '<rect x="8" y="38.5" width="11" height="4.5" rx="1" fill="#FFC800" stroke="#fff" stroke-width="1"/>';
+    '<circle cx="-40" cy="12" r="5.5" fill="#CB7F89" stroke="#fff" stroke-width="1.5"/>' +
+    '<rect x="8" y="38.5" width="11" height="4.5" rx="1" fill="#DB9E24" stroke="#fff" stroke-width="1"/>';
   const planeSvg = (rot, mirror) => '<svg class="apt-plane" viewBox="-52 -52 104 104"><g transform="rotate(' + rot + ')"><g' + (mirror ? ' transform="scale(-1,1)"' : '') + '>' + PLANE + '</g></g></svg>';
   const DIRS = ['N (000°)', 'NE (045°)', 'E (090°)', 'SE (135°)', 'S (180°)', 'SW (225°)', 'W (270°)', 'NW (315°)'];
   function genRotation(i) {
     if (i % 3 === 2) {   // heading question
       const h = rnd(0, 7), cand = [h, (h + 4) % 8, (8 - h) % 8, (h + 2) % 8, (h + 6) % 8, (h + 1) % 8].filter((v, k, a) => a.indexOf(v) === k);
       const opts = shuffle([h].concat(shuffle(cand.slice(1)).slice(0, 3)));
-      const compass = '<svg class="apt-compass" viewBox="-60 -60 120 120"><circle r="56" fill="#F4FAFF" stroke="#CFE6F7" stroke-width="2"/>' +
-        ['N', 'E', 'S', 'W'].map((d, k) => '<text x="' + [0, 50, 0, -50][k] + '" y="' + [-45, 4, 52, 4][k] + '" text-anchor="middle" font-size="11" font-weight="800" fill="' + (d === 'N' ? '#FF4B4B' : '#8AA0B6') + '">' + d + '</text>').join('') +
+      const compass = '<svg class="apt-compass" viewBox="-60 -60 120 120"><circle r="56" fill="#FDF8F6" stroke="#F2DCD4" stroke-width="2"/>' +
+        ['N', 'E', 'S', 'W'].map((d, k) => '<text x="' + [0, 50, 0, -50][k] + '" y="' + [-45, 4, 52, 4][k] + '" text-anchor="middle" font-size="11" font-weight="800" fill="' + (d === 'N' ? '#CB7F89' : '#D4886C') + '">' + d + '</text>').join('') +
         '<g transform="scale(.72)">' + planeSvg(h * 45, false).replace(/^<svg[^>]*>|<\/svg>$/g, '') + '</g></svg>';
       return { q: '<div class="apt-fig">' + compass + '</div><p class="apt-ask">เครื่องบินลำนี้กำลังมุ่งหน้าไปทิศใด (มองจากด้านบน ทิศเหนืออยู่ด้านบน)</p>',
         opts: opts.map((k) => DIRS[k]), a: opts.indexOf(h), ex: 'หัวเครื่องชี้ไปทาง ' + DIRS[h], plain: 'ทิศของเครื่องบิน' };
@@ -208,10 +208,10 @@
       const options = shuffle([{ c: spin(B), ok: true }].concat(outs.slice(0, 3).map((c) => ({ c: spin(c), ok: false }))));
       const board = '<svg class="apt-board" viewBox="-2 -2 ' + (N * 30 + 4) + ' ' + (N * 30 + 4) + '">' +
         all.map((c) => inA.has(ck(c))
-          ? '<rect x="' + c[1] * 30 + '" y="' + c[0] * 30 + '" width="30" height="30" rx="4" fill="#A570FF" stroke="#fff" stroke-width="2"/>'
-          : '<rect x="' + (c[1] * 30 + 2) + '" y="' + (c[0] * 30 + 2) + '" width="26" height="26" rx="4" fill="#FFF" stroke="#C9B8F2" stroke-width="1.5" stroke-dasharray="4 3"/>').join('') + '</svg>';
+          ? '<rect x="' + c[1] * 30 + '" y="' + c[0] * 30 + '" width="30" height="30" rx="4" fill="#DFA590" stroke="#fff" stroke-width="2"/>'
+          : '<rect x="' + (c[1] * 30 + 2) + '" y="' + (c[0] * 30 + 2) + '" width="26" height="26" rx="4" fill="#FFF" stroke="#ECCABE" stroke-width="1.5" stroke-dasharray="4 3"/>').join('') + '</svg>';
       return { q: '<div class="apt-fig">' + board + '</div><p class="apt-ask">ชิ้นส่วนใดเติมช่องว่าง (เส้นประ) ให้เต็มสี่เหลี่ยมพอดี — หมุนได้ แต่ไม่พลิก</p>',
-        opts: options.map((o) => shapeSvg(o.c, '#E5279B')), a: options.findIndex((o) => o.ok), grid: true,
+        opts: options.map((o) => shapeSvg(o.c, '#B95361')), a: options.findIndex((o) => o.ok), grid: true,
         ex: 'ชิ้นที่ถูกต้องมีรูปทรงตรงกับช่องว่างเมื่อหมุน ชิ้นอื่นต่างไป 1 ช่อง หรือเป็นภาพกลับด้าน', plain: 'ประกอบชิ้นส่วน' };
     }
   }
@@ -372,12 +372,12 @@
       if (hit) inside += dt;
       // draw
       ctx.clearRect(0, 0, W, H);
-      ctx.strokeStyle = 'rgba(28,176,246,.10)'; ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(202,107,72,.10)'; ctx.lineWidth = 1;
       for (let gx = 0; gx < W; gx += 32) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
       for (let gy = 0; gy < H; gy += 32) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
       ctx.beginPath(); ctx.arc(tx * W, ty * H, R, 0, 6.283);
-      ctx.fillStyle = hit ? 'rgba(28,176,246,.22)' : 'rgba(255,150,0,.16)'; ctx.fill();
-      ctx.lineWidth = 3; ctx.strokeStyle = hit ? '#1CB0F6' : '#FF9600'; ctx.stroke();
+      ctx.fillStyle = hit ? 'rgba(202,107,72,.22)' : 'rgba(203,127,137,.16)'; ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = hit ? '#CA6B48' : '#B54A58'; ctx.stroke();
       ctx.beginPath(); ctx.arc(p.x * W, p.y * H, 9, 0, 6.283); ctx.fillStyle = '#fff'; ctx.fill();
       ctx.lineWidth = 3; ctx.strokeStyle = '#2B2B2B'; ctx.stroke();
       const left = t.secs - el;

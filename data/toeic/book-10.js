@@ -14,7 +14,7 @@
   const P3 = "LOCAL RETAILER EXPANDS ONLINE\n\nMarlow Home Goods, a family-owned furniture store that has operated on Pine Street since 1988, launched its first online shop last week. Owner Tessa Marlow said the decision was driven by customer requests, particularly from younger shoppers who prefer to compare products from home. The website currently lists about 300 items, roughly half of the store's inventory, and offers free delivery within the city for purchases over $500.\n\nMs. Marlow emphasized that the physical store will remain open, noting that many customers still want to try a sofa in person before buying one. The company also plans to add an online design consultation service early next year.";
 
   window.TOEIC_UNITS.push({
-    id: 'toeic-b10', n: 10, title: 'Book 10', th: 'ชุดที่ 10', en: 'Book 10', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    id: 'toeic-b10', n: 10, title: 'Book 10', th: 'ชุดที่ 10', en: 'Book 10', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
     lessons: [
       { id: 'toeic-b10-p5', title: 'Part 5 · Incomplete Sentences', questions: [
         mc(1, "The new photocopier is very _____ and requires little maintenance.",

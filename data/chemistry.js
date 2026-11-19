@@ -5,7 +5,7 @@
   const mc = (d, q, o, ex) => ({ type: 'mc', d, q, o, a: 0, ex });
   const tf = (d, q, a, ex) => ({ type: 'tf', d, q, a, ex });
   window.CHEM_UNITS = [
-    { id: 'chem-atom', title: 'Atoms & periodic table', th: 'อะตอมและตารางธาตุ', en: 'Atoms and the periodic table', sym: 'e⁻', color: '#1CB0F6', dark: '#1899D6', text: '#fff',
+    { id: 'chem-atom', title: 'Atoms & periodic table', th: 'อะตอมและตารางธาตุ', en: 'Atoms and the periodic table', sym: 'e⁻', color: '#CA6B48', dark: '#B85836', text: '#fff',
       lessons: [
         { id: 'chem-atom-1', title: 'โครงสร้างอะตอม', en: 'Atomic structure', questions: [
           mc(1, 'ไอโซโทปของธาตุเดียวกันมีจำนวนอนุภาคใดต่างกัน', ['นิวตรอน', 'โปรตอน', 'อิเล็กตรอนในอะตอมที่เป็นกลาง', 'เลขอะตอม'], 'ไอโซโทปมีโปรตอนเท่ากัน (ธาตุเดียวกัน) แต่จำนวนนิวตรอนต่างกัน เลขมวลจึงต่างกัน'),
@@ -22,7 +22,7 @@
           mc(2, 'ในหมู่เดียวกัน จากบนลงล่าง พลังงานไอออไนเซชันลำดับที่ 1 เป็นอย่างไร', ['ลดลง', 'เพิ่มขึ้น', 'เท่าเดิม', 'เพิ่มแล้วลด'], 'อะตอมใหญ่ขึ้น อิเล็กตรอนชั้นนอกอยู่ไกลนิวเคลียส จึงดึงออกได้ง่ายขึ้น')
         ] }
       ] },
-    { id: 'chem-bond', title: 'Chemical bonding', th: 'พันธะเคมี', en: 'Chemical bonding', sym: '⚭', color: '#A570FF', dark: '#8549E8', text: '#fff',
+    { id: 'chem-bond', title: 'Chemical bonding', th: 'พันธะเคมี', en: 'Chemical bonding', sym: '⚭', color: '#DFA590', dark: '#D17E60', text: '#fff',
       lessons: [
         { id: 'chem-bond-1', title: 'พันธะไอออนิกและโคเวเลนต์', en: 'Ionic and covalent bonds', questions: [
           mc(1, 'NaCl ยึดเหนี่ยวกันด้วยพันธะชนิดใด', ['พันธะไอออนิก', 'พันธะโคเวเลนต์', 'พันธะโลหะ', 'พันธะไฮโดรเจน'], 'โลหะ (Na) ให้อิเล็กตรอนแก่อโลหะ (Cl) เกิดไอออนบวกและลบดึงดูดกัน'),
@@ -39,7 +39,7 @@
           tf(1, 'โลหะนำไฟฟ้าได้ดีเพราะมีอิเล็กตรอนที่เคลื่อนที่ได้อย่างอิสระ', true, 'พันธะโลหะมี "ทะเลอิเล็กตรอน" ที่เคลื่อนที่ได้ทั่วทั้งก้อนโลหะ')
         ] }
       ] },
-    { id: 'chem-mole', title: 'Mole & stoichiometry', th: 'โมลและปริมาณสารสัมพันธ์', en: 'Mole and stoichiometry', sym: 'n', color: '#FF9600', dark: '#E07F00', text: '#fff',
+    { id: 'chem-mole', title: 'Mole & stoichiometry', th: 'โมลและปริมาณสารสัมพันธ์', en: 'Mole and stoichiometry', sym: 'n', color: '#B54A58', dark: '#9F414E', text: '#fff',
       lessons: [
         { id: 'chem-mole-1', title: 'โมล มวล และปริมาตร', en: 'Moles, mass and volume', questions: [
           mc(1, 'สาร 1 โมลมีจำนวนอนุภาคเท่าใด', ['6.02 × 10²³', '6.02 × 10²²', '22.4', '1.66 × 10⁻²⁴'], 'เลขอาโวกาโดร = 6.02 × 10²³ อนุภาคต่อโมล'),
@@ -56,7 +56,7 @@
           mc(3, 'ผสม H₂ 2 mol กับ O₂ 2 mol (2H₂ + O₂ → 2H₂O) สารใดเป็นสารกำหนดปริมาณ', ['H₂', 'O₂', 'H₂O', 'ไม่มี เพราะพอดีกัน'], 'H₂ 2 mol ต้องใช้ O₂ เพียง 1 mol O₂ จึงเหลือ H₂ หมดก่อน H₂ เป็นสารกำหนดปริมาณ')
         ] }
       ] },
-    { id: 'chem-rate', title: 'Rates & equilibrium', th: 'อัตราการเกิดปฏิกิริยาและสมดุล', en: 'Reaction rates and equilibrium', sym: 'k', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    { id: 'chem-rate', title: 'Rates & equilibrium', th: 'อัตราการเกิดปฏิกิริยาและสมดุล', en: 'Reaction rates and equilibrium', sym: 'k', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
       lessons: [
         { id: 'chem-rate-1', title: 'อัตราการเกิดปฏิกิริยา', en: 'Reaction rates', questions: [
           mc(1, 'เมื่อเพิ่มอุณหภูมิ อัตราการเกิดปฏิกิริยาส่วนใหญ่เป็นอย่างไร', ['เพิ่มขึ้น', 'ลดลง', 'เท่าเดิม', 'หยุดเกิดปฏิกิริยา'], 'อนุภาคเคลื่อนที่เร็วขึ้น ชนกันบ่อยขึ้น และมีพลังงานถึงพลังงานก่อกัมมันต์มากขึ้น'),
@@ -73,7 +73,7 @@
           mc(3, 'ปฏิกิริยาคายความร้อนที่อยู่ในสมดุล ถ้าเพิ่มอุณหภูมิ สมดุลจะเลื่อนไปทางใด', ['ทางสารตั้งต้น (ซ้าย)', 'ทางผลิตภัณฑ์ (ขวา)', 'ไม่เปลี่ยน', 'ขึ้นกับความดันเท่านั้น'], 'การเพิ่มอุณหภูมิเหมือนเติมความร้อน ระบบจะดูดความร้อนโดยเกิดปฏิกิริยาย้อนกลับ (ดูดความร้อน)')
         ] }
       ] },
-    { id: 'chem-acid', title: 'Acids & bases', th: 'กรด–เบส', en: 'Acids and bases', sym: 'pH', color: '#E5279B', dark: '#C21A80', text: '#fff',
+    { id: 'chem-acid', title: 'Acids & bases', th: 'กรด–เบส', en: 'Acids and bases', sym: 'pH', color: '#B95361', dark: '#9C404C', text: '#fff',
       lessons: [
         { id: 'chem-acid-1', title: 'กรด เบส และ pH', en: 'Acids, bases and pH', questions: [
           mc(1, 'สารละลายที่มี pH 3 มีสมบัติเป็นอย่างไร', ['เป็นกรด', 'เป็นเบส', 'เป็นกลาง', 'เป็นบัฟเฟอร์เสมอ'], 'pH น้อยกว่า 7 เป็นกรด เท่ากับ 7 เป็นกลาง มากกว่า 7 เป็นเบส (ที่ 25 °C)'),
@@ -90,7 +90,7 @@
           tf(2, 'ที่จุดสมมูลของการไทเทรตกรดแก่กับเบสแก่ สารละลายมี pH ประมาณ 7', true, 'เกลือจากกรดแก่และเบสแก่ไม่ไฮโดรไลซ์ สารละลายจึงเป็นกลาง')
         ] }
       ] },
-    { id: 'chem-redox', title: 'Electrochemistry', th: 'ไฟฟ้าเคมี', en: 'Electrochemistry', sym: 'e', color: '#FFC800', dark: '#E5A800', text: '#3A2A00',
+    { id: 'chem-redox', title: 'Electrochemistry', th: 'ไฟฟ้าเคมี', en: 'Electrochemistry', sym: 'e', color: '#DB9E24', dark: '#C58E20', text: '#322408',
       lessons: [
         { id: 'chem-redox-1', title: 'รีดอกซ์และเซลล์ไฟฟ้าเคมี', en: 'Redox and electrochemical cells', questions: [
           mc(1, 'ปฏิกิริยารีดักชันคือข้อใด', ['การรับอิเล็กตรอน', 'การเสียอิเล็กตรอน', 'การรับโปรตอน', 'การเสียนิวตรอน'], 'ออกซิเดชัน = เสียอิเล็กตรอน (เลขออกซิเดชันเพิ่ม) รีดักชัน = รับอิเล็กตรอน (เลขออกซิเดชันลด)'),
@@ -100,7 +100,7 @@
           mc(2, 'เลขออกซิเดชันของ S ใน H₂SO₄ เท่าใด', ['+6', '+4', '−2', '+2'], 'H = +1 × 2 = +2, O = −2 × 4 = −8 → S = +6')
         ] }
       ] },
-    { id: 'chem-org', title: 'Organic chemistry', th: 'เคมีอินทรีย์', en: 'Organic chemistry', sym: 'C', color: '#00B4E6', dark: '#0094C2', text: '#fff',
+    { id: 'chem-org', title: 'Organic chemistry', th: 'เคมีอินทรีย์', en: 'Organic chemistry', sym: 'C', color: '#B25534', dark: '#96482C', text: '#fff',
       lessons: [
         { id: 'chem-org-1', title: 'ไฮโดรคาร์บอน', en: 'Hydrocarbons', questions: [
           mc(1, 'CH₄ มีชื่อว่าอะไร', ['มีเทน', 'อีเทน', 'อีทีน', 'โพรเพน'], 'แอลเคนคาร์บอน 1 อะตอม = มีเทน (2 = อีเทน, 3 = โพรเพน)'),

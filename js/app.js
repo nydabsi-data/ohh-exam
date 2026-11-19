@@ -247,7 +247,7 @@
     // Pilot: the 6 aptitude tests as one more unit, same card style (always open)
     if (course === 'pilot') {
       const tests = EXAMS.filter((x) => x.id !== 'learn');
-      html += '<section class="unit" style="--c:#FF4B4B;--d:#E03A3A;--t:#fff">' +
+      html += '<section class="unit" style="--c:#CB7F89;--d:#BD5D6A;--t:#fff">' +
         '<header class="unit-head"><div><small>Unit ' + (UNITS.length + 1) + ' · แบบทดสอบความถนัด</small><h2>Aptitude tests</h2></div>' +
         '<span class="unit-tools"><span class="unit-count">' + tests.length + ' ' + T('ชุด') + '</span>' +
           '<button class="row-arrow" data-dir="-1" aria-label="ก่อนหน้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>' +
@@ -271,7 +271,7 @@
     // Picture cards for this course (tap to enlarge)
     const figs = Object.keys(window.FIGS || {}).filter((k) => FIGS[k].course === course);
     if (figs.length) {
-      html = '<section class="unit fig-unit" style="--c:#A570FF;--d:#8549E8;--t:#fff">' +
+      html = '<section class="unit fig-unit" style="--c:#DFA590;--d:#D17E60;--t:#fff">' +
         '<header class="unit-head"><div><small>ดูภาพแล้วจำง่ายขึ้น</small><h2>ภาพประกอบ</h2></div>' +
         '<span class="unit-tools"><span class="unit-count">' + figs.length + ' ภาพ</span></span></header>' +
         '<div class="lesson-row fig-row">' + figs.map((k) =>
@@ -523,33 +523,33 @@
     math: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 7h6M8 4v6M14 7h6M5.5 15.5l5 5M10.5 15.5l-5 5M14 16h6M14 20h6"/></svg>'
   };
   const EXAMS = [
-    { id: 'learn', title: 'Pilot Knowledge', th: 'ความรู้นักบิน แบบบทเรียนสั้น', icon: 'book', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#learn', meta: ['6 วิชา', 'XP · Streak'] },
-    { id: 'series', title: 'Series Number', th: 'หาตัวเลขถัดไปในอนุกรม', icon: 'series', color: '#FF4B4B', dark: '#E03A3A', text: '#fff', href: '#apt-series', meta: ['15 ข้อ', '6 นาที'] },
-    { id: 'math', title: 'Math Test', th: 'คณิตคิดเร็วสำหรับนักบิน', icon: 'math', color: '#FF9600', dark: '#E07F00', text: '#fff', href: '#apt-math', meta: ['20 ข้อ', '8 นาที'] },
-    { id: 'rotation', title: 'Aircraft Rotation', th: 'การหมุนและทิศทางของเครื่องบิน', icon: 'plane', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#apt-rotation', meta: ['15 ข้อ', '4 นาที'] },
-    { id: 'jigsaw', title: 'Spatial Jigsaw', th: 'มิติสัมพันธ์ ประกอบชิ้นส่วน', icon: 'puzzle', color: '#E5279B', dark: '#C21A80', text: '#fff', href: '#apt-jigsaw', meta: ['12 ข้อ', '5 นาที'] },
-    { id: 'joystick', title: 'Joy Stick', th: 'ควบคุมและความแม่นยำ', icon: 'stick', color: '#00B4E6', dark: '#0094C2', text: '#fff', href: '#apt-joystick', meta: ['60 วินาที'] },
-    { id: 'multitask', title: 'Multitask', th: 'ทำหลายอย่างพร้อมกัน', icon: 'multi', color: '#FF86D0', dark: '#E865B5', text: '#fff', href: '#apt-multitask', meta: ['90 วินาที'] }
+    { id: 'learn', title: 'Pilot Knowledge', th: 'ความรู้นักบิน แบบบทเรียนสั้น', icon: 'book', color: '#CA6B48', dark: '#B85836', text: '#fff', href: '#learn', meta: ['6 วิชา', 'XP · Streak'] },
+    { id: 'series', title: 'Series Number', th: 'หาตัวเลขถัดไปในอนุกรม', icon: 'series', color: '#CB7F89', dark: '#BD5D6A', text: '#fff', href: '#apt-series', meta: ['15 ข้อ', '6 นาที'] },
+    { id: 'math', title: 'Math Test', th: 'คณิตคิดเร็วสำหรับนักบิน', icon: 'math', color: '#B54A58', dark: '#9F414E', text: '#fff', href: '#apt-math', meta: ['20 ข้อ', '8 นาที'] },
+    { id: 'rotation', title: 'Aircraft Rotation', th: 'การหมุนและทิศทางของเครื่องบิน', icon: 'plane', color: '#DFA590', dark: '#D17E60', text: '#fff', href: '#apt-rotation', meta: ['15 ข้อ', '4 นาที'] },
+    { id: 'jigsaw', title: 'Spatial Jigsaw', th: 'มิติสัมพันธ์ ประกอบชิ้นส่วน', icon: 'puzzle', color: '#B95361', dark: '#9C404C', text: '#fff', href: '#apt-jigsaw', meta: ['12 ข้อ', '5 นาที'] },
+    { id: 'joystick', title: 'Joy Stick', th: 'ควบคุมและความแม่นยำ', icon: 'stick', color: '#B25534', dark: '#96482C', text: '#fff', href: '#apt-joystick', meta: ['60 วินาที'] },
+    { id: 'multitask', title: 'Multitask', th: 'ทำหลายอย่างพร้อมกัน', icon: 'multi', color: '#DCA9B0', dark: '#CC818B', text: '#fff', href: '#apt-multitask', meta: ['90 วินาที'] }
   ];
 
   // Modes on the home page. Each mode groups its own exam cards (only "Pilot" for now).
   const MODES = [
-    { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', cls: 'cream', color: '#F2C66D', dark: '#D9A23C', text: '#fff', href: '#learn', course: 'pilot',
+    { id: 'pilot', title: 'Pilot', th: 'ความรู้นักบินและแบบทดสอบความถนัด', icon: 'plane', cls: 'cream', color: '#E9C376', dark: '#DEA637', text: '#fff', href: '#learn', course: 'pilot',
       items: (window.UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
-    { id: 'physics', title: 'ฟิสิกส์ ม.ปลาย', th: 'กลศาสตร์ คลื่น ไฟฟ้า และฟิสิกส์ยุคใหม่', icon: 'atom', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#learn-physics', course: 'physics',
+    { id: 'physics', title: 'ฟิสิกส์ ม.ปลาย', th: 'กลศาสตร์ คลื่น ไฟฟ้า และฟิสิกส์ยุคใหม่', icon: 'atom', color: '#CA6B48', dark: '#B85836', text: '#fff', href: '#learn-physics', course: 'physics',
       items: (window.PHYSICS_UNITS || []).map((u) => ({ title: u.title, color: u.color, sym: u.sym })) },
-    { id: 'chem', title: 'เคมี ม.ปลาย', th: 'อะตอม พันธะ โมล กรด–เบส และอินทรีย์', icon: 'flask', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#learn-chem', course: 'chem',
+    { id: 'chem', title: 'เคมี ม.ปลาย', th: 'อะตอม พันธะ โมล กรด–เบส และอินทรีย์', icon: 'flask', color: '#DFA590', dark: '#D17E60', text: '#fff', href: '#learn-chem', course: 'chem',
       items: (window.CHEM_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
-    { id: 'bio', title: 'ชีววิทยา ม.ปลาย', th: 'เซลล์ พันธุศาสตร์ ระบบร่างกาย พืช นิเวศ และวิวัฒนาการ', icon: 'leaf', color: '#FF4B9B', dark: '#E0307F', text: '#fff', href: '#learn-bio', course: 'bio',
+    { id: 'bio', title: 'ชีววิทยา ม.ปลาย', th: 'เซลล์ พันธุศาสตร์ ระบบร่างกาย พืช นิเวศ และวิวัฒนาการ', icon: 'leaf', color: '#CB7F89', dark: '#BA5663', text: '#fff', href: '#learn-bio', course: 'bio',
       items: (window.BIO_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
-    { id: 'mathhs', title: 'คณิตศาสตร์ ม.ปลาย', th: 'เซต ฟังก์ชัน ตรีโกณ ลำดับ ความน่าจะเป็น สถิติ แคลคูลัส', icon: 'sigma', color: '#FF9600', dark: '#E07F00', text: '#fff', href: '#learn-math', course: 'math',
+    { id: 'mathhs', title: 'คณิตศาสตร์ ม.ปลาย', th: 'เซต ฟังก์ชัน ตรีโกณ ลำดับ ความน่าจะเป็น สถิติ แคลคูลัส', icon: 'sigma', color: '#B54A58', dark: '#9F414E', text: '#fff', href: '#learn-math', course: 'math',
       items: (window.MATH_UNITS || []).map((u) => ({ title: u.title, color: u.color })) },
     // English groups three courses; its card opens #english, which lists them
-    { id: 'english', title: 'English', th: 'TOEIC ไวยากรณ์ และคำศัพท์', icon: 'english', unitLabel: 'คอร์ส', color: '#FF4B4B', dark: '#E03A3A', text: '#fff', href: '#english', courses: ['toeic', 'grammar', 'vocab'],
+    { id: 'english', title: 'English', th: 'TOEIC ไวยากรณ์ และคำศัพท์', icon: 'english', unitLabel: 'คอร์ส', color: '#CB7F89', dark: '#BD5D6A', text: '#fff', href: '#english', courses: ['toeic', 'grammar', 'vocab'],
       items: [
-        { id: 'toeic', course: 'toeic', title: 'TOEIC', th: 'Reading Part 5–7 แนวข้อสอบจริง จับเวลา', icon: 'toeic', color: '#FF4B4B', dark: '#E03A3A', text: '#fff', href: '#learn-toeic' },
-        { id: 'grammar', course: 'grammar', title: 'Grammar', th: 'ไวยากรณ์ที่ออกสอบ TOEIC', icon: 'grammar', color: '#A570FF', dark: '#8549E8', text: '#fff', href: '#learn-grammar' },
-        { id: 'vocab', course: 'vocab', title: 'Vocabulary', th: 'คำศัพท์ TOEIC จับคู่การ์ด เติมคำ', icon: 'vocab', color: '#1CB0F6', dark: '#1899D6', text: '#fff', href: '#learn-vocab' }
+        { id: 'toeic', course: 'toeic', title: 'TOEIC', th: 'Reading Part 5–7 แนวข้อสอบจริง จับเวลา', icon: 'toeic', color: '#CB7F89', dark: '#BD5D6A', text: '#fff', href: '#learn-toeic' },
+        { id: 'grammar', course: 'grammar', title: 'Grammar', th: 'ไวยากรณ์ที่ออกสอบ TOEIC', icon: 'grammar', color: '#DFA590', dark: '#D17E60', text: '#fff', href: '#learn-grammar' },
+        { id: 'vocab', course: 'vocab', title: 'Vocabulary', th: 'คำศัพท์ TOEIC จับคู่การ์ด เติมคำ', icon: 'vocab', color: '#CA6B48', dark: '#B85836', text: '#fff', href: '#learn-vocab' }
       ] }
   ];
   // a mode's courses (English has three, the others one)
@@ -568,8 +568,8 @@
   /* ---------- Characters (img/chars/c1..c8.png) ---------- */
   // n = image number (img/chars/c<n>.png). The pink-shirt girl (6) and the chef (7) were removed.
   const CHARS = [
-    { n: 1, th: 'นักอ่าน', bg: '#A570FF' }, { n: 2, th: 'นักผจญภัย', bg: '#FFC800' }, { n: 3, th: 'สายเทค', bg: '#FF4B9B' },
-    { n: 4, th: 'คนรักดนตรี', bg: '#00C2D1' }, { n: 5, th: 'นักคิด', bg: '#FF9600' }, { n: 8, th: 'นักปลูก', bg: '#1CB0F6' }
+    { n: 1, th: 'นักอ่าน', bg: '#DFA590' }, { n: 2, th: 'นักผจญภัย', bg: '#DB9E24' }, { n: 3, th: 'สายเทค', bg: '#CB7F89' },
+    { n: 4, th: 'คนรักดนตรี', bg: '#A24E2F' }, { n: 5, th: 'นักคิด', bg: '#B54A58' }, { n: 8, th: 'นักปลูก', bg: '#CA6B48' }
   ];
   const charSrc = (n) => 'img/chars/c' + n + '.png';
   const charOf = (n) => CHARS.find((c) => c.n === n) || CHARS[0];

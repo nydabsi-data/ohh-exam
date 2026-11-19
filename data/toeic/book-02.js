@@ -13,7 +13,7 @@
 
   window.TOEIC_UNITS = window.TOEIC_UNITS || [];
   window.TOEIC_UNITS.push({
-    id: 'toeic-b02', n: 2, title: 'Book 02', th: 'ชุดที่ 02', en: 'Book 02', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    id: 'toeic-b02', n: 2, title: 'Book 02', th: 'ชุดที่ 02', en: 'Book 02', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
     lessons: [
       { id: 'toeic-b02-p5', title: 'Part 5 · Incomplete Sentences', questions: [
         mc(1, "The store will be closed _____ December 25 for the holiday.", ["on", "in", "at", "by"], "ใช้ on กับวันที่/วันเฉพาะ → on December 25"),

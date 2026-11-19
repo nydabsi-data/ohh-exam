@@ -10,7 +10,7 @@
     lessons: [{ id: 'eg-' + id + '-1', title: th, en: title, questions: qs }] });
 
   window.GRAMMAR_UNITS = [
-    U('forms', 'Word forms', 'รูปคำ: นาม คุณศัพท์ กริยาวิเศษณ์', '#1CB0F6', '#1899D6', [
+    U('forms', 'Word forms', 'รูปคำ: นาม คุณศัพท์ กริยาวิเศษณ์', '#CA6B48', '#B85836', [
       mc(1, 'The hotel is in a _____ location.', ['convenient', 'convenience', 'conveniently', 'convene'], 'หน้านาม location ใช้คุณศัพท์'),
       mc(1, 'Please read the instructions _____.', ['carefully', 'careful', 'care', 'carefulness'], 'ขยายกริยา read ใช้กริยาวิเศษณ์ -ly'),
       mc(1, 'We were impressed by her _____.', ['presentation', 'present', 'presented', 'presenting'], 'หลัง her ต้องเป็นนาม'),
@@ -32,7 +32,7 @@
       mt('จับคู่คำลงท้ายกับชนิดของคำ', [['-tion', 'noun'], ['-ive', 'adjective'], ['-ly', 'adverb'], ['-ize', 'verb']], '-tion นาม · -ive คุณศัพท์ · -ly กริยาวิเศษณ์ · -ize กริยา'),
       mt('จับคู่คำกับชนิดของคำ', [['decision', 'noun'], ['decisive', 'adjective'], ['decisively', 'adverb'], ['decide', 'verb']], 'รากเดียวกัน 4 รูป ดูจากคำลงท้าย')]),
 
-    U('tense', 'Tenses', 'Tense ที่ออกบ่อย', '#A570FF', '#8549E8', [
+    U('tense', 'Tenses', 'Tense ที่ออกบ่อย', '#DFA590', '#D17E60', [
       mc(1, 'We _____ the contract yesterday.', ['signed', 'sign', 'have signed', 'will sign'], 'yesterday = อดีตธรรมดา'),
       mc(1, 'The CEO _____ the new plan next week.', ['will announce', 'announced', 'has announced', 'announcing'], 'next week = อนาคต'),
       mc(1, 'Ms. Ito has worked here _____ 2020.', ['since', 'for', 'during', 'ago'], 'Present Perfect + จุดเริ่มต้น ใช้ since'),
@@ -54,7 +54,7 @@
       mt('จับคู่คำบอกเวลากับ tense', [['yesterday', 'Past Simple'], ['so far', 'Present Perfect'], ['right now', 'Present Continuous'], ['next month', 'Future']], 'คำบอกเวลาเป็นตัวบอก tense ที่ชัดที่สุดใน Part 5'),
       mt('จับคู่รูปกริยา', [['have + V3', 'Present Perfect'], ['had + V3', 'Past Perfect'], ['will have + V3', 'Future Perfect'], ['was + V-ing', 'Past Continuous']], 'จำโครงสร้างให้แม่น')]),
 
-    U('prep', 'Prepositions', 'คำบุพบท เวลาและสถานที่', '#FF9600', '#E07F00', [
+    U('prep', 'Prepositions', 'คำบุพบท เวลาและสถานที่', '#B54A58', '#9F414E', [
       mc(1, 'The meeting is _____ Monday.', ['on', 'in', 'at', 'by'], 'วัน ใช้ on'),
       mc(1, 'Our flight leaves _____ 7:30.', ['at', 'on', 'in', 'during'], 'เวลาเป็นนาฬิกา ใช้ at'),
       mc(1, 'The company was founded _____ 1998.', ['in', 'on', 'at', 'by'], 'ปี ใช้ in'),
@@ -76,7 +76,7 @@
       mt('จับคู่คำบุพบทกับสิ่งที่ตามมา', [['at', '9:30'], ['on', 'Tuesday'], ['in', 'March'], ['during', 'the meeting']], 'at เวลา · on วัน · in เดือน/ปี · during + นาม'),
       mt('จับคู่ความหมาย', [['by Friday', 'ไม่เกินวันศุกร์'], ['until Friday', 'จนถึงวันศุกร์'], ['since Friday', 'ตั้งแต่วันศุกร์'], ['for a week', 'เป็นเวลาหนึ่งสัปดาห์']], 'คำที่สับสนบ่อยใน Part 5')]),
 
-    U('conj', 'Conjunctions', 'คำเชื่อม vs คำบุพบท', '#00C2D1', '#00A3B0', [
+    U('conj', 'Conjunctions', 'คำเชื่อม vs คำบุพบท', '#A24E2F', '#884128', [
       mc(1, '_____ the rain, the event went ahead.', ['Despite', 'Although', 'Because', 'However'], 'ตามด้วยนาม ใช้ Despite'),
       mc(1, '_____ it rained, the event went ahead.', ['Although', 'Despite', 'Because of', 'In spite of'], 'ตามด้วยประโยค ใช้ Although'),
       mc(1, 'The flight was canceled _____ the storm.', ['because of', 'because', 'although', 'so'], 'ตามด้วยนาม ใช้ because of'),
@@ -98,7 +98,7 @@
       mt('จับคู่คำเชื่อมกับความหมาย', [['although', 'แม้ว่า'], ['unless', 'ถ้าไม่'], ['so that', 'เพื่อที่จะ'], ['once', 'ทันทีที่']], 'คำเชื่อมที่ออกบ่อย'),
       mt('จับคู่คู่คำ', [['neither', 'nor'], ['either', 'or'], ['both', 'and'], ['not only', 'but also']], 'คู่คำที่ต้องใช้ด้วยกัน')]),
 
-    U('rel', 'Relative pronouns', 'Who / Whom / Whose / Which', '#FF4B9B', '#E0307F', [
+    U('rel', 'Relative pronouns', 'Who / Whom / Whose / Which', '#CB7F89', '#BA5663', [
       mc(1, 'The woman _____ called you is my manager.', ['who', 'which', 'whose', 'whom'], 'แทนคน เป็นประธาน ใช้ who'),
       mc(1, 'The report _____ you sent was very clear.', ['that', 'who', 'whose', 'whom'], 'แทนสิ่งของ ใช้ that หรือ which'),
       mc(2, 'Applicants _____ résumés are selected will be called.', ['whose', 'who', 'which', 'whom'], 'แสดงความเป็นเจ้าของ ตามด้วยนาม ใช้ whose'),
@@ -120,7 +120,7 @@
       mt('จับคู่คำกับสิ่งที่แทน', [['who', 'คน (ประธาน)'], ['whom', 'คน (กรรม)'], ['which', 'สิ่งของ'], ['whose', 'ความเป็นเจ้าของ']], 'relative pronouns หลัก'),
       mt('จับคู่คำกับสิ่งที่แทน', [['where', 'สถานที่'], ['when', 'เวลา'], ['why', 'เหตุผล'], ['what', 'สิ่งที่']], 'relative adverbs และ what')]),
 
-    U('cond', 'Conditionals', 'ประโยค If', '#FF4B4B', '#E03A3A', [
+    U('cond', 'Conditionals', 'ประโยค If', '#CB7F89', '#BD5D6A', [
       mc(1, 'If it rains tomorrow, we _____ the picnic.', ['will cancel', 'would cancel', 'canceled', 'had canceled'], 'Type 1: If + V1, will + V1'),
       mc(1, 'If you order today, you _____ a discount.', ['will get', 'got', 'would have got', 'getting'], 'Type 1'),
       mc(2, 'If I _____ more time, I would join the course.', ['had', 'have', 'will have', 'had had'], 'Type 2: If + V2, would + V1'),
@@ -142,7 +142,7 @@
       mt('จับคู่ประเภทกับโครงสร้าง', [['Type 1', 'If + V1, will + V1'], ['Type 2', 'If + V2, would + V1'], ['Type 3', 'If + had V3, would have V3'], ['Type 0', 'If + V1, V1']], 'โครงสร้าง If 4 แบบ'),
       mt('จับคู่ประโยคกลับ', [['Should you…', 'If you…'], ['Had I known…', 'If I had known…'], ['Were I…', 'If I were…']], 'ประโยคกลับที่ออกบ่อยใน Part 5')]),
 
-    U('pass', 'Passive voice', 'ประโยค Passive', '#E5279B', '#C21A80', [
+    U('pass', 'Passive voice', 'ประโยค Passive', '#B95361', '#9C404C', [
       mc(1, 'The package _____ yesterday.', ['was delivered', 'delivered', 'is delivering', 'delivers'], 'ของถูกส่ง อดีต: was + V3'),
       mc(1, 'English _____ in many countries.', ['is spoken', 'speaks', 'is speaking', 'spoke'], 'ถูกพูด ปัจจุบัน: is + V3'),
       mc(2, 'The new office _____ next month.', ['will be opened', 'will open it', 'opened', 'is opening it'], 'อนาคต: will be + V3'),
@@ -164,7 +164,7 @@
       mt('จับคู่ tense กับรูป passive', [['Present', 'is made'], ['Past', 'was made'], ['Future', 'will be made'], ['Present Perfect', 'has been made']], 'passive ในแต่ละ tense'),
       mt('จับคู่ active กับ passive', [['They built it.', 'It was built.'], ['They will send it.', 'It will be sent.'], ['They are fixing it.', 'It is being fixed.']], 'เปลี่ยนกรรมไปเป็นประธาน')]),
 
-    U('comp', 'Comparisons', 'การเปรียบเทียบ', '#8549E8', '#6A35C2', [
+    U('comp', 'Comparisons', 'การเปรียบเทียบ', '#D17E60', '#BF5C38', [
       mc(1, 'This model is _____ than that one.', ['cheaper', 'cheap', 'cheapest', 'more cheap'], 'than → ขั้นกว่า'),
       mc(1, 'It is the _____ hotel in the city.', ['largest', 'larger', 'large', 'more large'], 'the + ขั้นสุด'),
       mc(2, 'This model is _____ cheaper than that one.', ['much', 'very', 'more', 'most'], 'ขยายขั้นกว่า ใช้ much / far / even'),

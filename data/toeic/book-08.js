@@ -13,7 +13,7 @@
 
   window.TOEIC_UNITS = window.TOEIC_UNITS || [];
   window.TOEIC_UNITS.push({
-    id: 'toeic-b08', n: 8, title: 'Book 08', th: 'ชุดที่ 08', en: 'Book 08', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    id: 'toeic-b08', n: 8, title: 'Book 08', th: 'ชุดที่ 08', en: 'Book 08', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
     lessons: [
       { id: 'toeic-b08-p5', title: 'Part 5 · Incomplete Sentences', questions: [
         // Word form

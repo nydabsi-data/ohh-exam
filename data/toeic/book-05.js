@@ -14,7 +14,7 @@
 
   window.TOEIC_UNITS = window.TOEIC_UNITS || [];
   window.TOEIC_UNITS.push({
-    id: 'toeic-b05', n: 5, title: 'Book 05', th: 'ชุดที่ 05', en: 'Book 05', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    id: 'toeic-b05', n: 5, title: 'Book 05', th: 'ชุดที่ 05', en: 'Book 05', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
     lessons: [
       { id: 'toeic-b05-p5', title: 'Part 5 · Incomplete Sentences', questions: [
         mc(1, "The hotel's new spa has been _____ popular with business travelers since it opened in March.",

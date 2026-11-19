@@ -3,7 +3,7 @@
   const mc = (d, q, o, ex) => ({ type: 'mc', d, q, o, a: 0, ex });
   const tf = (d, q, a, ex) => ({ type: 'tf', d, q, a, ex });
   const UNITS = [
-    { id: 'math-seq', title: 'Sequences & series', th: 'ลำดับและอนุกรม', en: 'Sequences and series', sym: 'Σ', color: '#00B4E6', dark: '#0094C2', text: '#fff',
+    { id: 'math-seq', title: 'Sequences & series', th: 'ลำดับและอนุกรม', en: 'Sequences and series', sym: 'Σ', color: '#B25534', dark: '#96482C', text: '#fff',
       lessons: [
         { id: 'math-seq-1', title: 'ลำดับเลขคณิตและเรขาคณิต', en: 'Arithmetic and geometric sequences', questions: [
           mc(1, 'ลำดับเลขคณิต 3, 7, 11, 15, ... มีผลต่างร่วมเท่าใด', ['4', '3', '−4', '11'], 'd = a₂ − a₁ = 7 − 3 = 4'),
@@ -50,7 +50,7 @@
           tf(3, 'ปล่อยลูกบอลจากความสูง 10 m ทุกครั้งที่กระทบพื้นจะเด้งขึ้นสูง 1/2 ของความสูงก่อนหน้า ระยะทางทั้งหมด (ขึ้นและลง) จนหยุดเท่ากับ 30 m', true, '10 + 2(5 + 2.5 + ...) = 10 + 2·(5/(1 − 1/2)) = 10 + 20 = 30 m')
         ] }
       ] },
-    { id: 'math-prob', title: 'Counting & probability', th: 'หลักการนับและความน่าจะเป็น', en: 'Counting and probability', sym: 'P', color: '#FFC800', dark: '#E5A800', text: '#3A2A00',
+    { id: 'math-prob', title: 'Counting & probability', th: 'หลักการนับและความน่าจะเป็น', en: 'Counting and probability', sym: 'P', color: '#DB9E24', dark: '#C58E20', text: '#322408',
       lessons: [
         { id: 'math-prob-1', title: 'หลักการนับ วิธีเรียงสับเปลี่ยน และวิธีจัดหมู่', en: 'Counting, permutations, combinations', questions: [
           mc(1, 'มีเสื้อ 4 ตัวและกางเกง 3 ตัว (ต่างกันทั้งหมด) แต่งตัวชุดละ 1 ตัวต่อชนิดได้กี่แบบ', ['12', '7', '64', '24'], 'หลักการคูณ: 4 × 3 = 12 แบบ'),
@@ -97,7 +97,7 @@
           tf(3, 'โยนลูกเต๋า 2 ลูก ความน่าจะเป็นที่ผลคูณของแต้มเป็นจำนวนคู่เท่ากับ 3/4', true, 'ผลคูณเป็นคี่เมื่อคี่ทั้งคู่ = (1/2)(1/2) = 1/4 จึงได้ 1 − 1/4 = 3/4')
         ] }
       ] },
-    { id: 'math-stat', title: 'Statistics', th: 'สถิติ', en: 'Statistics', sym: 'x̄', color: '#A570FF', dark: '#8549E8', text: '#fff',
+    { id: 'math-stat', title: 'Statistics', th: 'สถิติ', en: 'Statistics', sym: 'x̄', color: '#DFA590', dark: '#D17E60', text: '#fff',
       lessons: [
         { id: 'math-stat-1', title: 'ค่ากลางและการกระจายของข้อมูล', en: 'Averages and spread', questions: [
           mc(1, 'ค่าเฉลี่ยเลขคณิตของข้อมูล 4, 6, 8, 10, 12 คือข้อใด', ['8', '40', '10', '6'], 'x̄ = 40/5 = 8'),
@@ -122,7 +122,7 @@
           tf(3, 'ข้อมูลชุดหนึ่งมีส่วนเบี่ยงเบนมาตรฐานเท่ากับ 0 ก็ต่อเมื่อข้อมูลทุกค่าเท่ากัน', true, 'σ = 0 ⇔ Σ(x − x̄)² = 0 ⇔ ทุกค่าเท่ากับ x̄')
         ] }
       ] },
-    { id: 'math-calc', title: 'Calculus', th: 'แคลคูลัสเบื้องต้น', en: 'Introductory calculus', sym: '∫', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    { id: 'math-calc', title: 'Calculus', th: 'แคลคูลัสเบื้องต้น', en: 'Introductory calculus', sym: '∫', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
       lessons: [
         { id: 'math-calc-1', title: 'ลิมิต อนุพันธ์ และปริพันธ์ของพหุนาม', en: 'Limits, derivatives and integrals of polynomials', questions: [
           mc(1, 'lim (3x + 1) เมื่อ x → 2 มีค่าเท่าใด', ['7', '6', '5', '3'], 'พหุนามต่อเนื่อง แทน x = 2 ได้ 3(2) + 1 = 7'),

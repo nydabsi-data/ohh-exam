@@ -5,7 +5,7 @@
   const mc = (d, q, o, ex) => ({ type: 'mc', d, q, o, a: 0, ex });
   const tf = (d, q, a, ex) => ({ type: 'tf', d, q, a, ex });
   const UNITS = [
-    { id: 'math-set', title: 'Sets & logic', th: 'เซตและตรรกศาสตร์', en: 'Sets and logic', sym: '∪', color: '#1CB0F6', dark: '#1899D6', text: '#fff',
+    { id: 'math-set', title: 'Sets & logic', th: 'เซตและตรรกศาสตร์', en: 'Sets and logic', sym: '∪', color: '#CA6B48', dark: '#B85836', text: '#fff',
       lessons: [
         { id: 'math-set-1', title: 'เซต', en: 'Sets', questions: [
           mc(1, 'ให้ A = {1, 2, 3, 4} และ B = {3, 4, 5} แล้ว A ∩ B คือเซตใด', ['{3, 4}', '{1, 2, 3, 4, 5}', '{1, 2}', '{5}'], 'A ∩ B คือสมาชิกที่อยู่ทั้งใน A และ B ได้ 3 กับ 4'),
@@ -52,7 +52,7 @@
           mc(3, 'เหตุ: p → q และ ∼q ผลสรุปใดทำให้การอ้างเหตุผลสมเหตุสมผล', ['∼p', 'p', 'q', '∼p ∧ q'], '∼q จริงทำให้ q เท็จ และ p → q จริง จึงต้องมี p เท็จ ได้ผลสรุป ∼p')
         ] }
       ] },
-    { id: 'math-real', title: 'Real numbers', th: 'จำนวนจริงและเลขยกกำลัง', en: 'Real numbers and exponents', sym: '√', color: '#A570FF', dark: '#8549E8', text: '#fff',
+    { id: 'math-real', title: 'Real numbers', th: 'จำนวนจริงและเลขยกกำลัง', en: 'Real numbers and exponents', sym: '√', color: '#DFA590', dark: '#D17E60', text: '#fff',
       lessons: [
         { id: 'math-real-1', title: 'จำนวนจริง อสมการ ค่าสัมบูรณ์ เลขยกกำลัง และราก', en: 'Real numbers, inequalities, absolute value, exponents, roots', questions: [
           mc(1, 'ข้อใดเป็นจำนวนอตรรกยะ', ['√5', '√9', '0.25', '22/7'], '√9 = 3, 0.25 = 1/4 และ 22/7 เป็นเศษส่วน ส่วน √5 เขียนเป็นเศษส่วนของจำนวนเต็มไม่ได้'),
@@ -77,7 +77,7 @@
           tf(3, 'ถ้า a < b แล้ว a² < b² สำหรับทุกจำนวนจริง a, b', false, 'เช่น a = −3, b = 1 ได้ a < b แต่ a² = 9 > 1 = b²')
         ] }
       ] },
-    { id: 'math-func', title: 'Functions', th: 'ฟังก์ชัน', en: 'Functions', sym: 'f', color: '#FF9600', dark: '#E07F00', text: '#fff',
+    { id: 'math-func', title: 'Functions', th: 'ฟังก์ชัน', en: 'Functions', sym: 'f', color: '#B54A58', dark: '#9F414E', text: '#fff',
       lessons: [
         { id: 'math-func-1', title: 'ฟังก์ชันและกราฟ', en: 'Functions and graphs', questions: [
           mc(1, 'ถ้า f(x) = 2x + 3 แล้ว f(4) เท่ากับเท่าใด', ['11', '14', '9', '10'], 'f(4) = 2(4) + 3 = 11'),
@@ -102,7 +102,7 @@
           mc(3, 'รูปสี่เหลี่ยมผืนผ้าที่มีความยาวรอบรูป 20 หน่วย มีพื้นที่มากที่สุดเท่าใด', ['25', '100', '20', '24'], 'ด้าน x และ 10 − x พื้นที่ x(10 − x) = 25 − (x − 5)² มากสุด 25 เมื่อ x = 5')
         ] }
       ] },
-    { id: 'math-explog', title: 'Exponential & log', th: 'เอกซ์โพเนนเชียลและลอการิทึม', en: 'Exponential and logarithmic functions', sym: 'log', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    { id: 'math-explog', title: 'Exponential & log', th: 'เอกซ์โพเนนเชียลและลอการิทึม', en: 'Exponential and logarithmic functions', sym: 'log', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
       lessons: [
         { id: 'math-explog-1', title: 'เอกซ์โพเนนเชียลและลอการิทึม', en: 'Exponentials and logarithms', questions: [
           mc(1, 'log₂ 8 มีค่าเท่าใด', ['3', '4', '2', '16'], '2³ = 8 จึงได้ log₂ 8 = 3'),
@@ -127,7 +127,7 @@
           tf(3, 'log₂ 3 × log₃ 8 = 3', true, 'log₂ 3 × log₃ 8 = log₂ 8 (เปลี่ยนฐาน) = 3')
         ] }
       ] },
-    { id: 'math-trig', title: 'Trigonometry', th: 'ตรีโกณมิติ', en: 'Trigonometry', sym: 'θ', color: '#E5279B', dark: '#C21A80', text: '#fff',
+    { id: 'math-trig', title: 'Trigonometry', th: 'ตรีโกณมิติ', en: 'Trigonometry', sym: 'θ', color: '#B95361', dark: '#9C404C', text: '#fff',
       lessons: [
         { id: 'math-trig-1', title: 'อัตราส่วนตรีโกณมิติและฟังก์ชันตรีโกณมิติ', en: 'Trigonometric ratios and functions', questions: [
           mc(1, 'sin 30° มีค่าเท่าใด', ['1/2', '√3/2', '√2/2', '1'], 'ค่ามาตรฐาน sin 30° = 1/2'),

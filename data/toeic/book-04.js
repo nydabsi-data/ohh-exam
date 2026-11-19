@@ -14,7 +14,7 @@
 
   window.TOEIC_UNITS = window.TOEIC_UNITS || [];
   window.TOEIC_UNITS.push({
-    id: 'toeic-b04', n: 4, title: 'Book 04', th: 'ชุดที่ 04', en: 'Book 04', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    id: 'toeic-b04', n: 4, title: 'Book 04', th: 'ชุดที่ 04', en: 'Book 04', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
     lessons: [
       { id: 'toeic-b04-p5', title: 'Part 5 · Incomplete Sentences', questions: [
         mc(1, "The apartment complex is _____ located near the subway station.",

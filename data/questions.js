@@ -7,7 +7,7 @@
    NOTE: sample questions for building the app; verify against official material before real use. */
 window.UNITS = [
   {
-    id: 'pof', title: 'Principles of Flight', th: 'หลักการบิน', color: '#1CB0F6', dark: '#1899D6', text: '#fff',
+    id: 'pof', title: 'Principles of Flight', th: 'หลักการบิน', color: '#CA6B48', dark: '#B85836', text: '#fff',
     lessons: [
       {
         id: 'pof-1', title: 'Four forces & controls',
@@ -44,7 +44,7 @@ window.UNITS = [
     ]
   },
   {
-    id: 'met', title: 'Meteorology', th: 'อุตุนิยมวิทยา', color: '#A570FF', dark: '#8549E8', text: '#fff',
+    id: 'met', title: 'Meteorology', th: 'อุตุนิยมวิทยา', color: '#DFA590', dark: '#D17E60', text: '#fff',
     lessons: [
       {
         id: 'met-1', title: 'ISA atmosphere',
@@ -79,7 +79,7 @@ window.UNITS = [
     ]
   },
   {
-    id: 'nav', title: 'Navigation', th: 'การเดินอากาศ', color: '#FF9600', dark: '#E07F00', text: '#fff',
+    id: 'nav', title: 'Navigation', th: 'การเดินอากาศ', color: '#B54A58', dark: '#9F414E', text: '#fff',
     lessons: [
       {
         id: 'nav-1', title: 'Units & distance',
@@ -114,7 +114,7 @@ window.UNITS = [
     ]
   },
   {
-    id: 'law', title: 'Air Law', th: 'กฎหมายการบิน', color: '#FF4B4B', dark: '#E03A3A', text: '#fff',
+    id: 'law', title: 'Air Law', th: 'กฎหมายการบิน', color: '#CB7F89', dark: '#BD5D6A', text: '#fff',
     lessons: [
       {
         id: 'law-1', title: 'Squawks & ICAO',
@@ -149,7 +149,7 @@ window.UNITS = [
     ]
   },
   {
-    id: 'agk', title: 'Aircraft & Instruments', th: 'ระบบอากาศยานและเครื่องวัด', color: '#E5279B', dark: '#C21A80', text: '#fff',
+    id: 'agk', title: 'Aircraft & Instruments', th: 'ระบบอากาศยานและเครื่องวัด', color: '#B95361', dark: '#9C404C', text: '#fff',
     lessons: [
       {
         id: 'agk-1', title: 'Pitot-static system',
@@ -171,7 +171,7 @@ window.UNITS = [
     ]
   },
   {
-    id: 'hfr', title: 'Radio & Human Factors', th: 'วิทยุสื่อสารและปัจจัยมนุษย์', color: '#FFC800', dark: '#E5A800', text: '#3A2A00',
+    id: 'hfr', title: 'Radio & Human Factors', th: 'วิทยุสื่อสารและปัจจัยมนุษย์', color: '#DB9E24', dark: '#C58E20', text: '#322408',
     lessons: [
       {
         id: 'hfr-1', title: 'Radiotelephony',
