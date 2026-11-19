@@ -316,3 +316,9 @@ body {
 /* TOEIC reading passage above the question */
 .q-passage { white-space: pre-line; background: #FFFDF6; border: 2px solid var(--line); border-left: 5px solid #FF9F9F; border-radius: 14px;
   padding: 14px 16px; margin: 6px 0 14px; font-size: 15.5px; line-height: 1.65; color: var(--ink); max-height: 46vh; overflow: auto; }
+
+/* Handwritten wordmark logo */
+.brand img.wordmark { width: auto; height: 34px; }
+.auth-wordmark { margin: 0; line-height: 0; }
+.auth-wordmark img { height: 84px; width: auto; max-width: 100%; }
+@media (max-width: 900px) { .auth-wordmark img { height: 64px; } }

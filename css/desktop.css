@@ -3,7 +3,7 @@
 @media (min-width: 1024px) {
   .topbar-in, .hub, .home { max-width: 1200px; padding-left: 32px; padding-right: 32px; }
   .topbar-in { padding-top: 12px; padding-bottom: 12px; }
-  .brand img { width: 42px; height: 42px; }
+  .brand img.wordmark { height: 40px; }
   .brand { font-size: 22px; }
 
   /* Home (mode picker) */
