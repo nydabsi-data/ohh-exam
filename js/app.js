@@ -56,6 +56,8 @@
     q.__key = l.id + '#' + k; QBANK[q.__key] = { q, lesson: l };
   })));
   const ALL_LESSONS = [].concat(...Object.values(COURSES).map((c) => c.lessons));
+  // Memory trick shown after answering: q.tip, or window.Q_TIPS['<lessonId>#<index>'] (data/tips/*.js)
+  const qTip = (q) => q.tip || (window.Q_TIPS && window.Q_TIPS[q.__key]) || '';
   let course = 'pilot', UNITS = COURSES.pilot.units, LESSONS = COURSES.pilot.lessons;
   function setCourse(c) { course = COURSES[c] ? c : 'pilot'; UNITS = COURSES[course].units; LESSONS = COURSES[course].lessons; }
 
@@ -339,8 +341,8 @@
         '</div><button class="row-arrow topic-next" type="button" data-dir="1" aria-controls="topic-row" aria-label="' + T('เลื่อนหัวข้อไปทางขวา') + '">' +
           TI('<path d="M9 5l7 7-7 7"/>') + '</button></div>' + html;
     }
-    // Picture cards for this course (tap to enlarge)
-    const figs = Object.keys(window.FIGS || {}).filter((k) => FIGS[k].course === course);
+    // Picture cards are no longer listed on the course page — each picture shows inside its question (after answering)
+    const figs = [];
     if (figs.length) {
       html = '<section class="unit fig-unit" style="--c:#DFA590;--d:#D17E60;--t:#fff">' +
         '<header class="unit-head"><div><small>ดูภาพแล้วจำง่ายขึ้น</small><h2>ภาพประกอบ</h2></div>' +
@@ -356,6 +358,9 @@
         '<span class="lc-go" aria-label="เปิด">' + PLAY_ICON + '</span></a>' +
         '<a class="glossary-entry" href="#picture-flash"><span class="ge-ico">' + imgIcon('airport') + '</span>' +
         '<span class="ge-body"><b>' + T('Flash Card พร้อมรูป') + '</b><i>' + Math.min(PICTURE_FLASH_LIMIT, (window.PM_QUIZ || []).length) + ' ' + T('ข้อ') + '</i></span>' +
+        '<span class="lc-go">' + PLAY_ICON + '</span></a>' +
+        '<a class="glossary-entry" href="#aircraft-flash"><span class="ge-ico">' + pilotIcon('plane') + '</span>' +
+        '<span class="ge-body"><b>' + T('Flash Card เครื่องบิน 3D') + '</b><i>' + AIRCRAFT_FLASH.length + ' ' + T('ข้อ') + '</i></span>' +
         '<span class="lc-go">' + PLAY_ICON + '</span></a>' +
         '<button type="button" class="glossary-entry" id="pm-quiz"><span class="ge-ico">' +
         TI('<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M6 12l3-3 3 3 4-5"/>') + '</span>' +
@@ -538,7 +543,9 @@
     $('#fb').innerHTML =
       '<div class="fb-head"><span class="ico">' + (ok ? ICON.check : ICON.x) + '</span><h4>' + (ok ? pick(PRAISE) : 'ยังไม่ถูก') + '</h4></div>' +
       (ans ? '<p><b>คำตอบที่ถูก:</b> ' + (L.q.type === 'tf' ? esc(ans) : '<span class="no-i18n">' + esc(ans) + '</span>') + '</p>' : '') +
-      (L.q.ex ? '<p class="no-i18n">' + esc(L.q.ex) + '</p>' : '');
+      (L.q.ex ? '<p class="no-i18n">' + esc(L.q.ex) + '</p>' : '') +
+      (qTip(L.q) ? '<p class="fb-tip no-i18n"><b>💡 วิธีจำ:</b> ' + esc(qTip(L.q)) + '</p>' : '') +
+      (course === 'pilot' || L.q.image ? abbrBox([L.q.q, L.q.ex, qTip(L.q)].concat(L.opts ? L.opts.map((o) => o.t) : []).join(' ')) : '');
     // A labelled picture for this topic (data/figs.js), shown under the question after answering
     const fig = figFor(L.q);
     if (fig) $('#qbox').insertAdjacentHTML('beforeend', '<figure class="q-fig no-i18n"><figcaption>ภาพประกอบ: ' + fig.title + '</figcaption>' + fig.svg + figParts(fig) + '</figure>');
@@ -747,6 +754,8 @@
     exam1: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4.2l2.6 1.6M9.5 2.5h5M12 2.5V6M18.5 6.5l1.5-1.5"/></svg>',
     perfect: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 3h10v2h3.5v3A4.5 4.5 0 0 1 16.3 12.5 5 5 0 0 1 13 15.9V19h3.5v2h-9v-2H11v-3.1a5 5 0 0 1-3.3-3.4A4.5 4.5 0 0 1 3.5 8V5H7zm0 4H5.5v1A2.5 2.5 0 0 0 7 10.3zm10 0v3.3A2.5 2.5 0 0 0 18.5 8V7z"/></svg>'
   };
+  // Mission pictures (img/topics); a claimed mission shows the team trophy
+  const M_IMG = { lesson1: 'm-pencil', xp50: 'apt-series', correct15: 'm-target', exam1: 'apt-jigsaw', perfect: 'm-trophy' };
   const claimable = () => MISSIONS.filter((m) => m.get() >= m.need && !S.daily.claimed[m.id]).length;
   const TAB_ICON = {
     home: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10.5V20a1 1 0 0 0 1 1h5v-6h6v6h5a1 1 0 0 0 1-1v-9.5z"/></svg>',
@@ -759,12 +768,12 @@
     const left = Math.max(0, Math.ceil((new Date(new Date().setHours(24, 0, 0, 0)) - Date.now()) / 3600000));
     const doneN = MISSIONS.filter((m) => S.daily.claimed[m.id]).length;
     $('#mission-list').innerHTML =
-      '<div class="page-banner"><p>ภารกิจประจำวัน · รีเซ็ตในอีก ' + left + ' ชม.</p><h1>ภารกิจวันนี้</h1>' +
+      '<div class="page-banner"><img class="pb-art" src="img/topics/m-diamond.png" alt="" aria-hidden="true"><p>ภารกิจประจำวัน · รีเซ็ตในอีก ' + left + ' ชม.</p><h1>ภารกิจวันนี้</h1>' +
         '<div class="banner-row"><span>' + ICON.flame + 'ต่อเนื่อง ' + S.streak + ' วัน</span><span>' + ICON.check + 'สำเร็จ ' + doneN + '/' + MISSIONS.length + '</span></div></div>' +
       MISSIONS.map((m) => {
         const v = Math.min(m.need, m.get()), full = v >= m.need, got = !!S.daily.claimed[m.id];
         return '<div class="mission' + (got ? ' got' : '') + '">' +
-          '<span class="m-ico">' + (got ? ICON.check : M_ICON[m.id] || TAB_ICON.missions) + '</span>' +
+          '<span class="m-ico">' + (got ? imgIcon('m-team') : M_IMG[m.id] ? imgIcon(M_IMG[m.id]) : M_ICON[m.id] || TAB_ICON.missions) + '</span>' +
           '<div class="m-body"><b>' + esc(m.title) + '</b>' +
             '<div class="m-prog"><div class="bar"><span style="width:' + (v / m.need) * 100 + '%"></span></div><i>' + v + '/' + m.need + '</i></div></div>' +
           (got ? '<span class="m-done">รับแล้ว</span>'
@@ -791,6 +800,7 @@
     target: TAB_ICON.missions,
     shuffle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>'
   };
+  const PR_IMG = { redo: 'm-pencil', target: 'apt-series', shuffle: 'hist' };   // Practice tiles: full-colour pictures
   let practiceSets = {};
   function renderPractice() {
     const missed = missedQuestions();
@@ -800,7 +810,7 @@
     practiceSets = { missed, weak: weakQs, review: reviewQs };
     const tile = (id, icon, title, sub, n, cls) =>
       '<button class="pr-tile ' + cls + '" data-p="' + id + '"' + (n ? '' : ' disabled') + '>' +
-        '<span class="pr-ico">' + PR_ICON[icon] + '</span><span class="pr-body"><b>' + title + '</b><i>' + sub + '</i></span>' +
+        '<span class="pr-ico">' + (PR_IMG[icon] ? imgIcon(PR_IMG[icon]) : PR_ICON[icon]) + '</span><span class="pr-body"><b>' + title + '</b><i>' + sub + '</i></span>' +
         '<span class="pr-count">' + n + ' <small>ข้อ</small></span></button>';
     $('#practice-body').innerHTML =
       '<div class="page-banner"><p>ฝึกได้ไม่จำกัด · ได้ XP ตามระดับความยาก</p><h1>Practice</h1></div>' +
@@ -854,7 +864,7 @@
     }).join('');
     const week = vals.reduce((a, b) => a + b, 0);
     $('#perf-body').innerHTML =
-      '<div class="page-banner"><p>ผลคะแนนและพัฒนาการของคุณ</p><h1>Performance</h1></div>' +
+      '<div class="page-banner"><img class="pb-art" src="img/topics/m-trophy.png" alt="" aria-hidden="true"><p>ผลคะแนนและพัฒนาการของคุณ</p><h1>Performance</h1></div>' +
       '<div class="kpis">' +
         '<div class="kpi"><span>XP สะสม</span><b>' + S.xp + '</b></div>' +
         '<div class="kpi"><span>ความแม่นยำ</span><b>' + (acc == null ? '–' : acc + '%') + '</b></div>' +
@@ -987,6 +997,35 @@
   // Entry: [term, abbreviation, Thai meaning, Thai explanation, category]
   const AVIA_CATS = { aircraft: 'เครื่องบินและระบบ', aero: 'อากาศพลศาสตร์และสมรรถนะ', met: 'อุตุนิยมวิทยา', nav: 'การเดินอากาศ', atc: 'ATC ห้วงอากาศ กฎหมาย', ops: 'สนามบิน ปฏิบัติการ ความปลอดภัย' };
   let AVIA = null;
+  // Abbreviations in a question / its answer: full English name + Thai meaning, shown after answering.
+  // Source: the aviation vocabulary (data/avia/*.js) plus a few simulator terms it does not have.
+  const EXTRA_ABBR = {
+    IOS: ['Instructor Operating Station', 'สถานีครูฝึก ใช้ตั้งสภาพอากาศ ใส่ความผิดปกติ และย้ายตำแหน่งเครื่องในเครื่องจำลอง'],
+    'TO/GA': ['Take-Off / Go-Around', 'โหมดเร่งกำลังเต็มสำหรับขึ้นบินหรือบินขึ้นใหม่ (ยกเลิกการลงจอด)'],
+    FLCH: ['Flight Level Change', 'โหมดเปลี่ยนระดับบิน คุมความเร็วด้วยการก้ม–เงยหัวเครื่อง'],
+    MCDU: ['Multipurpose Control and Display Unit', 'จอและแป้นพิมพ์ของ Airbus สำหรับป้อนเส้นทางและข้อมูลให้ระบบจัดการการบิน'],
+    FCU: ['Flight Control Unit', 'แผงตั้งค่าออโต้ไพลอตของ Airbus เช่น ความเร็ว ทิศทาง ความสูง'],
+    MCP: ['Mode Control Panel', 'แผงตั้งค่าออโต้ไพลอตของ Boeing เช่น ความเร็ว ทิศทาง ความสูง'],
+    CB: ['Cumulonimbus', 'เมฆฝนฟ้าคะนองก้อนใหญ่ (ถ้าเป็นเรื่องระบบไฟฟ้า CB = Circuit Breaker เบรกเกอร์ตัดไฟ)'],
+    RA: ['Rain', 'ฝน (รหัสในรายงาน METAR) · ถ้าเป็นเรื่องเครื่องวัด RA = Radio Altimeter'],
+  };
+  let ABBR = null;
+  function abbrMap() {
+    if (ABBR) return ABBR;
+    ABBR = {};
+    aviaTerms().forEach((t) => {
+      const a = String(t[1] || '').trim();
+      if (/^[A-Z][A-Z0-9/]{1,9}$/.test(a) && !ABBR[a]) ABBR[a] = [t[0], t[2]];
+    });
+    return Object.assign(ABBR, EXTRA_ABBR);
+  }
+  function abbrBox(text) {
+    const m = abbrMap(), found = [];
+    (String(text).match(/[A-Z][A-Z0-9]{1,6}(?:\/[A-Z]{1,4})?/g) || []).forEach((a) => { if (m[a] && found.indexOf(a) < 0) found.push(a); });
+    if (!found.length) return '';
+    return '<div class="fb-abbr no-i18n"><b>ตัวย่อในข้อนี้</b>' + found.slice(0, 8).map((a) =>
+      '<span><b>' + esc(a) + '</b> = ' + esc(m[a][0]) + ' — ' + esc(m[a][1]) + '</span>').join('') + '</div>';
+  }
   function aviaTerms() {
     if (AVIA) return AVIA;
     const seen = new Set();
@@ -1032,16 +1071,130 @@
      shuffled round starts, and it keeps going until "หยุด". +2 XP per right answer. */
   const FC_SECS = 5;
   const PICTURE_FLASH_LIMIT = 30;
+  const AIRCRAFT_FLASH = [
+    { icao: 'BCS3', name: 'Airbus A220-300', asset: 'a220.glb', clue: 'เครื่องบินลำตัวแคบที่เริ่มพัฒนาภายใต้ชื่อ Bombardier CS300',
+      tip: 'จำว่า «220 = CS300» เวลาดูรูปให้เริ่มจากลำตัวเรียว แล้วเทียบขนาดเครื่องยนต์กับลำตัว' },
+    { icao: 'A320', name: 'Airbus A320', asset: 'a320.glb', clue: 'เครื่องบินลำตัวแคบสองเครื่องยนต์ สังเกตจมูกโค้งและประตูทางออกเหนือปีก',
+      tip: 'จำ «จมูกมน + เครื่องกลม» แล้วเทียบกับ 737 ที่จมูกแหลมกว่าและเครื่องยนต์อยู่ต่ำกว่า' },
+    { icao: 'A359', name: 'Airbus A350', asset: 'a350.glb', clue: 'เครื่องบินลำตัวกว้างสองเครื่องยนต์ สังเกตปลายปีกที่โค้งเชิดขึ้น',
+      tip: 'จำ «ปีกเชิด» มองจากด้านหน้าเฉียงแล้วไล่จากโคนปีกไปถึงปลายที่ยกขึ้น' },
+    { icao: 'A388', name: 'Airbus A380', asset: 'a380.glb', clue: 'เครื่องบินลำตัวกว้างสี่เครื่องยนต์ที่มีห้องโดยสารสองชั้นตลอดลำตัว',
+      tip: 'จำ «2 ชั้น 4 เครื่อง» ดูหน้าต่างสองแถวตลอดลำ แล้วนับเครื่องยนต์ข้างละสอง' },
+    { icao: 'B738', name: 'Boeing 737', asset: 'b737.glb', clue: 'เครื่องบินลำตัวแคบสองเครื่องยนต์ จมูกค่อนข้างแหลมและเครื่องยนต์ติดต่ำ',
+      tip: 'จำ «จมูกแหลม + เครื่องอยู่ต่ำ» แล้วเทียบกับจมูกมนของ A320' },
+    { icao: 'B788', name: 'Boeing 787 Dreamliner', asset: 'b787.glb', clue: 'เครื่องบินลำตัวกว้างสองเครื่องยนต์ สังเกตแนวปีกโค้งและขอบท้ายฝาครอบเครื่องยนต์แบบฟันเลื่อย',
+      tip: 'จำ «ปีกโค้ง + ขอบเครื่องเป็นซี่» ลองหมุนไปดูด้านข้างและท้ายเครื่องยนต์' },
+    { icao: 'A333', name: 'Airbus A330-300', asset: 'a333.glb', cc0: true,
+      clue: 'เครื่องบินลำตัวกว้างสองเครื่องยนต์ในตระกูล A330 สังเกตปลายปีกแบบแผ่นยกขึ้น',
+      tip: 'จำ «A330 ปลายปีกเป็นแผ่น» เทียบกับ A350 ที่ปลายปีกเชิดขึ้นแบบโค้งต่อเนื่อง' },
+    { icao: 'B752', name: 'Boeing 757-200', asset: 'b752.glb', cc0: true,
+      clue: 'เครื่องบินลำตัวแคบสองเครื่องยนต์ มีลำตัวเรียวยาวและระยะจากท้องเครื่องถึงพื้นค่อนข้างสูง',
+      tip: 'จำ «757 ลำเรียวและขายาว» แล้วเทียบกับ 767 ซึ่งมีลำตัวกว้างกว่า' },
+    { icao: 'B763', name: 'Boeing 767-300', asset: 'b763.glb', cc0: true,
+      clue: 'เครื่องบินลำตัวกว้างสองเครื่องยนต์ สัดส่วนช่วงลำตัวดูหนากว่า 757',
+      tip: 'จำ «767 ลำกว้างกว่า 757» ลองหมุนมุมหน้าเฉียงเพื่อดูหน้าตัดของลำตัว' },
+    { icao: 'B77W', name: 'Boeing 777-300ER', asset: 'b77w.glb', cc0: true,
+      clue: 'เครื่องบินลำตัวกว้างที่มีลำตัวยาว เครื่องยนต์คู่ขนาดใหญ่ และปลายปีกกวาดยื่นออกตามแนวปีก',
+      tip: 'จำ «ลำยาว เครื่องใหญ่ ปลายปีกกวาด» แล้วเทียบกับ 787 ที่ขอบท้ายฝาครอบเครื่องยนต์เป็นซี่' },
+    { icao: 'E190', name: 'Embraer E190', asset: 'e190.glb', cc0: true,
+      clue: 'เจ็ตภูมิภาคที่ติดตั้งเครื่องยนต์ใต้ปีกและมีแพนหางระดับอยู่ต่ำกว่ายอดครีบหาง',
+      tip: 'จำ «E190 เครื่องอยู่ใต้ปีก» ถ้าเครื่องยนต์อยู่ข้างท้ายลำและหางเป็นตัว T ให้เทียบกับ CRJ900' },
+    { icao: 'CRJ9', name: 'Bombardier CRJ900', asset: 'crj9.glb', cc0: true,
+      clue: 'เจ็ตภูมิภาคที่มีเครื่องยนต์ติดข้างท้ายลำตัวและแพนหางระดับอยู่บนยอดครีบหาง',
+      tip: 'จำ «เครื่องคู่ท้ายลำ + หางตัว T» มองด้านข้างจะเห็นเครื่องยนต์อยู่หลังปีกหลัก' },
+    { icao: 'DH8D', name: 'Dash 8 Q400', asset: 'dh8d.glb', cc0: true,
+      clue: 'เครื่องบินโดยสารภูมิภาคแบบใบพัดคู่ มีปีกสูงและแพนหางระดับอยู่บนยอดครีบหาง',
+      tip: 'จำ «ใบพัดคู่ ปีกบน หาง T» ใช้ตำแหน่งปีกสูงแยกจาก King Air 200 ที่ปีกอยู่ต่ำ' },
+    { icao: 'BE20', name: 'Beechcraft King Air 200', asset: 'be20.glb', cc0: true,
+      clue: 'เครื่องบินใบพัดคู่สำหรับงานธุรกิจและภารกิจทั่วไป มีปีกต่ำและลำตัวสั้นกว่าฝูงเครื่องโดยสารภูมิภาคในชุดนี้',
+      tip: 'จำ «ใบพัดคู่ ปีกล่าง ลำสั้น» เทียบกับ Dash 8 Q400 ที่ปีกอยู่บนลำตัวและลำยาวกว่า' },
+    { group: 'engine', name: 'Fan · พัดลมหน้าเครื่อง', asset: 'fan.glb', clue: 'พัดลมหน้ารับอากาศเข้าสู่เครื่องยนต์ ส่วนหนึ่งไหลผ่านแกนกลางและอีกส่วนไหลอ้อมแกนเพื่อสร้างแรงขับ',
+      tip: 'จำ «จานใหญ่สุดอยู่หน้า» มองหาใบพัดแถวแรกที่กว้างกว่าชุดอื่น' },
+    { group: 'engine', name: 'Compressor · ชุดอัดอากาศ', asset: 'compressor.glb', clue: 'ชุดใบพัดหลายขั้นเพิ่มความดันของอากาศก่อนส่งเข้าสู่ห้องเผาไหม้',
+      tip: 'จำ «อัดก่อนเผา» ดูแถวใบพัดเล็กหลายชั้นระหว่างพัดลมหน้าและห้องเผาไหม้' },
+    { group: 'engine', name: 'Combustor · ห้องเผาไหม้', asset: 'combustor.glb', clue: 'เป็นบริเวณที่อากาศอัดผสมกับเชื้อเพลิงและเกิดการเผาไหม้ ก๊าซร้อนไหลต่อไปยังกังหัน',
+      tip: 'จำ «วงกลางไร้ใบ» ในโมเดลเป็นปลอกวงแหวนคั่นระหว่างชุดอัดอากาศกับกังหัน' },
+    { group: 'engine', name: 'Turbine · กังหัน', asset: 'turbine.glb', clue: 'รับพลังงานจากก๊าซร้อนที่ไหลผ่าน แล้วส่งกำลังผ่านเพลาไปหมุนชุดอัดอากาศและพัดลม',
+      tip: 'จำ «ก๊าซร้อนหมุนใบพัดท้าย» มองหาชุดใบพัดหลังห้องเผาไหม้' },
+    { group: 'airframe', name: 'Flap · แฟลป', asset: 'flap.glb', clue: 'พื้นผิวที่ขอบท้ายปีก มักอยู่ด้านในใกล้ลำตัว ใช้เพิ่มแรงยกและแรงต้านในช่วงบินช้า',
+      tip: 'จำ «แฟลปอยู่ใกล้ลำ» หมุนดูปีกจากด้านบน แล้วเทียบตำแหน่งกับแพนเอียงที่อยู่ไกลออกไป' },
+    { group: 'airframe', name: 'Aileron · แพนเอียง', asset: 'aileron.glb', clue: 'พื้นผิวที่ขอบท้ายปีกด้านนอก ช่วยให้อากาศยานเอียงซ้ายหรือขวารอบแกนตามยาว',
+      tip: 'จำ «ท้ายปีกนอกใช้เอียง» มองหาชิ้นที่อยู่ใกล้ปลายปีกกว่าแฟลป' },
+    { group: 'airframe', name: 'Rudder · แพนหางเสือ', asset: 'rudder.glb', clue: 'พื้นผิวขยับได้ที่ขอบท้ายแพนหางดิ่ง ใช้ควบคุมการหันหัวซ้าย–ขวา',
+      tip: 'จำ «หางตั้ง หัวหัน» ชิ้นที่ไฮไลต์อยู่หลังครีบแนวตั้ง' },
+    { group: 'airframe', name: 'Landing Gear · ชุดฐานล้อ', asset: 'landing-gear.glb', clue: 'ชุดล้อและขารับแรงที่รองรับเครื่องบินเมื่อจอด ขับเคลื่อนบนพื้น วิ่งขึ้น หรือลงจอด',
+      tip: 'จำ «ล้อ + ขารับแรง» ลองหมุนมองจากด้านข้าง จะเห็นขาเชื่อมจากโครงเครื่องลงมาที่เพลาล้อ' },
+    { group: 'airframe', name: 'Elevator · แพนบังคับขึ้นลง', asset: 'elevator.glb',
+      clue: 'พื้นบังคับที่ขอบท้ายแพนหางระดับ ใช้เปลี่ยนมุมก้ม–เงยของหัวเครื่องบิน (pitch)',
+      tip: 'จำ «ชิ้นท้ายหางนอน ขยับหัวขึ้นลง» ส่วนคงที่ด้านหน้าคือ Horizontal Stabilizer' },
+    { group: 'airframe', name: 'Horizontal Stabilizer · แพนหางระดับ', asset: 'horizontal-stabilizer.glb',
+      clue: 'พื้นผิวแนวนอนที่หาง ช่วยให้เครื่องบินมีเสถียรภาพด้านก้ม–เงย ในแบบที่เห็น Elevator เป็นชิ้นขยับได้ที่ขอบท้าย',
+      tip: 'จำ «แผ่นนอนแผ่นใหญ่ช่วยทรงตัว» ส่วนขอบท้ายที่เล็กกว่าใช้บังคับก้ม–เงย' },
+    { group: 'airframe', name: 'Vertical Stabilizer · แพนหางดิ่ง', asset: 'vertical-stabilizer.glb',
+      clue: 'ครีบแนวตั้งที่หาง ช่วยให้อากาศยานคงทิศทาง ส่วนที่ขยับได้ตรงขอบท้ายคือ Rudder',
+      tip: 'จำ «ครีบตั้งช่วยคงทิศ ขอบท้ายใช้หัน» แยกแผ่นหลักที่อยู่ด้านหน้าออกจากแพนหางเสือ' },
+    { group: 'airframe', name: 'Slat · สแลต', asset: 'slat.glb',
+      clue: 'ชิ้นส่วนที่ขอบหน้าปีก เมื่อกางจะช่วยให้กระแสอากาศเกาะผิวปีกได้ที่มุมปะทะสูงขึ้นก่อนเกิดสตอลล์',
+      tip: 'จำ «สแลตหน้า แฟลปท้าย» หมุนมองจากด้านบนเพื่อดูว่าชิ้นที่ไฮไลต์อยู่ขอบไหน' },
+    { group: 'airframe', name: 'Spoiler · แผงลดแรงยก', asset: 'spoiler.glb',
+      clue: 'แผงบนผิวปีกที่ยกตัวขึ้นเพื่อลดแรงยกและเพิ่มแรงต้าน บางระบบใช้ช่วยควบคุมการเอียงด้วย',
+      tip: 'จำ «ฝาเด้งบนปีกเพื่อลดแรงยก» มองจากด้านข้างจะเห็นแผงยกออกจากผิวปีก' },
+    { group: 'airframe', name: 'Winglet · ปลายปีกตั้ง', asset: 'winglet.glb',
+      clue: 'พื้นผิวที่ปลายปีกซึ่งส่วนมากยกขึ้น ช่วยลดแรงต้านเหนี่ยวนำที่เกี่ยวข้องกับกระแสหมุนวนบริเวณปลายปีก',
+      tip: 'จำ «ปีกเล็กติดปลายปีก» ไล่สายตาจากโคนปีกไปหาชิ้นที่เชิดขึ้นตรงปลายสุด' },
+    { group: 'airframe', name: 'Pitot Tube · ท่อพิโตต์', asset: 'pitot.glb',
+      clue: 'ท่อขนาดเล็กที่หันช่องรับอากาศไปด้านหน้าเพื่อรับความดันรวม ระบบใช้ร่วมกับความดันสถิตเพื่อหาความเร็วอากาศ',
+      tip: 'จำ «ท่อเล็กหันหน้าไปรับลม» ในโมเดลให้หมุนดูข้างจมูกเครื่องบินแล้วหาปลายท่อ' },
+    { group: 'airframe', name: 'Fuselage · ลำตัวเครื่องบิน', asset: 'fuselage.glb',
+      clue: 'โครงสร้างส่วนกลางที่มีห้องนักบินและพื้นที่สำหรับผู้โดยสารหรือสัมภาระ เป็นจุดเชื่อมกับปีกและส่วนหาง',
+      tip: 'จำ «ลำยาวจากจมูกถึงหาง» ส่วนที่ไฮไลต์คือโครงหลักที่ปีกทั้งสองข้างยื่นออกมา' }
+  ];
+  function aircraftFigure(aircraft) {
+    const asset = 'img/aircraft-flash/' + aircraft.asset;
+    const source = aircraft.icao ? 'https://planes.fyi/aircraft/types/' + aircraft.icao : '';
+    return '<figure class="q-product-image aircraft-figure">' +
+      '<model-viewer src="' + asset + '" alt="' + T('โมเดล 3D สำหรับคำถาม') + '" camera-controls touch-action="pan-y" camera-orbit="55deg 68deg 105%" shadow-intensity="0.6" loading="eager"></model-viewer>' +
+      '<p class="aircraft-status" role="status">' + T('กำลังโหลดโมเดล 3D') + '</p>' +
+      '<figcaption>' + (aircraft.cc0
+        ? '<a href="https://github.com/oktal3700/bluebell" target="_blank" rel="noopener">Bluebell CSL</a> · ' +
+          '<a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">CC0 1.0</a>'
+        : T('โมเดลจำลองเพื่อการเรียนรู้')) +
+      (source ? ' · <a href="' + source + '" target="_blank" rel="noopener">' + T('ดูรุ่นนี้บน Planes.FYI') + '</a>'
+              : ' · ' + T('สังเกตส่วนที่ไฮไลต์สีส้ม')) + '</figcaption></figure>';
+  }
+  function loadAircraftModel() {
+    const model = $('#glossary-body model-viewer');
+    if (!model) return;
+    const status = model.nextElementSibling;
+    const unavailable = () => {
+      model.hidden = true;
+      status.textContent = T('โหลดโมเดล 3D ไม่สำเร็จ ลองเปิดหน้านี้อีกครั้ง');
+    };
+    model.addEventListener('load', () => { status.hidden = true; }, { once: true });
+    model.addEventListener('error', unavailable, { once: true });
+    import('./vendor/model-viewer-4.1.0.min.js').catch(unavailable);
+  }
   let FC = null;
   function fcStop() { if (FC) { clearInterval(FC.timer); clearTimeout(FC.next); FC.on = false; } }
-  function startFlash(picture = false) {
+  const fcId = (t, mode) => mode === 'air' ? (t.name || '') + '|' + (t.q || t.icao || '') : mode === 'pic' ? (t.q || '') : (t[0] || '') + '|' + (t[1] || '');
+  function startFlash(picture = false, aircraft = false) {
     fcStop();
-    const pool = picture
+    const pool = aircraft ? AIRCRAFT_FLASH : picture
       ? (window.PM_QUIZ || [])
       : glossaryList().length >= 4 ? glossaryList() : aviaTerms();
     if (pool.length < 4) return toast(T('ยังไม่มีคำศัพท์ให้ทดสอบ'));
-    const deck = shuffle(pool.slice()).slice(0, picture ? PICTURE_FLASH_LIMIT : pool.length);
-    FC = { on: true, picture, pool, deck, i: 0, round: 1, right: 0, wrong: 0, streak: 0 };
+    // Never the same order: every start is a fresh shuffle, and cards not seen in earlier
+    // sessions come first (the list of seen cards resets once every card has been shown)
+    const mode = aircraft ? 'air' : picture ? 'pic' : 'word';
+    const seenKey = 'ohh_fc_seen_' + mode;
+    let seen = [];
+    try { seen = JSON.parse(localStorage.getItem(seenKey) || '[]'); } catch (e) { seen = []; }
+    let seenSet = new Set(seen);
+    if (pool.every((t) => seenSet.has(fcId(t, mode)))) { seen = []; seenSet = new Set(); }
+    const fresh = shuffle(pool.filter((t) => !seenSet.has(fcId(t, mode))));
+    const old = shuffle(pool.filter((t) => seenSet.has(fcId(t, mode))));
+    const deck = fresh.concat(old).slice(0, picture && !aircraft ? PICTURE_FLASH_LIMIT : pool.length);
+    FC = { on: true, picture, aircraft, mode, seenKey, seen, pool, deck, i: 0, round: 1, right: 0, wrong: 0, streak: 0 };
     fcCard();
   }
   function fcCard() {
@@ -1055,8 +1208,18 @@
     }
     if (FC.i >= FC.deck.length) { FC.deck = shuffle(FC.pool.slice()); FC.i = 0; FC.round++; toast(T('เริ่มรอบใหม่ สุ่มลำดับใหม่')); }
     const t = FC.deck[FC.i];
+    // remember this card as seen, so the next session starts with cards not seen yet
+    const id = fcId(t, FC.mode);
+    if (FC.seen.indexOf(id) < 0) {
+      FC.seen.push(id);
+      if (FC.seen.length > 5000) FC.seen = FC.seen.slice(-5000);
+      try { localStorage.setItem(FC.seenKey, JSON.stringify(FC.seen)); } catch (e) { /* storage full or blocked */ }
+    }
 
-    if (FC.picture) {
+    if (FC.aircraft) {
+      const others = shuffle(FC.pool.filter((item) => item !== t && item.group === t.group)).slice(0, 3);
+      FC.opts = shuffle([t, ...others].map((aircraft) => ({ s: aircraft.name, c: aircraft === t })));
+    } else if (FC.picture) {
       FC.opts = shuffle(t.o.map((option, index) => ({ s: option, c: index === t.a })));
     } else {
       const others = shuffle(FC.pool.filter((option) => option[2] !== t[2])).slice(0, 3);
@@ -1069,13 +1232,16 @@
           '<span class="fc-score"><b class="ok">✓ ' + FC.right + '</b> <b class="bad">✗ ' + FC.wrong + '</b>' + (FC.streak > 2 ? ' <b class="st">🔥 ' + FC.streak + '</b>' : '') + '</span></div>' +
         (FC.picture ? '' : '<div class="fc-bar"><span id="fc-time"></span></div>') +
         (FC.picture
-          ? '<div class="fc-card fc-picture"><h1 class="no-i18n">' + esc(t.q) + '</h1>' + productFigure(t) + '</div>'
+          ? '<div class="fc-card fc-picture"><h1 class="no-i18n">' + (FC.aircraft ? T(t.group ? 'ชิ้นส่วนที่ไฮไลต์คืออะไร?' : 'เครื่องบินในภาพคือรุ่นใด?') : esc(t.q)) + '</h1>' +
+            (FC.aircraft ? aircraftFigure(t) : productFigure(t)) + '</div>'
           : '<div class="fc-card no-i18n">' + (t[1] ? '<small>' + esc(t[1]) + '</small>' : '') + '<b>' + esc(t[0]) + '</b><i>' + esc(AVIA_CATS[t[4]] || '') + '</i></div>') +
         '<div class="fc-opts no-i18n">' + FC.opts.map((o, k) => '<button class="fc-opt" data-k="' + k + '"><span class="k">' + (k + 1) + '</span>' + esc(o.s) + '</button>').join('') + '</div>' +
         '<p class="fc-ex no-i18n" id="fc-ex" role="status"></p>' +
-        '<div class="fc-actions"><button class="btn ghost" id="fc-back">' + T('หยุด') + '</button>' + (FC.picture ? '<button class="btn hidden" id="fc-next">' + T('ถัดไป') + '</button>' : '') + '</div>' +
+        '<div class="fc-actions"><button class="btn ghost" id="fc-back">' + T('หยุด') + '</button>' +
+          (FC.picture && FC.i < FC.deck.length - 1 ? '<button class="btn ghost" id="fc-skip">' + T('ข้ามไว้ก่อน') + '</button>' : '') +
+          (FC.picture ? '<button class="btn hidden" id="fc-next">' + T('ถัดไป') + '</button>' : '') + '</div>' +
       '</div>';
-    if (FC.picture) return;
+    if (FC.picture) { if (FC.aircraft) loadAircraftModel(); return; }
     FC.timer = setInterval(() => {
       const left = FC_SECS - (Date.now() - FC.start) / 1000, bar = $('#fc-time');
       if (bar) { bar.style.width = Math.max(0, left / FC_SECS * 100) + '%'; bar.classList.toggle('low', left < 1); }
@@ -1090,10 +1256,15 @@
     else { FC.wrong++; FC.streak = 0; }
     tone(ok);
     $$('#glossary .fc-opt').forEach((b, j) => { b.disabled = true; if (FC.opts[j].c) b.classList.add('right'); else if (j === k) b.classList.add('wrong'); });
-    if (FC.picture) {
+    if (FC.aircraft) {
+      $('#fc-ex').innerHTML = '<strong>' + esc(FC.t.name) + '</strong>' +
+        '<span class="fc-definition">' + esc(FC.t.clue) + '</span>' +
+        '<span class="fc-definition"><strong>' + T('ทริกจำง่าย') + '</strong> · ' + esc(FC.t.tip) + '</span>';
+    } else if (FC.picture) {
       const question = FC.t;
       $('#fc-ex').innerHTML = '<strong>' + esc(question.o[question.a]) + '</strong>' +
-        '<span class="fc-definition">' + esc(question.ex) + '</span>';
+        '<span class="fc-definition">' + esc(question.ex) + '</span>' +
+        abbrBox([question.q].concat(question.o, [question.ex]).join(' '));
     } else {
       const [term, , meaning, description] = FC.t;
       $('#fc-ex').innerHTML =
@@ -1104,6 +1275,7 @@
     FC.i++;
     $('#glossary .fc-card').classList.add(ok ? 'is-correct' : 'is-incorrect');
     if (FC.picture) {
+      $('#fc-skip')?.classList.add('hidden');
       const next = $('#fc-next');
       next.classList.remove('hidden');
       next.focus();
@@ -1113,7 +1285,7 @@
   }
 
   /* ---------- Router: bottom tab bar ---------- */
-  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#learn-toeic': 'learn', '#learn-grammar': 'learn', '#learn-vocab': 'learn', '#glossary': 'glossary', '#picture-flash': 'glossary', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
+  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#learn-toeic': 'learn', '#learn-grammar': 'learn', '#learn-vocab': 'learn', '#glossary': 'glossary', '#picture-flash': 'glossary', '#aircraft-flash': 'glossary', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
     if (location.hash === '#pilot') history.replaceState(null, '', location.pathname + location.search + '#learn');   // old Pilot page → Pilot lessons
@@ -1149,8 +1321,9 @@
     else if (page === 'profile') renderProfile();
     else if (page === 'practice') renderPractice();
     else if (page === 'glossary') {
-      const picture = location.hash === '#picture-flash';
-      if (picture && !(FC && FC.on && FC.picture)) startFlash(true);
+      const aircraft = location.hash === '#aircraft-flash';
+      const picture = aircraft || location.hash === '#picture-flash';
+      if (picture && !(FC && FC.on && FC.picture && FC.aircraft === aircraft)) startFlash(true, aircraft);
       if (!picture && !(FC && FC.on && !FC.picture)) { fcStop(); renderGlossary(); }
     }
     else renderHub(sub);
@@ -1197,8 +1370,13 @@
   $('#glossary').addEventListener('click', (e) => {
     if (FC && FC.on) {
       const o = e.target.closest('.fc-opt'); if (o) return fcAnswer(+o.dataset.k);
-      if (e.target.closest('#fc-again')) return startFlash(FC.picture);
-      if (e.target.closest('#fc-next')) return fcCard();
+      if (e.target.closest('#fc-again')) return startFlash(FC.picture, FC.aircraft);
+      if (e.target.closest('#fc-next') && FC.done) return fcCard();
+      if (e.target.closest('#fc-skip') && FC.picture && !FC.done && FC.i < FC.deck.length - 1) {
+        const [deferred] = FC.deck.splice(FC.i, 1);
+        FC.deck.push(deferred);
+        return fcCard();
+      }
       if (e.target.closest('#fc-back')) { if (FC.picture) { location.hash = '#learn'; return; } fcStop(); return renderGlossary(); }
       return;
     }

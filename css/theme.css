@@ -713,3 +713,43 @@ body:has(#home-view:not(.hidden) #hub:not(.hidden) .exam-grid:not(.modes)),
 .img-zoom img { width: min(100%, 1100px); max-height: calc(100vh - 70px); height: auto; object-fit: contain;
   image-rendering: -webkit-optimize-contrast; image-rendering: high-quality; border-radius: 8px; }
 .img-zoom span { color: rgba(255, 255, 255, .75); font-size: 13px; }
+
+/* Daily missions: full-colour pictures instead of the coloured icon tiles; diamond trophy on the banner */
+.m-ico:has(.topic-img), .mission.got .m-ico:has(.topic-img) { background: transparent !important; box-shadow: none !important; width: 52px; height: 52px; }
+.m-ico .topic-img { font-size: 50px; }
+.page-banner .pb-art { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 120px; height: 120px; object-fit: contain; z-index: 1;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, .18)); pointer-events: none; }
+.page-banner:has(.pb-art) > :not(.pb-art) { position: relative; z-index: 2; max-width: calc(100% - 120px); }
+@media (max-width: 480px) { .page-banner .pb-art { width: 84px; height: 84px; right: 10px; } .page-banner:has(.pb-art) > :not(.pb-art) { max-width: calc(100% - 84px); } }
+
+/* Practice tiles: full-colour pictures (greyed out while a tile has nothing to practise) */
+.pr-ico:has(.topic-img) { background: transparent !important; box-shadow: none !important; width: 56px; height: 56px; }
+.pr-ico .topic-img { font-size: 54px; }
+.pr-tile:disabled .pr-ico .topic-img { filter: grayscale(1); opacity: .5; }
+/* Performance banner: diamond trophy + #1 trophy side by side */
+.page-banner.pb-two .pb-art { right: 118px; width: 104px; height: 104px; }
+.page-banner.pb-two .pb-art2 { right: 16px; width: 112px; height: 112px; }
+.page-banner.pb-two > :not(.pb-art) { max-width: calc(100% - 230px); }
+@media (max-width: 480px) { .page-banner.pb-two .pb-art { right: 70px; width: 64px; height: 64px; } .page-banner.pb-two .pb-art2 { right: 8px; width: 68px; height: 68px; } .page-banner.pb-two > :not(.pb-art) { max-width: calc(100% - 140px); } }
+
+.aircraft-figure model-viewer { display: block; width: 100%; height: clamp(180px, 42vw, 290px); border-radius: 12px; background: #eef4f8; }
+.aircraft-figure model-viewer[hidden] { display: none; }
+.aircraft-status { margin: 6px 0; font-size: 13px; }
+
+/* Memory trick under the explanation after answering */
+.fb .fb-tip { margin-top: 8px; padding: 8px 12px; border-radius: 12px; background: rgba(255, 255, 255, .7); border: 1px dashed rgba(0, 0, 0, .15); color: #5a4300 !important; }
+.fb .fb-tip b { color: #9a6a00; }
+
+/* Missions banner: same light grey-brown gradient as the Pilot unit heads, dark brown text */
+#missions .page-banner { background: linear-gradient(120deg, #EFEAE4, #E2DAD1) !important; box-shadow: 0 6px 18px rgba(90, 70, 50, .08) !important; }
+#missions .page-banner h1, #missions .page-banner p { color: #4A3F35 !important; }
+#missions .page-banner::after { background: rgba(255, 255, 255, .35); }
+#missions .banner-row span { background: rgba(74, 63, 53, .10) !important; color: #4A3F35 !important; }
+#stats .page-banner { box-shadow: none !important; }
+#stats .page-banner .pb-art { width: 96px; height: 96px; right: 22px; } #stats .page-banner > :not(.pb-art) { max-width: calc(100% - 110px); }
+
+/* Abbreviations in this question: full name + Thai meaning (after answering) */
+.fb-abbr { display: grid; gap: 3px; margin-top: 8px; padding: 8px 12px; border-radius: 12px; background: rgba(255, 255, 255, .7); border: 1px solid rgba(0, 0, 0, .08); font-size: 13.5px; line-height: 1.45; color: var(--ink); text-align: left; }
+.fb-abbr > b { font-size: 12px; color: var(--muted); }
+.fb-abbr span b { color: #2F6F8A; }
+#fc-ex .fb-abbr { margin: 10px auto 0; max-width: 640px; }

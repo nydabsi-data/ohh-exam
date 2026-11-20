@@ -123,7 +123,28 @@
     lab(152, 112, 250, 214, 'ลาเมลลา', 'middle') +
     '<text x="' + W / 2 + '" y="' + (H - 2) + '" font-size="11" font-weight="600" fill="#6B6B6B" text-anchor="middle">แสง + CO₂ + H₂O → น้ำตาล + O₂ (ปฏิกิริยาแสงที่ไทลาคอยด์)</text>');
 
+  /* Pilot: navigation lights (top view, nose up) — red left/port, green right/starboard, white tail */
+  const navlights = svg(
+    '<path d="M44 122 L44 82 A40 40 0 0 0 6.4 135.7 Z" fill="#E5484D" fill-opacity=".18"/>' +
+    '<path d="M316 122 L316 82 A40 40 0 0 1 353.6 135.7 Z" fill="#30A46C" fill-opacity=".18"/>' +
+    '<path d="M180 201 L155.6 209.9 A26 26 0 0 0 204.4 209.9 Z" fill="#9AA4AE" fill-opacity=".25"/>' +
+    '<polygon points="168,100 44,118 44,127 168,130" fill="#DCE3EA" stroke="#9AA6B2" stroke-width="1.5"/>' +
+    '<polygon points="192,100 316,118 316,127 192,130" fill="#DCE3EA" stroke="#9AA6B2" stroke-width="1.5"/>' +
+    '<polygon points="173,180 140,194 140,200 173,195" fill="#DCE3EA" stroke="#9AA6B2" stroke-width="1.5"/>' +
+    '<polygon points="187,180 220,194 220,200 187,195" fill="#DCE3EA" stroke="#9AA6B2" stroke-width="1.5"/>' +
+    '<ellipse cx="180" cy="115" rx="14" ry="86" fill="#F3F6F9" stroke="#9AA6B2" stroke-width="1.5"/>' +
+    '<path d="M172 46 Q180 38 188 46" stroke="#5B8DEF" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+    '<circle cx="44" cy="122" r="7" fill="#E5484D" stroke="#fff" stroke-width="2"/>' +
+    '<circle cx="316" cy="122" r="7" fill="#30A46C" stroke="#fff" stroke-width="2"/>' +
+    '<circle cx="180" cy="201" r="6" fill="#fff" stroke="#6B6B6B" stroke-width="2"/>' +
+    '<text x="180" y="22" font-size="11" font-weight="700" fill="#6B6B6B" text-anchor="middle">▲ หัวเครื่อง</text>' +
+    '<text x="10" y="64" font-size="13" font-weight="800" fill="#C2362F">ซ้าย (Port) = แดง</text>' +
+    '<text x="350" y="64" font-size="13" font-weight="800" fill="#1F7A4D" text-anchor="end">ขวา (Starboard) = เขียว</text>' +
+    lab(186, 200, 230, 186, 'ท้าย = ขาว') +
+    cap('จำ: Port กับ Red คำสั้นคู่กัน · ขวาเขียว · ท้ายขาว'));
+
   window.FIGS = {
+    navlights:  { course: 'pilot', title: 'ไฟนำทาง (Navigation lights)', svg: navlights, keys: /navigation light|ไฟนำทาง/i },
     mitosis:    { course: 'bio', title: 'ระยะของไมโทซิส', svg: mitosis, keys: /ไมโทซิส|โพรเฟส|เมทาเฟส|แอนาเฟส|เทโลเฟส|ไซโทไคนีซิส/ },
     chromosome: { course: 'bio', title: 'โครโมโซม', svg: chromosome, keys: /โครโมโซม|โครมาทิด|เซนโทรเมียร์|ฮิสโตน/ },
     dna:        { course: 'bio', title: 'DNA เกลียวคู่', svg: dna, keys: /DNA|ดีเอ็นเอ|นิวคลีโอไทด์|คู่เบส|เบส [ATGC]/ },
