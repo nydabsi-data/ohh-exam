@@ -247,6 +247,8 @@
   const imgIcon = (name) => '<img class="topic-img" src="img/topics/' + name + '.png" alt="" aria-hidden="true" loading="lazy">';
   // Aptitude tests: full-colour pictures (rotation uses the red plane)
   const APT_IMG = { series: 'apt-series', math: 'apt-math', rotation: 'agk-plane', jigsaw: 'apt-jigsaw', joystick: 'apt-joystick', multitask: 'apt-multitask' };
+  // Home subject cards: full-colour pictures
+  const MODE_IMG = { pilot: 'agk-plane', physics: 'home-physics', chem: 'home-chem', bio: 'home-bio', mathhs: 'apt-math', english: 'home-english' };
   const exIcon = (x) => APT_IMG[x.id] ? imgIcon(APT_IMG[x.id]) : EX_ICON[x.icon];
   const TOPIC_IMG = { basic: 'agk-compass', pof: 'basic', met: 'met-cloud', hist: 'hist', nav: 'nav', law: 'law', agk: 'agk-plane', hfr: 'hfr-pilot', geo: 'geo', wind: 'wind',
     'phy-heat': 'fire', 'phy-energy': 'fuel-pump', 'chem-redox': 'fuel-pct', 'chem-org': 'fuel-nozzle' };
@@ -362,6 +364,10 @@
         '<a class="glossary-entry" href="#aircraft-flash"><span class="ge-ico">' + pilotIcon('plane') + '</span>' +
         '<span class="ge-body"><b>' + T('Flash Card เครื่องบิน 3D') + '</b><i>' + AIRCRAFT_FLASH.length + ' ' + T('ข้อ') + '</i></span>' +
         '<span class="lc-go">' + PLAY_ICON + '</span></a>' +
+        '<button type="button" class="glossary-entry" id="turbofan-quiz"><span class="ge-ico">' +
+        TI('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 10l-4-5m6 6 6-2m-8 5-1 6"/>') + '</span>' +
+        '<span class="ge-body"><b>Turbofan 3D Quiz</b><i>' + TURBOFAN_QUIZ.length + ' ' + T('ข้อ') + '</i></span>' +
+        '<span class="lc-go">' + PLAY_ICON + '</span></button>' +
         '<button type="button" class="glossary-entry" id="pm-quiz"><span class="ge-ico">' +
         TI('<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M6 12l3-3 3 3 4-5"/>') + '</span>' +
         '<span class="ge-body"><b>Project Magenta Quiz</b><i>' + (window.PM_QUIZ || []).length + ' ' + T('ข้อ') + '</i></span>' +
@@ -472,7 +478,8 @@
     }
     // Question text and answer options are content, not UI: the TH/EN switch leaves them as written.
     $('#qbox').innerHTML = '<div class="q-kind">' + kind + ' ' + diffChip(qDiff(q)) + '</div>' + qHead(q.q) +
-      (q.image ? productFigure(q) : '') + body;
+      (q.model ? aircraftFigure({ asset: q.model, reference: q.source }) : q.image ? productFigure(q) : '') + body;
+    if (q.model) loadAircraftModel('#qbox');
   }
 
   function productFigure(q) {
@@ -709,7 +716,7 @@
         return '<a class="exam-card mode-card' + (m.cls ? ' ' + m.cls : '') + '" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '"' +
             ' data-text="' + esc((m.title + ' ' + m.th).toLowerCase()) + '">' +
           '<span class="mc-deco">' + EX_ICON[m.icon] + '</span>' +
-          '<span class="mc-top"><span class="mc-ico">' + (m.id === 'pilot' ? imgIcon('agk-plane') : EX_ICON[m.icon]) + '</span>' +
+          '<span class="mc-top"><span class="mc-ico">' + (MODE_IMG[m.id] ? imgIcon(MODE_IMG[m.id]) : EX_ICON[m.icon]) + '</span>' +
             '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
           // Numbers on the card: topics (units) — or courses for English — questions, lessons passed
           '<span class="mc-nums">' +
@@ -1071,6 +1078,164 @@
      shuffled round starts, and it keeps going until "หยุด". +2 XP per right answer. */
   const FC_SECS = 5;
   const PICTURE_FLASH_LIMIT = 30;
+  const TURBOFAN_NASA = 'https://www.grc.nasa.gov/www/k-12/airplane/aturbf.html';
+  const TURBOFAN_FAA = 'https://www.faa.gov/sites/faa.gov/files/regulations_policies/handbooks_manuals/aviation/airplane_handbook/20_afh_glossary.pdf';
+  const TURBOFAN_FAA_POWERPLANT = 'https://www.faa.gov/sites/faa.gov/files/03_amtp_ch1.pdf';
+  const TURBOFAN_FAA_PHAK = 'https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/faa-h-8083-25c.pdf';
+  const TURBOFAN_NASA_NOZZLE = 'https://www.grc.nasa.gov/www/k-12/airplane/nozzle.html';
+  const TURBOFAN_NASA_TURBOPROP = 'https://www.grc.nasa.gov/WWW/K-12/airplane/Animation/turbtyp/etps.html';
+  const TURBOFAN_QUIZ = [
+    { type: 'mc', d: 1, model: 'fan.glb', source: TURBOFAN_NASA,
+      q: "หลังผ่านพัดลมหน้า อากาศใน turbofan แบ่งเป็นเส้นทางใด?",
+      o: ["ผ่านแกนเครื่องยนต์และไหลอ้อมแกน","เข้าห้องเผาไหม้ทั้งหมด","ออกจากเครื่องโดยไม่สร้างแรงขับทั้งหมด","แยกเป็นอากาศเข้าและเชื้อเพลิงเข้า"], a: 0,
+      ex: "อากาศหลังพัดลมส่วนหนึ่งผ่านแกนเพื่อเข้าสู่ชุดอัดอากาศ ส่วนที่เหลือไหลอ้อมแกนและช่วยสร้างแรงขับ",
+      tip: "ดูพัดลมหน้าแล้วจำ «กลางเข้าแกน รอบนอกไหลอ้อม»" },
+    { type: 'mc', d: 1, model: 'fan.glb', source: TURBOFAN_NASA,
+      q: "ถ้ากระแสอากาศไหลอ้อมแกน 80 หน่วย และผ่านแกน 10 หน่วย Bypass Ratio เท่าไร?",
+      o: ["8:1","1:8","9:1","10:1"], a: 0,
+      ex: "อัตราส่วนบายพาสคิดจากอัตราการไหลมวลของอากาศอ้อมแกนหารด้วยอัตราการไหลมวลผ่านแกน จึงได้ 80 ÷ 10 = 8",
+      tip: "จำ «อ้อม ÷ แกน» ใช้อัตราการไหลมวลของสองทาง" },
+    { type: 'mc', d: 1, model: 'compressor.glb', source: TURBOFAN_NASA,
+      q: "อากาศที่ผ่านแกนเครื่องยนต์พบชิ้นส่วนใดตามลำดับ?",
+      o: ["ชุดอัดอากาศ → ห้องเผาไหม้ → กังหัน","ห้องเผาไหม้ → กังหัน → ชุดอัดอากาศ","กังหัน → ชุดอัดอากาศ → ห้องเผาไหม้","ชุดอัดอากาศ → กังหัน → ห้องเผาไหม้"], a: 0,
+      ex: "อากาศถูกเพิ่มความดันก่อนเข้าสู่ห้องเผาไหม้ จากนั้นก๊าซร้อนจึงผ่านกังหัน",
+      tip: "ท่อง «อัด → เผา → หมุน» ไล่จากหน้าพัดลมไปทางท้ายเครื่อง" },
+    { type: 'mc', d: 1, model: 'compressor.glb', source: TURBOFAN_NASA,
+      q: "อะไรคือการเปลี่ยนแปลงหลักที่ชุดอัดอากาศทำกับอากาศ?",
+      o: ["ความดันเพิ่มขึ้น","เกิดการเผาไหม้ในชุดอัดอากาศ","อากาศทั้งหมดไหลออกทางบายพาส","ก๊าซแยกตัวเป็นเชื้อเพลิง"], a: 0,
+      ex: "ชุดอัดอากาศรับพลังงานกลจากเพลาเพื่อเพิ่มความดันอากาศก่อนเข้าสู่ห้องเผาไหม้",
+      tip: "เห็นใบหลายแถวด้านหน้า ให้คิดถึง «อัดให้ความดันสูงก่อนเผา»" },
+    { type: 'mc', d: 1, model: 'combustor.glb', source: TURBOFAN_NASA,
+      q: "ส่วนใดเติมพลังงานความร้อนให้กับกระแสอากาศในแกน?",
+      o: ["ห้องเผาไหม้","พัดลมหน้า","ชุดอัดอากาศ","กังหัน"], a: 0,
+      ex: "เชื้อเพลิงเผาไหม้กับอากาศอัดในห้องเผาไหม้ ก๊าซร้อนจึงไหลต่อไปยังกังหัน",
+      tip: "จำ «ที่เผาอยู่กลาง ระหว่างที่อัดกับที่หมุน»" },
+    { type: 'mc', d: 1, model: 'turbine.glb', source: TURBOFAN_NASA,
+      q: "กังหันนำพลังงานจากก๊าซร้อนไปใช้อย่างไร?",
+      o: ["หมุนเพลาที่ขับชุดอัดอากาศและพัดลม","ใช้ก๊าซร้อนอัดเชื้อเพลิงในถัง","เพิ่มปริมาณอากาศผ่านพัดลมโดยไม่มีเพลา","ส่งก๊าซกลับไปที่ช่องรับอากาศ"], a: 0,
+      ex: "ก๊าซร้อนถ่ายพลังงานให้ใบกังหัน กังหันส่งกำลังผ่านเพลาไปยังชุดหมุนที่เชื่อมกัน",
+      tip: "จำ «ก๊าซร้อนหมุนท้าย เพลากลับไปขับหน้า»" },
+    { type: 'mc', d: 1, model: 'turbine.glb', source: TURBOFAN_NASA,
+      q: "คำว่า two-spool ในตัวอย่าง turbofan อธิบายอะไร?",
+      o: ["ชุดหมุนสองชุดที่ใช้เพลาร่วมแนวแกนและหมุนได้ต่างความเร็ว","เครื่องยนต์สองตัวที่อยู่คนละปีก","ห้องเผาไหม้สองห้องที่ทำงานสลับกัน","กระแสอากาศสองทางที่มีความเร็วเท่ากันเสมอ"], a: 0,
+      ex: "แต่ละ spool ประกอบด้วยชิ้นส่วนที่เชื่อมกันด้วยเพลาเดียวกัน เพลาของสองชุดอยู่ร่วมแนวแกนโดยแต่ละชุดหมุนได้ด้วยความเร็วของตนเอง",
+      tip: "จำ «สอง spool = สองชุดหมุน» แม้อยู่ตรงกลางลำเครื่องยนต์แนวเดียวกัน" },
+    { type: 'mc', d: 1, model: 'fan.glb', source: TURBOFAN_NASA,
+      q: "ส่วนใดของกระแสอากาศมีส่วนสร้างแรงขับใน turbofan?",
+      o: ["ทั้งกระแสอ้อมแกนและไอพ่นออกจากแกน","เฉพาะอากาศที่ไหลอ้อมแกนเสมอ","เฉพาะอากาศที่ไหลผ่านแกนเสมอ","เฉพาะอากาศก่อนผ่านพัดลม"], a: 0,
+      ex: "เครื่องยนต์สร้างแรงขับจากการเพิ่มโมเมนตัมให้ทั้งกระแสบายพาสและกระแสจากแกน สัดส่วนขึ้นอยู่กับการออกแบบ",
+      tip: "จำ «แรงขับสองทาง» กระแสอ้อมแกนก็ช่วยผลักเครื่องบิน" },
+    { type: 'mc', d: 1, model: 'compressor.glb', source: TURBOFAN_FAA,
+      q: "Compressor stall คือความผิดปกติที่เริ่มจากอะไร?",
+      o: ["กระแสอากาศแยกตัวจากผิวใบชุดอัดอากาศ","การเผาไหม้หยุดลงที่ห้องเผาไหม้โดยตรง","พัดลมกลับทิศหมุนตามปกติ","อากาศเปลี่ยนจากผ่านแกนไปเป็นบายพาสตามปกติ"], a: 0,
+      ex: "เมื่อการไหลแยกตัวจากใบอัด บางขั้นของชุดอัดอากาศจะทำงานผิดปกติ การไหลผ่านเครื่องยนต์อาจไม่เสถียร",
+      tip: "จำ «ใบอัดก็สตอลล์ได้» จุดเริ่มอยู่ที่การไหลผ่านใบอัด" },
+    { type: 'mc', d: 1, model: 'combustor.glb', source: TURBOFAN_FAA,
+      q: "Flameout ในเครื่องยนต์กังหันหมายถึงอะไร?",
+      o: ["การเผาไหม้ในห้องเผาไหม้ดับลง","พัดลมหน้าเปลี่ยนความเร็วตามการเร่งเครื่องปกติ","ใบพัดอัดอากาศเกิดการไหลแยกตัวเสมอ","เข็มวัดอุณหภูมิแสดงค่าสูงทุกครั้ง"], a: 0,
+      ex: "Flameout คือภาวะที่ไฟในห้องเผาไหม้ดับลง จึงหยุดการเติมพลังงานความร้อนตามปกติให้กระแสแกน",
+      tip: "จำ «flame คือไฟ, out คือดับ» คำนี้เจาะจงที่การเผาไหม้" },
+    { type: 'mc', d: 1, model: 'fan.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "ช่องรับอากาศ (inlet) อยู่ตรงไหนในเส้นทางลมของ turbofan?",
+      o: ["ด้านหน้าพัดลม","ระหว่างห้องเผาไหม้กับกังหัน","หลังหัวฉีดไอเสีย","ระหว่างกังหันสองชุด"], a: 0,
+      ex: "ช่องรับอากาศนำอากาศจากภายนอกเข้าสู่พัดลมและเครื่องยนต์",
+      tip: "จำ «ช่องรับ → พัดลม» ไล่จากด้านหน้าสุด" },
+    { type: 'mc', d: 1, model: 'fan.glb', source: TURBOFAN_NASA,
+      q: "คำว่า high-bypass บอกอะไรเกี่ยวกับปริมาณอากาศในเครื่องยนต์?",
+      o: ["อากาศที่ไหลอ้อมแกนมีมากเมื่อเทียบกับที่ผ่านแกน","ความดันอากาศในห้องเผาไหม้สูงที่สุดเสมอ","เชื้อเพลิงส่วนใหญ่ไหลผ่านพัดลมหน้า","แรงขับทั้งหมดมาจากไอเสียร้อน"], a: 0,
+      ex: "ค่าบายพาสสูงหมายถึงอัตราการไหลมวลรอบแกนสูงเมื่อเทียบกับอัตราการไหลมวลผ่านแกน",
+      tip: "จำ «บายพาสสูง = ลมอ้อมมาก»" },
+    { type: 'mc', d: 1, model: 'compressor.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "ใบ rotor ของชุดอัดอากาศต่างจากใบ stator อย่างไร?",
+      o: ["Rotor หมุนกับเพลา ส่วน stator อยู่กับโครงเครื่อง","Rotor อยู่กับโครงเครื่อง ส่วน stator หมุนกับเพลา","ทั้งคู่หมุนสวนกันทุกขั้น","ทั้งคู่ยึดอยู่กับที่และมีแต่เพลาที่หมุน"], a: 0,
+      ex: "ใบ rotor ถ่ายพลังงานจากเพลาให้อากาศ ส่วนใบ stator เป็นแถวใบคงที่ซึ่งช่วยจัดทิศทางการไหล",
+      tip: "จำ «R = Rotate» ส่วน stator อยู่กับที่แม้บางแบบปรับมุมใบได้" },
+    { type: 'mc', d: 1, model: 'compressor.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "ใบ stator ระหว่างแถว rotor ช่วยเตรียมอากาศสำหรับขั้นถัดไปอย่างไร?",
+      o: ["ปรับทิศทางการไหลให้เข้าใบ rotor แถวถัดไป","เร่งความเร็วของเพลาโดยตรง","จุดไฟกลางทางเดินอากาศ","เปลี่ยนอากาศให้ไหลเข้าช่องบายพาสทั้งหมด"], a: 0,
+      ex: "ใบคงที่จัดมุมของกระแสลมออกจาก rotor หนึ่งขั้นให้เหมาะกับ rotor ขั้นถัดไป และมีส่วนช่วยเพิ่มความดันสถิต",
+      tip: "จำ «ใบหมุนเติมพลัง ใบอยู่กับที่จัดทาง»" },
+    { type: 'mc', d: 1, model: 'compressor.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "คำว่า axial-flow compressor สื่อถึงทิศทางการไหลหลักแบบใด?",
+      o: ["จากหน้าสู่ท้ายในแนวเพลา","จากเพลาออกด้านข้างเป็นหลัก","ย้อนกลับจากห้องเผาไหม้สู่ช่องรับ","ไหลสลับซ้ายขวาทุกแถว"], a: 0,
+      ex: "ชุดอัดอากาศแบบ axial จัดแถวใบต่อกันตามแนวยาว อากาศจึงไหลโดยรวมขนานกับแกนเพลา",
+      tip: "จำ «axial = ตาม axis หรือแนวแกน»" },
+    { type: 'mc', d: 1, model: 'compressor.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "ชุดอัดอากาศแบบ centrifugal ส่งอากาศออกจากใบหมุนไปทางใด?",
+      o: ["จากใกล้แกนออกสู่ขอบด้านนอก","จากขอบนอกวิ่งกลับเข้าแกนตลอด","ตรงตามแนวเพลาไปท้ายเครื่องตลอด","ออกทางปลายท่อไอเสียโดยตรง"], a: 0,
+      ex: "ใบ impeller เหวี่ยงอากาศออกสู่รอบนอก แล้ว diffuser ช่วยเปลี่ยนพลังงานความเร็วเป็นความดันสถิต",
+      tip: "จำ «แรงหนีศูนย์ พาลมออกขอบ»" },
+    { type: 'mc', d: 1, model: 'combustor.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "ทำไม diffuser ก่อนห้องเผาไหม้จึงมีทางไหลที่ช่วยให้อากาศช้าลง?",
+      o: ["เพื่อให้กระแสอากาศเหมาะกับการรักษาการเผาไหม้ให้เสถียร","เพื่อให้กังหันหมุนย้อนทาง","เพื่อให้เครื่องยนต์ไม่ต้องใช้เชื้อเพลิง","เพื่อให้อากาศทั้งหมดออกไปทางบายพาส"], a: 0,
+      ex: "อากาศความเร็วสูงออกจากชุดอัดถูกทำให้ช้าลงก่อนเข้าบริเวณเผาไหม้ เพื่อให้เปลวไฟคงตัวได้ง่ายขึ้น",
+      tip: "จำ «ก่อนเผา ลดความเร็วลม»" },
+    { type: 'mc', d: 1, model: 'combustor.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "คำว่า annular combustor อธิบายรูปร่างของห้องเผาไหม้แบบใด?",
+      o: ["เป็นวงแหวนรอบแนวเพลา","เป็นท่อเดี่ยวที่ติดนอกลำเครื่อง","เป็นถังเชื้อเพลิงทรงกลมปลายปีก","เป็นแผ่นเรียบอยู่หน้าพัดลม"], a: 0,
+      ex: "ห้องเผาไหม้แบบ annular จัดพื้นที่เผาไหม้เป็นวงต่อเนื่องรอบแกนกลางของเครื่องยนต์",
+      tip: "จำ «annular = รูปวงแหวน»" },
+    { type: 'mc', d: 1, model: 'combustor.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "อากาศบริเวณ dilution zone หลังส่วนเผาไหม้ช่วยอะไร?",
+      o: ["ผสมกับก๊าซร้อนเพื่อลดและกระจายอุณหภูมิก่อนเข้ากังหัน","เพิ่มอุณหภูมิจนถึงค่าสูงสุดก่อนเข้ากังหัน","หมุนพัดลมหน้าโดยตรง","แยกเชื้อเพลิงคืนไปยังถัง"], a: 0,
+      ex: "อากาศที่เติมช่วงท้ายห้องเผาไหม้ช่วยให้ก๊าซที่ส่งเข้ากังหันเย็นลงและอุณหภูมิสม่ำเสมอขึ้น",
+      tip: "จำ «dilution = เจือจางความร้อนก่อนกังหัน»" },
+    { type: 'mc', d: 1, model: 'combustor.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "หัวจุดระเบิด (igniter) มีหน้าที่อะไรในห้องเผาไหม้?",
+      o: ["ให้ประกายเริ่มจุดส่วนผสมอากาศและเชื้อเพลิง","เพิ่มความดันอากาศแทนชุดอัด","ถ่ายกำลังกลับไปขับพัดลม","ควบคุมช่องรับอากาศด้านหน้า"], a: 0,
+      ex: "หัวจุดระเบิดให้ประกายเพื่อเริ่มหรือจุดการเผาไหม้อีกครั้ง ส่วนการเผาไหม้ที่เสถียรสามารถดำเนินต่อได้เมื่อมีอากาศและเชื้อเพลิง",
+      tip: "จำ «igniter จุดไฟ ส่วน combustor คือที่ที่ไฟเผาไหม้»" },
+    { type: 'mc', d: 1, model: 'turbine.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "Turbine inlet guide vanes อยู่ก่อนใบกังหันหมุนเพื่อทำอะไร?",
+      o: ["ปรับทิศทางก๊าซร้อนให้เข้าหาใบกังหันอย่างเหมาะสม","ฉีดเชื้อเพลิงเข้าสู่ถังเครื่องยนต์","ลดความเร็วพัดลมหน้าโดยตรง","นำก๊าซร้อนย้อนกลับไปช่องอากาศเข้า"], a: 0,
+      ex: "ใบคงที่ทางเข้ากังหันจัดมุมและเร่งกระแสก๊าซก่อนเข้าปะทะใบหมุน",
+      tip: "จำ «guide vane นำลมร้อน ก่อน rotor รับแรง»" },
+    { type: 'mc', d: 1, model: 'turbine.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "ทำไมใบกังหันบางแบบจึงมีช่องระบายความร้อนภายใน?",
+      o: ["เพื่อให้อากาศช่วยควบคุมอุณหภูมิของใบที่สัมผัสก๊าซร้อน","เพื่อเก็บเชื้อเพลิงไว้ในใบกังหัน","เพื่อลดแรงดันลมก่อนเข้าพัดลมหน้า","เพื่อทำให้ใบกังหันหมุนโดยไม่ต้องมีก๊าซ"], a: 0,
+      ex: "อากาศสำหรับหล่อเย็นไหลในช่องของใบกังหัน บางแบบระบายออกที่ผิวเพื่อช่วยลดภาระความร้อนบนวัสดุ",
+      tip: "จำ «ก๊าซร้อนข้างนอก อากาศช่วยหล่อเย็นข้างใน»" },
+    { type: 'mc', d: 1, model: 'turbine.glb', source: TURBOFAN_FAA_POWERPLANT,
+      q: "Accessory gearbox ในเครื่องยนต์กังหันมีบทบาทใด?",
+      o: ["รับกำลังจากเครื่องยนต์เพื่อขับอุปกรณ์เสริม เช่น ปั๊ม","อัดอากาศหลักทั้งหมดเข้าห้องเผาไหม้","เป็นช่องทางหลักที่ก๊าซไอเสียออกจากเครื่อง","แยกการไหลเป็นแกนและบายพาส"], a: 0,
+      ex: "ชุดเฟืองถ่ายทอดกำลังจากเครื่องยนต์ไปยังอุปกรณ์ประกอบ เช่น ปั๊มน้ำมันหรือปั๊มเชื้อเพลิงตามการออกแบบ",
+      tip: "จำ «gearbox แจกกำลังให้อุปกรณ์ประกอบ»" },
+    { type: 'mc', d: 1, model: 'turbine.glb', source: TURBOFAN_NASA_NOZZLE,
+      q: "หัวฉีดไอเสีย (exhaust nozzle) มีหน้าที่หลักข้อใด?",
+      o: ["จัดการการไหลและส่งก๊าซออกไปด้านท้ายเพื่อสร้างแรงขับ","รับอากาศจากภายนอกให้พัดลม","เพิ่มพลังงานความร้อนด้วยการจุดไฟในห้องเผาไหม้","รับกำลังจากเพลาไปขับปั๊ม"], a: 0,
+      ex: "หัวฉีดไอเสียกำหนดลักษณะการไหลออกและเปลี่ยนพลังงานบางส่วนของกระแสให้เป็นความเร็วของไอพ่น",
+      tip: "จำ «nozzle คือปากออก» อยู่ด้านท้ายทางไหล" },
+    { type: 'mc', d: 1, model: 'fan.glb', source: TURBOFAN_NASA_NOZZLE,
+      q: "ในหัวฉีดแบบ co-annular กระแสอากาศบายพาสออกทางส่วนใด?",
+      o: ["ทางวงแหวนรอบหัวฉีดแกน","ทางหัวฉีดตรงกลางเพียงทางเดียว","ทางช่องรับอากาศด้านหน้า","ทางรูหัวฉีดเชื้อเพลิง"], a: 0,
+      ex: "ในรูปแบบ co-annular กระแสจากแกนออกทางกลาง ส่วนอากาศจากพัดลมออกทางช่องวงแหวนรอบนอก",
+      tip: "จำ «แกนกลางออกกลาง ลมอ้อมออกวงนอก»" },
+    { type: 'mc', d: 1, model: 'turbine.glb', source: TURBOFAN_NASA_TURBOPROP,
+      q: "Turboprop ใช้พลังงานจากเครื่องยนต์ไปสร้างแรงขับหลักผ่านอะไร?",
+      o: ["ใบพัดที่ขับด้วยกำลังจากกังหัน","ไอเสียร้อนอย่างเดียว","พัดลมที่อยู่ในท่อบายพาสแบบ turbofan","ก๊าซที่ยังไม่ผ่านการเผาไหม้"], a: 0,
+      ex: "turboprop ใช้กำลังกลจากกังหันไปขับใบพัด โดยใบพัดสร้างแรงขับส่วนใหญ่",
+      tip: "จำ «prop คือ propeller» ฟังชื่อแล้วมองหาใบพัดเปิด" },
+    { type: 'mc', d: 1, model: 'combustor.glb', source: TURBOFAN_FAA_PHAK,
+      q: "คำว่า EGT บนมาตรวัดเครื่องยนต์ย่อมาจากอะไร?",
+      o: ["Exhaust Gas Temperature","Engine Generator Torque","Estimated Ground Thrust","External Gauge Transfer"], a: 0,
+      ex: "EGT คือค่าอุณหภูมิของก๊าซไอเสีย ตำแหน่งเซนเซอร์และค่าที่ใช้ติดตามขึ้นกับแบบเครื่องยนต์",
+      tip: "จำ «Gas Temperature = อุณหภูมิก๊าซ» โดย E หมายถึง exhaust" },
+    { type: 'mc', d: 1, model: 'combustor.glb', source: TURBOFAN_FAA_PHAK,
+      q: "คำว่า Hot Start สื่อถึงความผิดปกติใดระหว่างสตาร์ตเครื่องยนต์กังหัน?",
+      o: ["อุณหภูมิที่ใช้ติดตามการสตาร์ตสูงเกินขีดจำกัด","เครื่องเร่งถึงรอบเดินเบาตามปกติ","อากาศไหลอ้อมแกนตามการออกแบบ","พัดลมหมุนจากลมภายนอกในช่วงจอด"], a: 0,
+      ex: "Hot start คือกรณีอุณหภูมิระหว่างเริ่มเดินเครื่องสูงเกินขีดจำกัดของเครื่องแบบนั้น",
+      tip: "จำ «hot ดูอุณหภูมิ» เทียบกับ hung ที่ดูว่ารอบขึ้นต่อหรือไม่" },
+    { type: 'mc', d: 1, model: 'compressor.glb', source: TURBOFAN_FAA_PHAK,
+      q: "ถ้าจุดติดแล้วแต่เครื่องยนต์เร่งไม่ถึงรอบเดินเบา เรียกภาวะนี้ว่าอะไร?",
+      o: ["Hung Start","Flameout ในทุกกรณี","Bypass Flow","Normal Idle"], a: 0,
+      ex: "Hung start คือกรณีเครื่องเร่งไม่ถึงรอบที่ควรได้หลังจุดติด หรือไม่สามารถขึ้นถึงรอบเดินเบาได้",
+      tip: "จำ «hung = รอบค้างก่อน idle»" },
+    { type: 'mc', d: 1, model: 'fan.glb', source: TURBOFAN_FAA_PHAK,
+      q: "FOD ที่เกิดจากการดูดสิ่งแปลกปลอมเข้าเครื่องยนต์ ย่อมาจากอะไรในบริบทของความเสียหาย?",
+      o: ["Foreign Object Damage","Fan Output Difference","Fuel Overrun Detection","Forward Orbit Direction"], a: 0,
+      ex: "ในบริบทนี้ FOD หมายถึงความเสียหายจากสิ่งแปลกปลอม เช่น เศษวัสดุที่ถูกดูดเข้าสู่บริเวณพัดลมหรือทางเดินอากาศ",
+      tip: "จำ «Object เข้าไป → Damage ตามมา»" }
+  ];
   const AIRCRAFT_FLASH = [
     { icao: 'BCS3', name: 'Airbus A220-300', asset: 'a220.glb', clue: 'เครื่องบินลำตัวแคบที่เริ่มพัฒนาภายใต้ชื่อ Bombardier CS300',
       tip: 'จำว่า «220 = CS300» เวลาดูรูปให้เริ่มจากลำตัวเรียว แล้วเทียบขนาดเครื่องยนต์กับลำตัว' },
@@ -1151,7 +1316,8 @@
   ];
   function aircraftFigure(aircraft) {
     const asset = 'img/aircraft-flash/' + aircraft.asset;
-    const source = aircraft.icao ? 'https://planes.fyi/aircraft/types/' + aircraft.icao : '';
+    const source = aircraft.reference || (aircraft.icao ? 'https://planes.fyi/aircraft/types/' + aircraft.icao : '');
+    const sourceLabel = aircraft.reference ? (source.includes('.nasa.gov/') ? 'NASA' : 'FAA') : T('ดูรุ่นนี้บน Planes.FYI');
     return '<figure class="q-product-image aircraft-figure">' +
       '<model-viewer src="' + asset + '" alt="' + T('โมเดล 3D สำหรับคำถาม') + '" camera-controls touch-action="pan-y" camera-orbit="55deg 68deg 105%" shadow-intensity="0.6" loading="eager"></model-viewer>' +
       '<p class="aircraft-status" role="status">' + T('กำลังโหลดโมเดล 3D') + '</p>' +
@@ -1159,11 +1325,11 @@
         ? '<a href="https://github.com/oktal3700/bluebell" target="_blank" rel="noopener">Bluebell CSL</a> · ' +
           '<a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">CC0 1.0</a>'
         : T('โมเดลจำลองเพื่อการเรียนรู้')) +
-      (source ? ' · <a href="' + source + '" target="_blank" rel="noopener">' + T('ดูรุ่นนี้บน Planes.FYI') + '</a>'
+      (source ? ' · <a href="' + esc(source) + '" target="_blank" rel="noopener">' + sourceLabel + '</a>'
               : ' · ' + T('สังเกตส่วนที่ไฮไลต์สีส้ม')) + '</figcaption></figure>';
   }
-  function loadAircraftModel() {
-    const model = $('#glossary-body model-viewer');
+  function loadAircraftModel(container = '#glossary-body') {
+    const model = $(container + ' model-viewer');
     if (!model) return;
     const status = model.nextElementSibling;
     const unavailable = () => {
@@ -1500,6 +1666,7 @@
 
   /* ---------- Events ---------- */
   $('#path').addEventListener('click', (e) => {
+    if (e.target.closest('#turbofan-quiz')) return startPractice(TURBOFAN_QUIZ, 'Turbofan 3D Quiz', TURBOFAN_QUIZ.length);
     if (e.target.closest('#pm-quiz')) return startPractice(window.PM_QUIZ || [], 'Project Magenta Quiz', window.PM_QUIZ?.length);
     const arrow = e.target.closest('.row-arrow');
     if (arrow) {

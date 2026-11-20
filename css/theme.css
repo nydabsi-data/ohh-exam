@@ -620,8 +620,8 @@ body:has(#home-view:not(.hidden) #hub:not(.hidden) .exam-grid:not(.modes)),
   color: #424b54;
   box-shadow: none;
 }
-.pilot-study-links #pm-quiz { width: 100%; font-family: inherit; text-align: left; cursor: pointer; }
-.pilot-study-links #pm-quiz:focus-visible { outline: 3px solid var(--sky-d); outline-offset: 3px; }
+.pilot-study-links :is(#pm-quiz, #turbofan-quiz) { width: 100%; font-family: inherit; text-align: left; cursor: pointer; }
+.pilot-study-links :is(#pm-quiz, #turbofan-quiz):focus-visible { outline: 3px solid var(--sky-d); outline-offset: 3px; }
 #lesson-view .q-product-image { margin: 0 0 16px; text-align: center; }
 .q-product-image img { display: block; margin: 0 auto; max-width: 100%; max-height: 300px; object-fit: contain; border-radius: 10px; }
 .q-product-image figcaption { margin-top: 6px; font-size: 13px; color: var(--muted); }
@@ -753,3 +753,8 @@ body:has(#home-view:not(.hidden) #hub:not(.hidden) .exam-grid:not(.modes)),
 .fb-abbr > b { font-size: 12px; color: var(--muted); }
 .fb-abbr span b { color: #2F6F8A; }
 #fc-ex .fb-abbr { margin: 10px auto 0; max-width: 640px; }
+
+/* Home subject cards: the same light grey-brown gradient as the unit heads, dark brown text */
+.exam-grid.modes .mode-card { --card-background: linear-gradient(135deg, #FFFFFF 0%, #F4F0EB 45%, #E4DCD3 100%); background: linear-gradient(135deg, #FFFFFF 0%, #F4F0EB 45%, #E4DCD3 100%) !important; color: #4A3F35 !important; }
+.exam-grid.modes .mode-card :is(.mc-title, .mc-sub, .mc-foot, .mc-foot *, small) { color: #4A3F35 !important; }
+.exam-grid.modes .mode-card .mc-deco { opacity: .25; color: #8A7B6C !important; }
