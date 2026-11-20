@@ -82,7 +82,7 @@
 
   /* ---------- Supabase: sign-in + progress sync (optional) ---------- */
   const CFG = window.PE_SUPABASE || {};
-  const sb = CFG.url && CFG.key && window.supabase ? window.supabase.createClient(CFG.url, CFG.key) : null;
+  let sb = null;
   let user = null, pushTimer = null;
   const uname = () => !user ? '' : (user.user_metadata && user.user_metadata.username) || (user.email || '').split('@')[0];
 
@@ -240,7 +240,21 @@
     [/^geo/, TI('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>')],
     [/^toeic|^eg-|^ev-/, TI('<path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2zM4 20a2 2 0 0 0 2 2h13v-4"/><path d="M8 8h7M8 12h5"/>')]
   ];
-  const topicIcon = (unitId) => { const t = TOPIC_ICONS.find((x) => x[0].test(unitId || '')); return t ? t[1] : ICON.star; };
+  const pilotIcon = (name) => '<span class="pilot-icon pilot-icon-' + name + '" aria-hidden="true"></span>';
+  // Full-colour topic pictures (img/topics/*.png)
+  const imgIcon = (name) => '<img class="topic-img" src="img/topics/' + name + '.png" alt="" aria-hidden="true" loading="lazy">';
+  // Aptitude tests: full-colour pictures (rotation uses the red plane)
+  const APT_IMG = { series: 'apt-series', math: 'apt-math', rotation: 'agk-plane', jigsaw: 'apt-jigsaw', joystick: 'apt-joystick', multitask: 'apt-multitask' };
+  const exIcon = (x) => APT_IMG[x.id] ? imgIcon(APT_IMG[x.id]) : EX_ICON[x.icon];
+  const TOPIC_IMG = { basic: 'agk-compass', pof: 'basic', met: 'met-cloud', hist: 'hist', nav: 'nav', law: 'law', agk: 'agk-plane', hfr: 'hfr-pilot', geo: 'geo', wind: 'wind',
+    'phy-heat': 'fire', 'phy-energy': 'fuel-pump', 'chem-redox': 'fuel-pct', 'chem-org': 'fuel-nozzle' };
+  const TOPIC_IMG_ALT = { hist: ['hist', 'agk'], pof: ['basic', 'airport', 'hfr'], met: ['met-cloud', 'met-rain', 'met-moon'], nav: ['nav', 'geo', 'agk'], law: ['seatbelt', 'law', 'gavel'], agk: ['agk-takeoff', 'agk-compass', 'agk-plane'], hfr: ['hfr-pilot', 'nav', 'ticket'], wind: ['agk-takeoff', 'wind'], geo: ['agk-compass', 'geo'], basic: ['agk-compass', 'agk-plane', 'fuel-pump'] };   // lesson cards take turns between these pictures
+  const topicIcon = (unitId, li) => {
+    const key = String(unitId || '').replace(/-\d+$/, '');
+    if (TOPIC_IMG_ALT[key] && li != null) return imgIcon(TOPIC_IMG_ALT[key][li % TOPIC_IMG_ALT[key].length]);
+    if (TOPIC_IMG[key]) return imgIcon(TOPIC_IMG[key]);
+    const t = TOPIC_ICONS.find((x) => x[0].test(unitId || '')); return t ? t[1] : ICON.star;
+  };
   const PLAY_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
 
   const isDone = (id) => !!S.done[id];
@@ -281,7 +295,7 @@
           : '<span class="lc-go" aria-label="เริ่ม">' + PLAY_ICON + '</span>';
         html += '<button class="lesson-card ' + st + (gl ? ' guest' : '') + '" data-i="' + i + '" aria-label="' + esc(l.title) + '">' +
           '<span class="lc-top"><span class="lc-num">บทที่ ' + (li + 1) + '</span>' + diffChip(lessonDiff(l)) + '</span>' +
-          '<span class="lc-ico">' + (st === 'done' ? ICON.check : st === 'locked' ? ICON.lock : topicIcon(u.id)) + '</span>' +
+          '<span class="lc-ico">' + (st === 'done' ? ICON.check : st === 'locked' ? ICON.lock : topicIcon(u.id, li)) + '</span>' +
           '<span class="lc-title">' + esc(l.title) + '</span>' +
           '<span class="lc-meta">' + l.questions.length + ' ข้อ</span>' +
           '<span class="lc-foot">' + foot + '</span></button>';
@@ -305,7 +319,7 @@
             '<span class="lc-foot"><span class="lc-state locked">' + ICON.lock + '<span>สมัครเพื่อปลดล็อก</span></span></span></button>'
           : '<a class="lesson-card open exam-lc" href="' + x.href + '" style="--c:' + x.color + ';--d:' + x.dark + '">' +
           '<span class="lc-top"><span class="lc-num">ชุดที่ ' + (ti + 1) + '</span></span>' +
-          '<span class="lc-ico">' + EX_ICON[x.icon] + '</span>' +
+          '<span class="lc-ico">' + exIcon(x) + '</span>' +
           '<span class="lc-title">' + esc(x.title) + '</span>' +
           '<span class="lc-meta">' + x.meta.map(esc).join(' · ') + '</span>' +
           '<span class="lc-foot">' + (aptBest(x.id) != null
@@ -316,11 +330,14 @@
     // Topic buttons: one square icon tile per unit (tap to jump to it)
     if (UNITS.length > 1) {
       const tiles = UNITS.map((u, ui) => ({ id: 'unit-' + ui, c: u.color, d: u.dark, icon: topicIcon(u.id), label: u.th || u.title }));
-      if (course === 'pilot') tiles.push({ id: 'unit-apt', c: '#CB7F89', d: '#BD5D6A', icon: EX_ICON.stick, label: 'แบบทดสอบ' });
+      if (course === 'pilot') tiles.push({ id: 'unit-apt', c: '#CB7F89', d: '#BD5D6A', icon: imgIcon('seatbelt'), label: 'แบบทดสอบ' });
       html = '<div class="topic-head"><h3>' + T('หัวข้อ') + '</h3><span>' + tiles.length + ' ' + T('หัวข้อ') + '</span></div>' +
-        '<div class="topic-row">' + tiles.map((t) =>
+        '<div class="topic-carousel"><button class="row-arrow topic-prev" type="button" data-dir="-1" aria-controls="topic-row" aria-label="' + T('เลื่อนหัวข้อไปทางซ้าย') + '">' +
+          TI('<path d="M15 5l-7 7 7 7"/>') + '</button>' +
+        '<div class="topic-row" id="topic-row">' + tiles.map((t) =>
           '<button class="topic-btn" data-go="' + t.id + '" style="--c:' + t.c + ';--d:' + t.d + '"><span class="tb-ico">' + t.icon + '</span><span class="tb-lab">' + esc(t.label) + '</span></button>').join('') +
-        '</div>' + html;
+        '</div><button class="row-arrow topic-next" type="button" data-dir="1" aria-controls="topic-row" aria-label="' + T('เลื่อนหัวข้อไปทางขวา') + '">' +
+          TI('<path d="M9 5l7 7-7 7"/>') + '</button></div>' + html;
     }
     // Picture cards for this course (tap to enlarge)
     const figs = Object.keys(window.FIGS || {}).filter((k) => FIGS[k].course === course);
@@ -334,15 +351,22 @@
     }
     // Pilot: aviation vocabulary (glossary page)
     if (course === 'pilot' && aviaTerms().length) {
-      html = '<a class="glossary-entry" href="#glossary"><span class="ge-ico">' + EX_ICON.book + '</span>' +
-        '<span class="ge-body"><b>คำศัพท์การบิน</b><i>' + nfmt(aviaTerms().length) + ' คำ พร้อมความหมายและคำอธิบาย · ค้นหาและทดสอบได้</i></span>' +
-        '<span class="lc-go" aria-label="เปิด">' + PLAY_ICON + '</span></a>' + html;
+      html = '<div class="pilot-study-links"><a class="glossary-entry" href="#glossary"><span class="ge-ico">' + imgIcon('ticket') + '</span>' +
+        '<span class="ge-body"><b>คำศัพท์การบิน</b><i>' + nfmt(aviaTerms().length) + ' คำ พร้อมคำแปลสั้น ๆ</i></span>' +
+        '<span class="lc-go" aria-label="เปิด">' + PLAY_ICON + '</span></a>' +
+        '<a class="glossary-entry" href="#picture-flash"><span class="ge-ico">' + imgIcon('airport') + '</span>' +
+        '<span class="ge-body"><b>' + T('Flash Card พร้อมรูป') + '</b><i>' + Math.min(PICTURE_FLASH_LIMIT, (window.PM_QUIZ || []).length) + ' ' + T('ข้อ') + '</i></span>' +
+        '<span class="lc-go">' + PLAY_ICON + '</span></a>' +
+        '<button type="button" class="glossary-entry" id="pm-quiz"><span class="ge-ico">' +
+        TI('<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M6 12l3-3 3 3 4-5"/>') + '</span>' +
+        '<span class="ge-body"><b>Project Magenta Quiz</b><i>' + (window.PM_QUIZ || []).length + ' ' + T('ข้อ') + '</i></span>' +
+        '<span class="lc-go">' + PLAY_ICON + '</span></button></div>' + html;
     }
     $('#path').innerHTML = html;
     // Bring the next lesson to do into view in its row
     const curCard = $('#path .lesson-card.current');
     if (curCard) { const row = curCard.parentElement; row.scrollLeft = Math.max(0, curCard.offsetLeft - row.offsetLeft - 16); }
-    $$('#path .lesson-row').forEach(updateArrows);
+    $$('#path :is(.lesson-row, .topic-row)').forEach(updateArrows);
     renderAside();
   }
   function updateArrows(row) {
@@ -386,11 +410,11 @@
     openLesson();
   }
   // Practice: a mixed set of questions; no hearts lost, lessons are not marked as passed.
-  function startPractice(questions, title) {
+  function startPractice(questions, title, limit = 10) {
     if (!questions.length) return toast('ยังไม่มีข้อให้ฝึก');
     sync();
-    const qs = shuffle(questions.slice()).slice(0, 10);
-    L = { i: null, practice: { title, src: questions }, les: { id: null, title, unit: { title: 'Practice' } },
+    const qs = shuffle(questions.slice()).slice(0, limit);
+    L = { i: null, practice: { title, src: questions, limit }, les: { id: null, title, unit: { title: 'Practice' } },
           queue: qs, total: qs.length, correct: 0, wrong: 0, xp: 0, start: Date.now(), state: 'answer', sel: null, opts: null };
     openLesson();
   }
@@ -442,7 +466,13 @@
       body = '<div class="opts">' + L.opts.map((o, j) => '<button class="opt" data-j="' + j + '"><span class="k">' + (j + 1) + '</span><span' + (q.type === 'tf' ? '' : ' class="no-i18n"') + '>' + esc(o.t) + '</span></button>').join('') + '</div>';
     }
     // Question text and answer options are content, not UI: the TH/EN switch leaves them as written.
-    $('#qbox').innerHTML = '<div class="q-kind">' + kind + ' ' + diffChip(qDiff(q)) + '</div>' + qHead(q.q) + body;
+    $('#qbox').innerHTML = '<div class="q-kind">' + kind + ' ' + diffChip(qDiff(q)) + '</div>' + qHead(q.q) +
+      (q.image ? productFigure(q) : '') + body;
+  }
+
+  function productFigure(q) {
+    return '<figure class="q-product-image"><img src="' + esc(q.image) + '" alt="' + T('ภาพหน้าจอสำหรับคำถาม') + '">' +
+      '<figcaption><a href="' + esc(q.source) + '" target="_blank" rel="noopener">Project Magenta</a></figcaption></figure>';
   }
 
   // Long reading passages (TOEIC) are written as "passage\n\nquestion": show the passage in its own box
@@ -559,7 +589,7 @@
     L = null;
     show('result');
     tone(true);
-    $('#again').onclick = () => practice ? startPractice(practice.src, practice.title) : startLesson(i);
+    $('#again').onclick = () => practice ? startPractice(practice.src, practice.title, practice.limit) : startLesson(i);
     $('#cont').onclick = goHome;
     $('#cont').focus();
   }
@@ -633,7 +663,6 @@
     let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
     return CHARS[h % CHARS.length].n;
   }
-  function setChar(n) { S.avatar = n; S.avatarAt = Date.now(); save(); }
 
   // A character on each Home card (image numbers from CHARS)
   const MODE_CHAR = { pilot: 2, physics: 5, chem: 3, bio: 8, mathhs: 4, english: 1 };
@@ -673,8 +702,8 @@
         return '<a class="exam-card mode-card' + (m.cls ? ' ' + m.cls : '') + '" href="' + m.href + '" style="--c:' + m.color + ';--d:' + m.dark + '"' +
             ' data-text="' + esc((m.title + ' ' + m.th).toLowerCase()) + '">' +
           '<span class="mc-deco">' + EX_ICON[m.icon] + '</span>' +
-          '<span class="mc-top"><span class="mc-ico">' + EX_ICON[m.icon] + '</span>' +
-            '<span><small class="mc-kick">' + T('เริ่ม') + '</small><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
+          '<span class="mc-top"><span class="mc-ico">' + (m.id === 'pilot' ? imgIcon('agk-plane') : EX_ICON[m.icon]) + '</span>' +
+            '<span><b class="mc-title">' + esc(m.title) + '</b><br><span class="mc-sub">' + esc(T(m.th)) + '</span></span></span>' +
           // Numbers on the card: topics (units) — or courses for English — questions, lessons passed
           '<span class="mc-nums">' +
             '<span><b>' + (m.courses ? cs.length : sumOf(cs, (c) => c.units.length)) + '</b><i>' + T(m.unitLabel || 'เรื่อง') + '</i></span>' +
@@ -696,7 +725,7 @@
         ? '<span class="ex-prog"><span class="bar"><span style="width:' + (doneN / COURSES.pilot.lessons.length) * 100 + '%"></span></span><b>' + doneN + '/' + COURSES.pilot.lessons.length + '</b></span>'
         : '');
       return '<a class="exam-card" href="' + x.href + '" style="--c:' + x.color + ';--d:' + x.dark + ';--t:' + x.text + '">' +
-        '<span class="ex-ico">' + EX_ICON[x.icon] + '</span>' +
+        '<span class="ex-ico">' + exIcon(x) + '</span>' +
         '<span class="ex-body"><b class="ex-title">' + esc(x.title) + '</b><span class="ex-th">' + esc(x.th) + '</span>' +
         '<span class="ex-meta">' + x.meta.map((m) => '<i>' + esc(m) + '</i>').join('') + '</span>' + extra + '</span>' +
         '<span class="ex-go">เริ่ม</span></a>';
@@ -851,10 +880,6 @@
         '<div><h1>' + esc(name) + '</h1><p>' + (user ? esc(user.email || '') : 'ยังไม่ได้เข้าสู่ระบบ ความคืบหน้าเก็บในเครื่องนี้') + '</p>' +
         (isAdmin ? '<span class="role-badge">Super admin</span>' : '') + '</div></div>' +
       (isAdmin ? '<button class="admin-entry" id="open-mgmt"><span class="ae-ico">' + TAB_ICON.stats + '</span><span><b>Management</b><i>จัดการผู้ใช้และดูภาพรวมระบบ</i></span><span class="ae-go">เปิด</span></button>' : '') +
-      '<div class="card"><h3>เลือกตัวละคร</h3><div class="char-grid">' +
-        CHARS.map((c) => '<button type="button" class="char-pick' + (myChar() === c.n ? ' on' : '') + '" data-char="' + c.n + '" style="--bg:' + c.bg + '">' +
-          '<img src="' + charSrc(c.n) + '" alt="" loading="lazy"></button>').join('') +
-      '</div></div>' +
       '<div class="card"><h3>ตั้งค่า</h3>' +
         '<label class="switch"><input type="checkbox" id="snd2"' + (S.sound ? ' checked' : '') + '> เสียงเอฟเฟกต์</label>' +
         '<button class="linkbtn" id="reset2">ล้างความคืบหน้าทั้งหมด</button></div>' +
@@ -882,8 +907,14 @@
     const fmt = (t) => t ? new Date(t).toLocaleDateString(window.I18N && window.I18N.lang === 'en' ? 'en-GB' : 'th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '–';
     const today = dayKey();
     const views = {
-      users: () => '<div class="mg-table-wrap"><table class="mg-table"><thead><tr><th>ผู้ใช้</th><th>XP</th><th>สมัครเมื่อ</th><th>ใช้งานล่าสุด</th><th>สิทธิ์</th></tr></thead><tbody>' +
-        users.map((u) => '<tr><td><b>' + esc(u.username) + '</b><small>' + esc(u.email) + '</small></td><td>' + u.xp + '</td><td>' + fmt(u.created_at) + '</td><td>' + fmt(u.last_sign_in_at) + '</td>' +
+      users: () => '<form class="mg-add" id="mg-add" autocomplete="off"><b>เพิ่มผู้ใช้</b>' +
+        '<input id="ma-email" type="email" placeholder="อีเมล (ไม่ใส่ก็ได้)">' +
+        '<input id="ma-user" type="text" placeholder="ชื่อผู้ใช้ (a–z 0–9 . _ -)" autocapitalize="none" spellcheck="false" required>' +
+        '<input id="ma-pw" type="text" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)" autocomplete="new-password" required>' +
+        '<select id="ma-role"><option value="user">User</option><option value="super_admin">Super admin</option></select>' +
+        '<button class="btn" type="submit">เพิ่ม</button><span class="form-msg" id="ma-msg"></span></form>' +
+        '<div class="mg-table-wrap"><table class="mg-table"><thead><tr><th>ผู้ใช้</th><th>XP</th><th>สมัครเมื่อ</th><th>ใช้งานล่าสุด</th><th>สิทธิ์</th></tr></thead><tbody>' +
+        users.map((u) => '<tr><td><b>' + esc(u.username) + '</b><small>' + (/@no-email.ohh-exam.local$/.test(u.email || '') ? T('ไม่มีอีเมล') : esc(u.email)) + '</small></td><td>' + u.xp + '</td><td>' + fmt(u.created_at) + '</td><td>' + fmt(u.last_sign_in_at) + '</td>' +
           '<td>' + (u.id === user.id ? '<span class="role-badge">Super admin</span>'
             : '<select class="role-sel" data-uid="' + u.id + '"><option value="user"' + (u.role === 'user' ? ' selected' : '') + '>User</option><option value="super_admin"' + (u.role === 'super_admin' ? ' selected' : '') + '>Super admin</option></select>') +
           '</td></tr>').join('') + '</tbody></table></div>',
@@ -909,12 +940,33 @@
       const u = users.find((x) => x.id === sel.dataset.uid); if (u) u.role = sel.value;
       toast('อัปเดตสิทธิ์แล้ว');
     };
+    $('#mg-body').onsubmit = async (e) => {
+      if (e.target.id !== 'mg-add') return;
+      e.preventDefault();
+      const msg = $('#ma-msg'), btn = e.target.querySelector('button[type=submit]');
+      const email = $('#ma-email').value.trim(), uname = $('#ma-user').value.trim().toLowerCase(), pw = $('#ma-pw').value, role = $('#ma-role').value;
+      if (!/^[a-z0-9._-]{3,20}$/.test(uname)) { msg.className = 'form-msg err'; msg.textContent = 'ชื่อผู้ใช้ใช้ได้เฉพาะ a–z 0–9 . _ - ยาว 3–20 ตัว'; return; }
+      if (pw.length < 6) { msg.className = 'form-msg err'; msg.textContent = 'รหัสผ่านอย่างน้อย 6 ตัว'; return; }
+      btn.disabled = true; msg.className = 'form-msg'; msg.textContent = 'กำลังเพิ่ม...';
+      const { data: newId, error: err } = await sb.rpc('admin_add_user', { p_email: email, p_username: uname, p_password: pw, p_role: role });
+      btn.disabled = false;
+      if (err) {
+        const m = err.message || '';
+        msg.className = 'form-msg err';
+        msg.textContent = /email already/.test(m) ? 'อีเมลนี้มีผู้ใช้แล้ว' : /username already/.test(m) ? 'ชื่อผู้ใช้นี้มีคนใช้แล้ว'
+          : /bad email/.test(m) ? 'อีเมลไม่ถูกต้อง' : /admin_add_user/.test(m) ? 'ยังไม่ได้ติดตั้งฟังก์ชัน ให้รันไฟล์ database/admin_add_user.sql ใน Supabase SQL Editor' : 'เพิ่มไม่ได้: ' + m;
+        return;
+      }
+      users.unshift({ id: newId, username: uname, email: email ? email.toLowerCase() : uname + '@no-email.ohh-exam.local', role, xp: 0, created_at: new Date().toISOString(), last_sign_in_at: null });
+      showMg('users');
+      toast('เพิ่มผู้ใช้ ' + uname + ' แล้ว — เข้าสู่ระบบได้ทันที');
+    };
     showMg('users');
   }
 
   /* ---------- Aptitude tests (js/aptitude.js) ---------- */
   let aptOpen = null;
-  window.APT_ICON = { series: EX_ICON.series, math: EX_ICON.math, rotation: EX_ICON.plane, jigsaw: EX_ICON.puzzle, joystick: EX_ICON.stick, multitask: EX_ICON.multi };
+  window.APT_ICON = { series: imgIcon(APT_IMG.series), math: imgIcon(APT_IMG.math), rotation: imgIcon(APT_IMG.rotation), jigsaw: imgIcon(APT_IMG.jigsaw), joystick: imgIcon(APT_IMG.joystick), multitask: imgIcon(APT_IMG.multitask) };
   const APT_HOST = {
     back: '#learn',
     best: (id) => aptBest(id),
@@ -957,7 +1009,7 @@
     $('#g-list').innerHTML = list.slice(0, G.limit).map((t) =>
       '<article class="g-item no-i18n"><header><b>' + esc(t[0]) + '</b>' + (t[1] ? '<span class="g-abbr">' + esc(t[1]) + '</span>' : '') +
       '<span class="g-cat">' + esc(AVIA_CATS[t[4]] || t[4]) + '</span></header>' +
-      '<p class="g-th">' + esc(t[2]) + '</p><p class="g-ex">' + esc(t[3]) + '</p></article>').join('') ||
+      '<p class="g-th">' + esc(t[2]) + '</p></article>').join('') ||
       '<p class="note">' + T('ไม่พบคำที่ค้นหา') + '</p>';
     $('#g-more').classList.toggle('hidden', list.length <= G.limit);
   }
@@ -965,10 +1017,10 @@
     const all = aviaTerms(), counts = {};
     all.forEach((t) => { counts[t[4]] = (counts[t[4]] || 0) + 1; });
     $('#glossary-body').innerHTML =
-      '<div class="page-banner"><p>' + T('คำศัพท์ที่นักบินต้องรู้ พร้อมคำแปลและคำอธิบาย') + '</p><h1>' + T('คำศัพท์การบิน') + '</h1>' +
+      '<div class="page-banner"><p>' + T('คำศัพท์พร้อมคำแปลสั้น ๆ') + '</p><h1>' + T('คำศัพท์การบิน') + '</h1>' +
         '<div class="banner-row"><span>' + nfmt(all.length) + ' ' + T('คำ') + '</span><span>' + Object.keys(counts).length + ' ' + T('หมวด') + '</span></div></div>' +
       '<div class="g-tools"><input id="g-search" class="g-search" type="search" placeholder="' + T('ค้นหาคำศัพท์ เช่น METAR, flap, มุมปะทะ') + '" value="' + esc(G.q) + '">' +
-        '<button class="btn" id="g-quiz">' + T('การ์ดคำศัพท์ 3 วิ') + '</button></div>' +
+        '<button class="btn" id="g-quiz">' + T('การ์ดคำศัพท์ 5 วิ') + '</button></div>' +
       '<div class="g-chips">' + ['all'].concat(Object.keys(AVIA_CATS).filter((k) => counts[k])).map((k) =>
         '<button class="g-chip' + (G.cat === k ? ' on' : '') + '" data-cat="' + k + '">' + (k === 'all' ? T('ทั้งหมด') : AVIA_CATS[k]) +
         ' <small>' + nfmt(k === 'all' ? all.length : counts[k]) + '</small></button>').join('') + '</div>' +
@@ -976,35 +1028,54 @@
       '<button class="btn ghost block hidden" id="g-more">' + T('ดูเพิ่มเติม') + '</button>';
     renderGlossaryList();
   }
-  /* Flash cards: every word in the current filter, shuffled; 3 seconds per card; when all are done a new
+  /* Flash cards: every word in the current filter, shuffled; 5 seconds per card; when all are done a new
      shuffled round starts, and it keeps going until "หยุด". +2 XP per right answer. */
-  const FC_SECS = 3;
+  const FC_SECS = 5;
+  const PICTURE_FLASH_LIMIT = 30;
   let FC = null;
   function fcStop() { if (FC) { clearInterval(FC.timer); clearTimeout(FC.next); FC.on = false; } }
-  function startFlash() {
+  function startFlash(picture = false) {
     fcStop();
-    const pool = glossaryList().length >= 4 ? glossaryList() : aviaTerms();
+    const pool = picture
+      ? (window.PM_QUIZ || [])
+      : glossaryList().length >= 4 ? glossaryList() : aviaTerms();
     if (pool.length < 4) return toast(T('ยังไม่มีคำศัพท์ให้ทดสอบ'));
-    FC = { on: true, pool, deck: shuffle(pool.slice()), i: 0, round: 1, right: 0, wrong: 0, streak: 0 };
+    const deck = shuffle(pool.slice()).slice(0, picture ? PICTURE_FLASH_LIMIT : pool.length);
+    FC = { on: true, picture, pool, deck, i: 0, round: 1, right: 0, wrong: 0, streak: 0 };
     fcCard();
   }
   function fcCard() {
     if (!FC || !FC.on) return;
+    if (FC.picture && FC.i >= FC.deck.length) {
+      $('#glossary-body').innerHTML = '<div class="fc-wrap"><div class="fc-card"><h1>' + T('จบชุดคำถาม') +
+        '</h1><b>' + FC.right + '/' + FC.deck.length + '</b><p>' + T('ตอบถูก') + '</p></div>' +
+        '<div class="fc-actions"><button class="btn" id="fc-again">' + T('ทำอีกครั้ง') + '</button>' +
+        '<a class="btn ghost" href="#learn">' + T('กลับไปหน้าบทเรียน') + '</a></div></div>';
+      return;
+    }
     if (FC.i >= FC.deck.length) { FC.deck = shuffle(FC.pool.slice()); FC.i = 0; FC.round++; toast(T('เริ่มรอบใหม่ สุ่มลำดับใหม่')); }
     const t = FC.deck[FC.i];
-    const others = shuffle(FC.pool.filter((x) => x[2] !== t[2])).slice(0, 3);
-    FC.opts = shuffle([{ s: t[2], c: true }].concat(others.map((x) => ({ s: x[2], c: false }))));
+
+    if (FC.picture) {
+      FC.opts = shuffle(t.o.map((option, index) => ({ s: option, c: index === t.a })));
+    } else {
+      const others = shuffle(FC.pool.filter((option) => option[2] !== t[2])).slice(0, 3);
+      FC.opts = shuffle([{ s: t[2], c: true }].concat(others.map((option) => ({ s: option[2], c: false }))));
+    }
     FC.t = t; FC.done = false; FC.start = Date.now();
     $('#glossary-body').innerHTML =
-      '<div class="fc-wrap">' +
-        '<div class="fc-top"><span>' + T('รอบที่') + ' ' + FC.round + ' · ' + T('คำที่') + ' ' + (FC.i + 1) + '/' + nfmt(FC.deck.length) + '</span>' +
+      '<div class="fc-wrap' + (FC.picture ? ' pic' : '') + '">' +
+        '<div class="fc-top"><span>' + (FC.picture ? '' : T('รอบที่') + ' ' + FC.round + ' · ') + T('คำที่') + ' ' + (FC.i + 1) + '/' + nfmt(FC.deck.length) + '</span>' +
           '<span class="fc-score"><b class="ok">✓ ' + FC.right + '</b> <b class="bad">✗ ' + FC.wrong + '</b>' + (FC.streak > 2 ? ' <b class="st">🔥 ' + FC.streak + '</b>' : '') + '</span></div>' +
-        '<div class="fc-bar"><span id="fc-time"></span></div>' +
-        '<div class="fc-card no-i18n">' + (t[1] ? '<small>' + esc(t[1]) + '</small>' : '') + '<b>' + esc(t[0]) + '</b><i>' + esc(AVIA_CATS[t[4]] || '') + '</i></div>' +
+        (FC.picture ? '' : '<div class="fc-bar"><span id="fc-time"></span></div>') +
+        (FC.picture
+          ? '<div class="fc-card fc-picture"><h1 class="no-i18n">' + esc(t.q) + '</h1>' + productFigure(t) + '</div>'
+          : '<div class="fc-card no-i18n">' + (t[1] ? '<small>' + esc(t[1]) + '</small>' : '') + '<b>' + esc(t[0]) + '</b><i>' + esc(AVIA_CATS[t[4]] || '') + '</i></div>') +
         '<div class="fc-opts no-i18n">' + FC.opts.map((o, k) => '<button class="fc-opt" data-k="' + k + '"><span class="k">' + (k + 1) + '</span>' + esc(o.s) + '</button>').join('') + '</div>' +
-        '<p class="fc-ex no-i18n" id="fc-ex"></p>' +
-        '<div class="fc-actions"><button class="btn ghost" id="fc-back">' + T('หยุด') + '</button></div>' +
+        '<p class="fc-ex no-i18n" id="fc-ex" role="status"></p>' +
+        '<div class="fc-actions"><button class="btn ghost" id="fc-back">' + T('หยุด') + '</button>' + (FC.picture ? '<button class="btn hidden" id="fc-next">' + T('ถัดไป') + '</button>' : '') + '</div>' +
       '</div>';
+    if (FC.picture) return;
     FC.timer = setInterval(() => {
       const left = FC_SECS - (Date.now() - FC.start) / 1000, bar = $('#fc-time');
       if (bar) { bar.style.width = Math.max(0, left / FC_SECS * 100) + '%'; bar.classList.toggle('low', left < 1); }
@@ -1019,13 +1090,30 @@
     else { FC.wrong++; FC.streak = 0; }
     tone(ok);
     $$('#glossary .fc-opt').forEach((b, j) => { b.disabled = true; if (FC.opts[j].c) b.classList.add('right'); else if (j === k) b.classList.add('wrong'); });
-    $('#fc-ex').innerHTML = (k < 0 ? '<b>' + T('หมดเวลา') + '</b> · ' : '') + esc(FC.t[3]);
+    if (FC.picture) {
+      const question = FC.t;
+      $('#fc-ex').innerHTML = '<strong>' + esc(question.o[question.a]) + '</strong>' +
+        '<span class="fc-definition">' + esc(question.ex) + '</span>';
+    } else {
+      const [term, , meaning, description] = FC.t;
+      $('#fc-ex').innerHTML =
+        (k < 0 ? '<b>' + T('หมดเวลา') + '</b> · ' : '') +
+        '<strong>' + esc(term) + '</strong> · ' + esc(meaning) +
+        (description ? '<span class="fc-definition">' + esc(description) + '</span>' : '');
+    }
     FC.i++;
-    FC.next = setTimeout(fcCard, ok ? 1100 : 2400);   // a little longer to read the explanation after a miss
+    $('#glossary .fc-card').classList.add(ok ? 'is-correct' : 'is-incorrect');
+    if (FC.picture) {
+      const next = $('#fc-next');
+      next.classList.remove('hidden');
+      next.focus();
+      return;
+    }
+    FC.next = setTimeout(fcCard, ok ? 1100 : 2400);   // a little longer to read the answer after a miss
   }
 
   /* ---------- Router: bottom tab bar ---------- */
-  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#learn-toeic': 'learn', '#learn-grammar': 'learn', '#learn-vocab': 'learn', '#glossary': 'glossary', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
+  const PAGES = { '#learn': 'learn', '#learn-physics': 'learn', '#learn-chem': 'learn', '#learn-bio': 'learn', '#learn-math': 'learn', '#learn-toeic': 'learn', '#learn-grammar': 'learn', '#learn-vocab': 'learn', '#glossary': 'glossary', '#picture-flash': 'glossary', '#practice': 'practice', '#missions': 'missions', '#stats': 'stats', '#profile': 'profile' };
   function route() {
     if (L) return;
     if (location.hash === '#pilot') history.replaceState(null, '', location.pathname + location.search + '#learn');   // old Pilot page → Pilot lessons
@@ -1060,12 +1148,36 @@
     else if (page === 'stats') renderPerf();
     else if (page === 'profile') renderProfile();
     else if (page === 'practice') renderPractice();
-    else if (page === 'glossary') { if (!(FC && FC.on)) renderGlossary(); }
+    else if (page === 'glossary') {
+      const picture = location.hash === '#picture-flash';
+      if (picture && !(FC && FC.on && FC.picture)) startFlash(true);
+      if (!picture && !(FC && FC.on && !FC.picture)) { fcStop(); renderGlossary(); }
+    }
     else renderHub(sub);
     $('#tab-dot').classList.toggle('hidden', !claimable());
     $('#tab-dot-p').classList.toggle('hidden', !Object.keys(S.miss || {}).some((k) => QBANK[k]));
   }
   window.addEventListener('hashchange', () => { if (!L) route(); });
+
+  // Picture flash cards: show the picture as big as it stays sharp (at most 2.2× its real size),
+  // tap it to see it full screen; tap again (or Esc) to close
+  document.addEventListener('load', (e) => {
+    const img = e.target;
+    if (!(img instanceof HTMLImageElement) || !img.closest('.fc-picture')) return;
+    img.style.maxWidth = 'min(100%, ' + Math.round(img.naturalWidth * 2.2) + 'px)';
+    img.style.maxHeight = 'min(62vh, ' + Math.round(img.naturalHeight * 2.2) + 'px)';
+  }, true);
+  document.addEventListener('click', (e) => {
+    const zoom = document.querySelector('.img-zoom');
+    if (zoom) { zoom.remove(); return; }
+    const img = e.target.closest('.fc-picture .q-product-image img');
+    if (!img) return;
+    const z = document.createElement('div');
+    z.className = 'img-zoom';
+    z.innerHTML = '<img src="' + img.getAttribute('src') + '" alt=""><span>' + T('แตะเพื่อปิด') + '</span>';
+    document.body.appendChild(z);
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const z = document.querySelector('.img-zoom'); if (z) z.remove(); } });
   window.addEventListener('langchange', () => { if (!L) route(); });
 
   // Home search
@@ -1085,8 +1197,9 @@
   $('#glossary').addEventListener('click', (e) => {
     if (FC && FC.on) {
       const o = e.target.closest('.fc-opt'); if (o) return fcAnswer(+o.dataset.k);
-      if (e.target.closest('#fc-again')) return startFlash();
-      if (e.target.closest('#fc-back')) { fcStop(); return renderGlossary(); }
+      if (e.target.closest('#fc-again')) return startFlash(FC.picture);
+      if (e.target.closest('#fc-next')) return fcCard();
+      if (e.target.closest('#fc-back')) { if (FC.picture) { location.hash = '#learn'; return; } fcStop(); return renderGlossary(); }
       return;
     }
     const chip = e.target.closest('.g-chip');
@@ -1116,8 +1229,6 @@
   });
   $('#profile').addEventListener('click', (e) => {
     const id = e.target.closest('button') && e.target.closest('button').id;
-    const pick = e.target.closest('[data-char]');
-    if (pick) { setChar(+pick.dataset.char); renderProfile(); return; }
     if (id === 'open-mgmt') openManagement();
     else if (id === 'logout2') signOut();
     else if (id === 'login2') gotoLogin();
@@ -1211,9 +1322,10 @@
 
   /* ---------- Events ---------- */
   $('#path').addEventListener('click', (e) => {
+    if (e.target.closest('#pm-quiz')) return startPractice(window.PM_QUIZ || [], 'Project Magenta Quiz', window.PM_QUIZ?.length);
     const arrow = e.target.closest('.row-arrow');
     if (arrow) {
-      const row = arrow.closest('.unit').querySelector('.lesson-row');
+      const row = arrow.closest('.topic-carousel, .unit').querySelector('.topic-row, .lesson-row');
       row.scrollBy({ left: +arrow.dataset.dir * (row.clientWidth * 0.8), behavior: 'smooth' });
       return;
     }
@@ -1228,8 +1340,8 @@
     if (n.classList.contains('locked')) return toast('ผ่านบทเรียนก่อนหน้าก่อน แล้วบทนี้จะปลดล็อก');
     startLesson(+n.dataset.i);
   });
-  $('#path').addEventListener('scroll', (e) => { if (e.target.classList && e.target.classList.contains('lesson-row')) updateArrows(e.target); }, true);
-  window.addEventListener('resize', () => $$('#path .lesson-row').forEach(updateArrows));
+  $('#path').addEventListener('scroll', (e) => { if (e.target.matches('.lesson-row, .topic-row')) updateArrows(e.target); }, true);
+  window.addEventListener('resize', () => $$('#path :is(.lesson-row, .topic-row)').forEach(updateArrows));
 
   function askReset() {
     modal({
@@ -1271,7 +1383,9 @@
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 
-  if (sb) {
+  function connectAccount() {
+    if (sb || !CFG.url || !CFG.key || !window.supabase) return;
+    sb = window.supabase.createClient(CFG.url, CFG.key);
     sb.auth.onAuthStateChange((ev, session) => {
       const u = session ? session.user : null;
       const changed = (u && u.id) !== (user && user.id);
@@ -1295,4 +1409,6 @@
   }
 
   route();
+  if (window.supabase) connectAccount();
+  else document.getElementById('supabase-sdk')?.addEventListener('load', connectAccount, { once: true });
 })();

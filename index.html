@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Ohh-Exam</title>
   <meta name="description" content="ฝึกข้อสอบวันละไม่กี่นาที สนุกเหมือนเล่นเกม">
-  <meta name="theme-color" content="#FFFFFF">
+  <meta name="theme-color" content="#F3F3E6">
   <script>
     /* Not signed in and not a guest → login page first */
     try {
@@ -18,11 +18,11 @@
   <link rel="apple-touch-icon" href="img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/style.css?v=9">
   <link rel="stylesheet" href="css/pages.css?v=15">
-  <link rel="stylesheet" href="css/theme.css?v=30">
-  <link rel="stylesheet" href="css/buttons.css?v=2">
+  <link rel="stylesheet" href="css/theme.css?v=57">
+  <link rel="stylesheet" href="css/buttons.css?v=3">
   <link rel="stylesheet" href="css/aptitude.css?v=2">
   <link rel="stylesheet" href="css/desktop.css?v=4">
 </head>
@@ -92,7 +92,7 @@
   <div id="modal" class="modal hidden"><div class="modal-box" id="modal-box" role="dialog" aria-modal="true"></div></div>
   <div id="toast" class="toast"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script async id="supabase-sdk" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script src="js/config.js?v=8"></script>
   <script src="data/questions.js?v=9"></script>
   <script src="data/pilot-basics.js?v=1"></script>
@@ -102,11 +102,11 @@
   <script src="data/chemistry.js?v=1"></script>
   <script src="data/biology.js?v=1"></script>
   <script src="data/figs.js?v=3"></script>
-  <script src="data/avia/aircraft.js?v=1"></script>
+  <script src="data/avia/aircraft.js?v=2"></script>
   <script src="data/avia/aero.js?v=1"></script>
-  <script src="data/avia/met.js?v=1"></script>
+  <script src="data/avia/met.js?v=2"></script>
   <script src="data/avia/nav.js?v=1"></script>
-  <script src="data/avia/atc.js?v=1"></script>
+  <script src="data/avia/atc.js?v=2"></script>
   <script src="data/avia/ops.js?v=1"></script>
   <script src="data/avia/more.js?v=1"></script>
   <script src="data/toeic/book-01.js?v=1"></script>
@@ -129,8 +129,9 @@
   <script src="data/extra/physics-b.js?v=1"></script>
   <script src="data/extra/chemistry.js?v=1"></script>
   <script src="data/extra/biology.js?v=1"></script>
-  <script src="js/i18n.js?v=25"></script>
+  <script src="js/i18n.js?v=27"></script>
   <script src="js/aptitude.js?v=92"></script>
-  <script src="js/app.js?v=38"></script>
+  <script src="data/project-magenta.js?v=2"></script>
+  <script src="js/app.js?v=65"></script>
 </body>
 </html>

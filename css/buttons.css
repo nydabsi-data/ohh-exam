@@ -6,29 +6,29 @@
 }
 .btn {
   border: 0; border-radius: 16px; padding: 13px 20px; font-size: 15px;
-  background: #CA6B48; color: #fff; box-shadow: 0 4px 0 #B85836;
+  background: var(--exam-teal); color: #173840; box-shadow: 0 4px 0 var(--sky-d);
 }
 .btn:hover:not(:disabled) { filter: brightness(1.06); }
-.btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #B85836; }
+.btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--sky-d); }
 .btn:disabled { background: #E5E5E5; color: #AFAFAF; box-shadow: 0 4px 0 #CFCFCF; }
 
 /* Secondary: white with a 2px border and a 4px bottom border */
 .btn.ghost, .btn.danger {
   background: #fff; border: 2px solid #E5E5E5; border-bottom-width: 4px; box-shadow: none; padding: 11px 20px 9px;
 }
-.btn.ghost { color: #CA6B48; }
+.btn.ghost { color: var(--sky-d); }
 .btn.danger { color: #CB7F89; }
 .btn.ghost:hover:not(:disabled), .btn.danger:hover:not(:disabled) { filter: none; background: #F7F7F7; }
 .btn.ghost:active:not(:disabled), .btn.danger:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; margin-bottom: 2px; box-shadow: none; }
 
 /* Lesson footer: blue after a right answer, red after a wrong one */
-.foot.ok .btn { background: #CA6B48; box-shadow: 0 4px 0 #B85836; }
+.foot.ok .btn { background: var(--exam-teal); box-shadow: 0 4px 0 var(--sky-d); }
 .foot.bad .btn { background: #CB7F89; box-shadow: 0 4px 0 #BB5A67; }
 .foot.bad .btn:active { box-shadow: 0 0 0 #BB5A67; }
 
 /* Small "Start" chips on exam cards */
-.ex-go { border: 2px solid #E5E5E5; border-bottom-width: 4px; background: #fff; color: #CA6B48; border-radius: 14px; padding: 7px 14px 5px; font-size: 13px; }
-.exam-card:hover .ex-go { background: #CA6B48; border-color: #B85836; color: #fff; }
+.ex-go { border: 2px solid #E5E5E5; border-bottom-width: 4px; background: #fff; color: var(--sky-d); border-radius: 14px; padding: 7px 14px 5px; font-size: 13px; }
+.exam-card:hover .ex-go { background: var(--exam-teal); border-color: var(--sky-d); color: #173840; }
 .exam-card:active .ex-go { transform: translateY(2px); border-bottom-width: 2px; }
 
 /* "Enter" on the Pilot mode card */
@@ -39,5 +39,5 @@
 .m-claim { border-radius: 14px; padding: 10px 14px; font-size: 13px; }
 
 /* Top-bar "Sign in" */
-.top-acct:not(.in) { background: #fff; color: #CA6B48; border: 2px solid #E5E5E5; border-bottom-width: 4px; border-radius: 14px; padding: 6px 12px 4px; font-size: 12px; }
+.top-acct:not(.in) { background: #fff; color: var(--sky-d); border: 2px solid #E5E5E5; border-bottom-width: 4px; border-radius: 14px; padding: 6px 12px 4px; font-size: 12px; }
 .top-acct:not(.in):active { transform: translateY(2px); border-bottom-width: 2px; }

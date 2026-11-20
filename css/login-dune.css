@@ -1,0 +1,39 @@
+/* Sign-in page: same cloud-sky background as Home, logo, glass fields, blue button — no tagline, no guest option */
+html body.auth-body {
+  min-height: 100vh;
+  background: #dce9ef url('../img/cloud-background.jpg') center bottom / cover no-repeat !important;
+  background-attachment: fixed !important;
+}
+html:has(body.auth-body) { background: #dce9ef; }
+.auth-body .auth { grid-template-columns: 1fr; max-width: 420px; gap: 22px; align-content: center; padding-top: 48px; }
+.auth-body .auth-hero { text-align: center; }
+.auth-body .auth-wordmark img { height: 72px; filter: drop-shadow(0 2px 10px rgba(255,255,255,.6)); }
+.auth-body .auth-tag, .auth-body .auth-points { display: none; }
+.auth-body .or, .auth-body #guest, .auth-body .note.center { display: none !important; }
+
+.auth-body .auth-card {
+  background: rgba(255,255,255,.55) !important; border: 1px solid rgba(255,255,255,.75) !important;
+  box-shadow: 0 18px 44px rgba(40,70,90,.16) !important; border-radius: 22px;
+  -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%);
+}
+.auth-body .tabs { background: rgba(255,255,255,.55); border-radius: 14px; }
+.auth-body .tabs button { color: #5d6b74; }
+.auth-body .tabs button.on { background: #fff; color: #2F8AA8; }
+
+.auth-body .form label { color: #3f4b53; }
+.auth-body .form input {
+  height: 50px; border-radius: 14px; color: #1f2a30;
+  background: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.95);
+  box-shadow: 0 4px 14px rgba(40,70,90,.08);
+}
+.auth-body .form input::placeholder { color: #8a979e; }
+.auth-body .form input:focus { border-color: #5FBCD6; background: #fff; box-shadow: 0 0 0 4px rgba(95,188,214,.22); }
+.auth-body .eye { color: #2F8AA8; }
+
+.auth-body #submit {
+  height: 52px; border-radius: 14px; color: #fff; text-shadow: none;
+  background: linear-gradient(180deg, #5FBCD6 0%, #3A98B6 100%) !important;
+  border: 1px solid rgba(255,255,255,.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 6px 18px rgba(30,100,130,.25) !important;
+}
+.auth-body #submit:hover { background: linear-gradient(180deg, #6CC6DE 0%, #42A2C0 100%) !important; }
