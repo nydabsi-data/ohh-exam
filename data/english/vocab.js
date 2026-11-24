@@ -121,7 +121,345 @@
     return q;
   }
 
-  window.VOCAB_UNITS = DECKS.map((D, n) => ({
+  const themedWords = DECKS.flatMap((deck) => deck.w);
+  const byPart = (part) => themedWords.filter((word) => word[1] === part).slice(0, 10);
+  const PARTS_OF_SPEECH = [
+    { id: 'pos-noun', title: 'Nouns (n.)', th: 'คำนาม (n.)', color: '#83C7D5', dark: '#226577', w: byPart('n.') },
+    { id: 'pos-verb', title: 'Verbs (v.)', th: 'คำกริยา (v.)', color: '#729CAD', dark: '#355F70', w: byPart('v.') },
+    { id: 'pos-adjective', title: 'Adjectives (adj.)', th: 'คำคุณศัพท์ (adj.)', color: '#DFA590', dark: '#A55035', w: byPart('adj.') },
+    { id: 'pos-adverb', title: 'Adverbs (adv.)', th: 'คำกริยาวิเศษณ์ (adv.)', color: '#CB7F89', dark: '#9F414E', w: [
+      ['usually', 'adv.', 'โดยปกติ', 'in most cases', 'The office usually opens at nine.'],
+      ['carefully', 'adv.', 'อย่างระมัดระวัง', 'with attention to detail or safety', 'Read the contract carefully before signing.'],
+      ['soon', 'adv.', 'เร็ว ๆ นี้', 'in a short time from now', 'We will announce the results soon.'],
+      ['recently', 'adv.', 'เมื่อไม่นานมานี้', 'a short time ago', 'We recently moved to a larger office.'],
+      ['nearly', 'adv.', 'เกือบ', 'almost but not quite', 'The report is nearly complete.'],
+      ['directly', 'adv.', 'โดยตรง', 'without going through an intermediate person or place', 'Send the invoice directly to the accountant.'],
+      ['automatically', 'adv.', 'โดยอัตโนมัติ', 'without someone having to do it manually', 'The system automatically saves your changes.'],
+      ['immediately', 'adv.', 'ทันที', 'without delay', 'Please contact the front desk immediately.'],
+      ['occasionally', 'adv.', 'เป็นครั้งคราว', 'sometimes but not often', 'We occasionally hold meetings online.'],
+      ['together', 'adv.', 'ด้วยกัน', 'with one another', 'Both teams worked together on the project.']
+    ] }
+  ];
+
+  const FLASH_WORDS_BY_PART = {
+    'n.': `
+accountant|นักบัญชี
+address|ที่อยู่
+advertisement|โฆษณา
+agreement|ข้อตกลง
+airport|สนามบิน
+amount|จำนวน
+announcement|ประกาศ
+appointment|นัดหมาย
+assignment|งานที่ได้รับมอบหมาย
+audience|ผู้ชม
+author|ผู้เขียน
+bakery|ร้านเบเกอรี
+bank|ธนาคาร
+bill|ใบเรียกเก็บเงิน
+branch|สาขา
+brochure|แผ่นพับ
+building|อาคาร
+business|ธุรกิจ
+candidate|ผู้สมัครรับตำแหน่ง
+cashier|พนักงานเก็บเงิน
+certificate|ใบรับรอง
+chairperson|ประธานที่ประชุม
+city|เมือง
+client|ผู้ว่าจ้าง
+cloud|เมฆ
+committee|คณะกรรมการ
+company|บริษัท
+computer|คอมพิวเตอร์
+condition|เงื่อนไข
+contract|สัญญา
+conversation|บทสนทนา
+coupon|คูปอง
+customer|ลูกค้า
+decision|การตัดสินใจ
+stationery|เครื่องเขียน
+department|แผนก
+director|ผู้อำนวยการ
+document|เอกสาร
+donation|เงินบริจาค
+drawer|ลิ้นชัก
+driver|คนขับรถ
+envelope|ซองจดหมาย
+equipment|อุปกรณ์
+event|กิจกรรม
+factory|โรงงาน
+flight|เที่ยวบิน
+form|แบบฟอร์ม
+garage|โรงจอดรถ
+guest|แขก
+guide|ผู้พาชม
+hotel|โรงแรม
+interview|การสัมภาษณ์
+journey|การเดินทาง
+key|กุญแจ
+library|ห้องสมุด
+manager|ผู้จัดการ
+market|ตลาด
+meal|มื้ออาหาร
+medicine|ยา
+menu|รายการอาหาร
+message|ข้อความ
+museum|พิพิธภัณฑ์
+neighbor|เพื่อนบ้าน
+newspaper|หนังสือพิมพ์
+office|สำนักงาน
+owner|เจ้าของ
+parcel|หีบห่อ
+passport|หนังสือเดินทาง
+payment|การชำระเงิน
+photograph|ภาพถ่าย
+project|โครงการ
+recipe|สูตรอาหาร
+report|รายงาน
+suitcase|กระเป๋าเดินทาง
+workshop|การอบรมเชิงปฏิบัติการ
+`,
+    'v.': `
+accept|ยอมรับ
+add|เพิ่ม
+advise|แนะนำ
+allow|อนุญาต
+announce|ประกาศ
+answer|ตอบ
+apologize|ขอโทษ
+appear|ปรากฏ
+arrange|จัดเตรียม
+arrive|มาถึง
+ask|ถาม
+attend|เข้าร่วม
+avoid|หลีกเลี่ยง
+begin|เริ่ม
+borrow|ยืม
+build|สร้าง
+buy|ซื้อ
+calculate|คำนวณ
+cancel|ยกเลิก
+carry|ถือไป
+change|เปลี่ยน
+check|ตรวจสอบ
+choose|เลือก
+clean|ทำความสะอาด
+collect|รวบรวม
+compare|เปรียบเทียบ
+complete|ทำให้เสร็จ
+confirm|ยืนยัน
+connect|เชื่อมต่อ
+consider|พิจารณา
+contact|ติดต่อ
+continue|ทำต่อ
+cook|ทำอาหาร
+copy|คัดลอก
+correct|แก้ไข
+count|นับ
+decide|ตัดสินใจ
+decrease|ลดลง
+describe|บรรยาย
+design|ออกแบบ
+discuss|หารือ
+divide|แบ่ง
+download|ดาวน์โหลด
+draw|วาด
+drink|ดื่ม
+drive|ขับรถ
+eat|กิน
+encourage|ให้กำลังใจ
+enter|เข้าไป
+evaluate|ประเมินผล
+examine|ตรวจอย่างละเอียด
+exercise|ออกกำลังกาย
+explain|อธิบาย
+find|หาเจอ
+finish|เสร็จสิ้น
+fix|ซ่อม
+follow|ติดตาม
+forget|ลืม
+gather|รวมตัว
+give|ให้
+greet|ทักทาย
+help|ช่วย
+improve|ปรับให้ดีขึ้น
+include|รวมไว้ด้วย
+inform|แจ้งให้ทราบ
+invite|เชิญ
+join|เข้าร่วมเป็นส่วนหนึ่ง
+learn|เรียนรู้
+listen|ฟัง
+measure|วัด
+notice|สังเกตเห็น
+offer|เสนอ
+prepare|เตรียม
+recommend|แนะนำให้เลือก
+remind|เตือนความจำ
+`,
+    'adj.': `
+accurate|แม่นยำ
+active|กระตือรือร้น
+affordable|ราคาเอื้อมถึง
+afraid|กลัว
+annual|ประจำปี
+appropriate|เหมาะสม
+attractive|น่าดึงดูด
+awake|ตื่นอยู่
+basic|ขั้นพื้นฐาน
+beautiful|สวย
+busy|ยุ่ง
+bright|สว่าง
+broken|เสีย
+calm|สงบ
+careful|ระมัดระวัง
+cheap|ราคาถูก
+clear|ชัดเจน
+cold|เย็น
+comfortable|สบาย
+common|พบได้ทั่วไป
+competitive|แข่งขันได้
+creative|สร้างสรรค์
+crowded|แออัด
+curious|ใคร่รู้
+dangerous|อันตราย
+dark|มืด
+deep|ลึก
+delicious|อร่อย
+different|แตกต่าง
+difficult|ยาก
+dry|แห้ง
+early|แต่เนิ่น ๆ
+easy|ง่าย
+empty|ว่างเปล่า
+equal|เท่ากัน
+excellent|ยอดเยี่ยม
+expensive|แพง
+fair|ยุติธรรม
+famous|มีชื่อเสียง
+familiar|คุ้นเคย
+fast|เร็ว
+flexible|ยืดหยุ่น
+formal|เป็นทางการ
+fresh|สด
+friendly|เป็นมิตร
+full|เต็ม
+gentle|อ่อนโยน
+grateful|รู้สึกขอบคุณ
+happy|มีความสุข
+healthy|สุขภาพดี
+heavy|หนัก
+helpful|เป็นประโยชน์
+honest|ซื่อสัตย์
+hot|ร้อน
+important|สำคัญ
+independent|เป็นอิสระ
+international|ระหว่างประเทศ
+kind|ใจดี
+large|ขนาดใหญ่
+late|สาย
+legal|ถูกกฎหมาย
+light|น้ำหนักเบา
+local|ท้องถิ่น
+long|ยาว
+loud|ดัง
+modern|ทันสมัย
+narrow|แคบ
+necessary|จำเป็น
+nervous|ประหม่า
+new|ใหม่
+noisy|เสียงอึกทึก
+official|อย่างเป็นทางการ
+ordinary|ธรรมดา
+patient|อดทน
+quiet|เงียบ
+`,
+    'adv.': `
+abroad|ในต่างประเทศ
+absolutely|อย่างเต็มร้อย
+accidentally|โดยบังเอิญ
+actually|อันที่จริง
+afterward|ภายหลัง
+again|อีกครั้ง
+ahead|ไปข้างหน้า
+almost|เกือบจะ
+alone|ตามลำพัง
+already|เรียบร้อยแล้ว
+also|ด้วยเช่นกัน
+always|เสมอ
+annually|ทุกปี
+anywhere|ที่ไหนก็ได้
+apparently|ดูเหมือนว่า
+approximately|โดยประมาณ
+badly|อย่างแย่
+barely|แทบจะไม่
+beforehand|ล่วงหน้า
+briefly|อย่างสั้น ๆ
+certainly|อย่างแน่นอน
+clearly|อย่างชัดเจน
+closely|อย่างใกล้ชิด
+completely|อย่างสมบูรณ์
+correctly|อย่างถูกต้อง
+currently|ในขณะนี้
+daily|ทุกวัน
+definitely|โดยไม่มีข้อสงสัย
+easily|อย่างง่ายดาย
+elsewhere|ที่อื่น
+especially|โดยเฉพาะ
+eventually|ในที่สุด
+everywhere|ทุกแห่ง
+exactly|ตรงเป๊ะ
+extremely|อย่างยิ่ง
+fairly|ค่อนข้าง
+finally|สุดท้าย
+firstly|ประการแรก
+fluently|อย่างคล่องแคล่ว
+fortunately|โชคดีที่
+frequently|บ่อยครั้ง
+fully|อย่างเต็มที่
+generally|โดยทั่วไป
+gently|อย่างเบามือ
+gradually|ทีละน้อย
+hardly|แทบไม่
+here|ที่นี่
+honestly|พูดตามตรง
+hopefully|หวังว่า
+however|อย่างไรก็ตาม
+indoors|ในอาคาร
+instead|แทน
+intentionally|โดยตั้งใจ
+jointly|ร่วมกัน
+kindly|อย่างกรุณา
+lately|ช่วงที่ผ่านมา
+locally|ในท้องถิ่น
+loudly|เสียงดัง
+mainly|เป็นหลัก
+meanwhile|ในระหว่างนั้น
+merely|เพียงเท่านั้น
+monthly|ทุกเดือน
+mostly|ส่วนใหญ่
+naturally|ตามธรรมชาติ
+never|ไม่เคย
+normally|ตามปกติ
+now|ตอนนี้
+often|บ่อย ๆ
+online|ทางออนไลน์
+openly|อย่างเปิดเผย
+outdoors|กลางแจ้ง
+partly|บางส่วน
+personally|โดยส่วนตัว
+politely|อย่างสุภาพ
+quickly|อย่างรวดเร็ว
+`,
+  };
+  const existingWords = [...new Map(DECKS.concat(PARTS_OF_SPEECH).flatMap((deck) => deck.w)
+    .map((word) => [word[0], word.slice(0, 3)])).values()];
+  window.VOCAB_FLASH_WORDS = existingWords.concat(Object.entries(FLASH_WORDS_BY_PART).flatMap(([part, words]) =>
+    words.trim().split('\n').map((line) => {
+      const [term, meaning] = line.trim().split('|');
+      return [term, part, meaning];
+    })));
+
+  window.VOCAB_UNITS = DECKS.concat(PARTS_OF_SPEECH).map((D, n) => ({
     id: 'ev-' + D.id, n: n + 1, title: D.title, th: D.th, en: D.title, color: D.color, dark: D.dark, text: '#fff',
     lessons: [{ id: 'ev-' + D.id + '-1', title: D.th + ' · 10 คำ', en: D.title + ' · 10 words', questions: lesson(D) }]
   }));

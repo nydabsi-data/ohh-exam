@@ -707,7 +707,7 @@ body:has(#home-view:not(.hidden) #hub:not(.hidden) .exam-grid:not(.modes)),
 }
 .fc-wrap.pic .q-product-image figcaption::before { content: "แตะภาพเพื่อขยาย · "; }
 .fc-wrap.pic .fc-opts { margin-top: 14px; }
-@media (max-width: 600px) { .fc-wrap.pic .q-product-image img { max-height: 48vh; } }
+@media (max-width: 600px) { .fc-wrap.pic { --fc-img-h: 40vh; } .fc-wrap.pic .q-product-image img { max-height: 40vh; } }
 .img-zoom { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; gap: 10px; padding: 16px;
   background: rgba(10, 12, 16, .9); cursor: zoom-out; animation: pop .15s ease-out; }
 .img-zoom img { width: min(100%, 1100px); max-height: calc(100vh - 70px); height: auto; object-fit: contain;
@@ -758,3 +758,73 @@ body:has(#home-view:not(.hidden) #hub:not(.hidden) .exam-grid:not(.modes)),
 .exam-grid.modes .mode-card { --card-background: linear-gradient(135deg, #FFFFFF 0%, #F4F0EB 45%, #E4DCD3 100%); background: linear-gradient(135deg, #FFFFFF 0%, #F4F0EB 45%, #E4DCD3 100%) !important; color: #4A3F35 !important; }
 .exam-grid.modes .mode-card :is(.mc-title, .mc-sub, .mc-foot, .mc-foot *, small) { color: #4A3F35 !important; }
 .exam-grid.modes .mode-card .mc-deco { opacity: .25; color: #8A7B6C !important; }
+
+/* ===== iPhone (17 Pro Max ≈ 440 × 956): fit the phone browser ===== */
+/* notch / Dynamic Island: keep content clear of the screen edges (landscape) and the status bar */
+.topbar { padding-top: env(safe-area-inset-top); }
+@media (max-width: 1023px) {
+  .topbar-in, .l-top, .foot-in, .hub, .home, .page, .apt-top, .apt-body {
+    padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+  .lesson, .apt { padding-top: env(safe-area-inset-top); }
+}
+/* iOS zooms into any text box under 16px — keep them all at 16px on phones */
+@media (max-width: 640px) { input, select, textarea, .mg-add input, .mg-add select { font-size: 16px; } }
+/* Home banner: the character moves to the top-right corner so the stats card gets the full width */
+@media (max-width: 480px) {
+  .hub-head { padding-right: 16px; min-height: 0; }
+  .hub-head .hub-hello, .hub-head h1 { padding-right: 96px; }
+  .hub-char { top: 6px; bottom: auto; right: 6px; height: 92px; }
+  .hub-stats { max-width: none; margin-top: 18px; padding: 10px 6px; }
+  .hub-stats > span { flex-direction: column; align-items: flex-start; gap: 2px; padding: 2px 10px; }
+  .hub-stats .hs-ico { width: 24px; height: 24px; }
+  .hub-stats .hs-ico svg { width: 16px; height: 16px; }
+  .hub-stats small, .hub-stats b { white-space: nowrap; }
+  .hub-search { width: 100%; }
+}
+/* flash cards: the "ถัดไป" button scrolls into view above the bottom tab bar */
+#fc-next { scroll-margin-bottom: calc(120px + env(safe-area-inset-bottom)); }
+/* phones: the flash-card buttons (หยุด / ข้าม / ถัดไป) stay pinned just above the bottom tab bar */
+@media (max-width: 640px) {
+  #fc-ex + .fc-actions, .fc-wrap .fc-actions:has(#fc-next) { position: sticky; z-index: 5; bottom: calc(96px + env(safe-area-inset-bottom));
+    margin-top: 12px; padding: 10px; border-radius: 18px; background: rgba(255,255,255,.88);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 6px 20px rgba(60,45,30,.12); }
+}
+
+/* ===== ปูพื้นฐาน: primer card + reader ===== */
+.lesson-card.primer-card { background: linear-gradient(160deg, #FFFFFF 0%, #FFF6E6 100%); border-color: #F1D9A8; }
+.primer-card .lc-ico { color: #B9781F; background: #FFF1D6; }
+.primer-chip { font-size: 11px; font-weight: 700; color: #9A6514; background: #FFEBC4; padding: 2px 8px; border-radius: 99px; }
+.modal-box.primer { max-width: 680px; padding: 22px 18px 18px; max-height: calc(100dvh - 32px); -webkit-overflow-scrolling: touch; }
+.modal-box.primer h3 { text-align: left; margin: 0 0 12px; font-size: 20px; }
+.modal-box.primer .modal-actions { position: sticky; bottom: -18px; margin: 14px -18px -18px; padding: 12px 18px 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.85), #fff 30%); grid-template-columns: 2fr 1fr; }
+.primer-body { display: grid; gap: 14px; font-size: 15.5px; line-height: 1.6; color: var(--ink); }
+.pr-sec { display: grid; gap: 12px; }
+.pr-sec + .pr-sec { border-top: 2px dashed var(--line); padding-top: 16px; }
+.pr-head { margin: 0; font-size: 17px; color: #7A4E12; }
+.primer-body b { display: block; font-size: 13px; letter-spacing: .2px; color: var(--muted); margin-bottom: 4px; }
+.primer-body p { margin: 0; }
+.pr-idea { background: #EEF7FB; border-radius: 14px; padding: 12px 14px; }
+.pr-idea p { font-size: 16px; font-weight: 600; color: #173840; }
+.pr-keys { margin: 0; display: grid; gap: 6px; }
+.pr-keys > div { display: grid; grid-template-columns: minmax(64px, auto) 1fr; gap: 10px; align-items: baseline; padding: 6px 10px; background: var(--soft, #F7F5F2); border-radius: 10px; }
+.pr-keys dt { font-weight: 800; color: #B9781F; white-space: nowrap; }
+.pr-keys dd { margin: 0; font-size: 14.5px; }
+.pr-f { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.pr-f li { padding: 8px 12px; border-left: 4px solid #E7B04A; background: #FFF9EC; border-radius: 8px; font-weight: 600; overflow-wrap: anywhere; }
+.pr-ex { background: #F1F8EF; border-radius: 14px; padding: 12px 14px; }
+.pr-ex .pr-q { font-weight: 700; margin-bottom: 6px; }
+.pr-ex ol { margin: 0 0 6px; padding-left: 22px; }
+.pr-a strong { color: #2E7D32; }
+.pr-trap { background: #FDF0EE; border-radius: 14px; padding: 12px 14px; }
+.pr-tip { background: #FFF6DF; border-radius: 14px; padding: 12px 14px; }
+@media (max-width: 480px) { .primer-body { font-size: 15px; } .pr-keys > div { grid-template-columns: 1fr; gap: 0; } }
+/* ปูพื้นฐาน: diagrams */
+.pr-fig { margin: 0; padding: 12px 10px 10px; background: #fff; border: 1.5px solid var(--line); border-radius: 14px; }
+.pr-fig svg { display: block; width: 100%; max-width: 420px; height: auto; margin: 0 auto; font-family: inherit; }
+.pr-fig figcaption { margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--muted); text-align: center; }
+.pr-truth { width: 100%; max-width: 420px; margin: 0 auto; border-collapse: separate; border-spacing: 3px; text-align: center; font-weight: 700; }
+.pr-truth th { font-size: 13px; padding: 6px 2px; background: var(--soft, #F6F2EC); border-radius: 6px; }
+.pr-truth td { padding: 6px 2px; border-radius: 6px; }
+.pr-truth td.tt { background: #DDF2E3; color: #1F7A45; }
+.pr-truth td.ff { background: #FBE1E1; color: #B83232; }

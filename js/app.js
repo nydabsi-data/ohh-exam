@@ -250,9 +250,16 @@
   // Home subject cards: full-colour pictures
   const MODE_IMG = { pilot: 'agk-plane', physics: 'home-physics', chem: 'home-chem', bio: 'home-bio', mathhs: 'apt-math', english: 'home-english' };
   const exIcon = (x) => APT_IMG[x.id] ? imgIcon(APT_IMG[x.id]) : EX_ICON[x.icon];
-  const TOPIC_IMG = { basic: 'agk-compass', pof: 'basic', met: 'met-cloud', hist: 'hist', nav: 'nav', law: 'law', agk: 'agk-plane', hfr: 'hfr-pilot', geo: 'geo', wind: 'wind',
-    'phy-heat': 'fire', 'phy-energy': 'fuel-pump', 'chem-redox': 'fuel-pct', 'chem-org': 'fuel-nozzle' };
-  const TOPIC_IMG_ALT = { hist: ['hist', 'agk'], pof: ['basic', 'airport', 'hfr'], met: ['met-cloud', 'met-rain', 'met-moon'], nav: ['nav', 'geo', 'agk'], law: ['seatbelt', 'law', 'gavel'], agk: ['agk-takeoff', 'agk-compass', 'agk-plane'], hfr: ['hfr-pilot', 'nav', 'ticket'], wind: ['agk-takeoff', 'wind'], geo: ['agk-compass', 'geo'], basic: ['agk-compass', 'agk-plane', 'fuel-pump'] };   // lesson cards take turns between these pictures
+  const TOPIC_IMG = { 'math-set': 'math-sphere', 'math-real': 'math-neq', 'math-func': 'math-pyramid', 'math-explog': 'math-inf-blue', 'math-trig': 'math-pi', 'math-seq': 'math-inf-pink', 'math-prob': 'math-pct', 'math-stat': 'math-pyramid', 'math-calc': 'math-inf-pink', 'phy-start': 'phys-cradle', 'phy-kin': 'phys-sun', 'phy-force': 'phys-scale', 'phy-energy': 'phys-bullets', 'phy-motion': 'phys-flowergun', 'phy-wave': 'phys-sound', 'phy-elec': 'phys-plug', 'phy-mag': 'phys-signal', 'phy-heat': 'fire', 'phy-modern': 'phys-emc2', basic: 'agk-compass', pof: 'basic', met: 'met-cloud', hist: 'hist', nav: 'nav', law: 'law', agk: 'agk-plane', hfr: 'hfr-pilot', geo: 'geo', wind: 'wind',
+    'chem-atom': 'chem-atomic', 'chem-bond': 'chem-dumbbell', 'chem-mole': 'chem-boxes', 'chem-rate': 'chem-molecules', 'chem-acid': 'chem-molecule', 'chem-redox': 'fuel-pct', 'chem-org': 'chem-hex' };
+  const TOPIC_IMG_ALT = {
+    'math-set': ['math-sphere', 'math-neq'], 'math-seq': ['math-inf-pink', 'math-pct'], 'math-prob': ['math-pyramid', 'math-pct'],
+    'chem-atom': ['chem-atomic', 'chem-element'], 'chem-bond': ['chem-dumbbell', 'chem-molecule'], 'chem-mole': ['chem-boxes', 'chem-element'], 'chem-rate': ['chem-molecules', 'chem-dumbbell'],
+    'chem-acid': ['chem-molecule', 'chem-molecules'], 'chem-org': ['chem-hex', 'chem-molecule'],
+    'phy-start': ['phys-cradle', 'phys-emc2'], 'phy-kin': ['phys-sun', 'phys-bullets'], 'phy-force': ['phys-scale', 'phys-book', 'phys-apple'],
+    'phy-energy': ['phys-bullets', 'phys-force', 'phys-energy'], 'phy-motion': ['phys-flowergun', 'phys-blast'], 'phy-wave': ['phys-sound', 'phys-sun', 'phys-signal'],
+    'phy-elec': ['phys-energy', 'phys-plug', 'phys-bulb'], 'phy-mag': ['phys-signal', 'phys-plug'], 'phy-heat': ['fire', 'fuel-pct'], 'phy-modern': ['phys-emc2', 'phys-bulb'],
+    hist: ['hist', 'agk'], pof: ['basic', 'airport', 'hfr'], met: ['met-cloud', 'met-rain', 'met-moon'], nav: ['nav', 'geo', 'agk'], law: ['seatbelt', 'law', 'gavel'], agk: ['agk-takeoff', 'agk-compass', 'agk-plane'], hfr: ['hfr-pilot', 'nav', 'ticket'], wind: ['agk-takeoff', 'wind'], geo: ['agk-compass', 'geo'], basic: ['agk-compass', 'agk-plane', 'fuel-pump'] };   // lesson cards take turns between these pictures
   const topicIcon = (unitId, li) => {
     const key = String(unitId || '').replace(/-\d+$/, '');
     if (TOPIC_IMG_ALT[key] && li != null) return imgIcon(TOPIC_IMG_ALT[key][li % TOPIC_IMG_ALT[key].length]);
@@ -276,6 +283,38 @@
   }
   const OFFSETS = [0, -70, -40, 40, 70, 0];
 
+  // ปูพื้นฐาน: easy primers per lesson (data/primers/*.js → window.PRIMERS), opened from the first card of a unit
+  const PRIMERS = () => window.PRIMERS || {};
+  function primerHtml(l, p, n) {
+    const li = (s) => '<li>' + esc(s) + '</li>';
+    // diagrams (data/primers/*-figs.js) go right after the block they explain
+    const fig = (at) => ((window.PRIMER_FIGS || {})[l.id] || []).filter((g) => g.at === at)
+      .map((g) => '<figure class="pr-fig no-i18n">' + g.svg + (g.cap ? '<figcaption>' + esc(g.cap) + '</figcaption>' : '') + '</figure>').join('');
+    return '<section class="pr-sec">' +
+      (n > 1 ? '<h4 class="pr-head">' + esc(l.title) + '</h4>' : '') +
+      '<div class="pr-idea"><b>' + T('เข้าใจก่อน') + '</b><p>' + esc(p.idea) + '</p></div>' + fig('idea') +
+      (p.keys?.length ? '<div class="pr-block"><b>' + T('คำและสัญลักษณ์ที่ต้องรู้') + '</b><dl class="pr-keys">' +
+        p.keys.map(([k, v]) => '<div><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>').join('') + '</dl></div>' : '') + fig('keys') +
+      (p.f?.length ? '<div class="pr-block"><b>' + T('สูตรที่ใช้บ่อย') + '</b><ul class="pr-f">' + p.f.map(li).join('') + '</ul></div>' : '') + fig('f') +
+      (p.ex ? '<div class="pr-ex"><b>' + T('ลองทำตัวอย่าง') + '</b><p class="pr-q">' + esc(p.ex.q) + '</p><ol>' + p.ex.s.map(li).join('') + '</ol>' +
+        '<p class="pr-a">' + T('ตอบ') + ': <strong>' + esc(p.ex.a) + '</strong></p></div>' : '') + fig('ex') +
+      (p.trap ? '<div class="pr-trap"><b>⚠️ ' + T('จุดที่พลาดบ่อย') + '</b><p>' + esc(p.trap) + '</p></div>' : '') +
+      (p.tip ? '<div class="pr-tip"><b>💡 ' + T('วิธีจำ') + '</b><p>' + esc(p.tip) + '</p></div>' : '') +
+      '</section>';
+  }
+  function openPrimer(ui) {
+    const u = UNITS[ui]; if (!u) return;
+    const ls = u.lessons.filter((l) => PRIMERS()[l.id]);
+    const first = LESSONS.findIndex((l) => l.id === u.lessons[0].id);
+    modal({ title: T('ปูพื้นฐาน') + ' · ' + esc(u.th || u.title), body: '',
+      actions: [{ label: T('เริ่มบทที่ 1'), fn: () => { const c = document.querySelector('.lesson-card[data-i="' + first + '"]'); if (c) c.click(); } },
+        { label: T('ปิด'), cls: 'ghost' }] });
+    const box = $('#modal-box');
+    box.classList.add('wide', 'primer');
+    box.querySelector('p').outerHTML = '<div class="primer-body">' + ls.map((l) => primerHtml(l, PRIMERS()[l.id], ls.length)).join('') + '</div>';
+    box.scrollTop = 0;
+  }
+
   function renderHome() {
     sync(); renderStats();
     const cur = LESSONS.findIndex((l) => !isDone(l.id));
@@ -288,6 +327,14 @@
           '<button class="row-arrow" data-dir="-1" aria-label="ก่อนหน้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>' +
           '<button class="row-arrow" data-dir="1" aria-label="ถัดไป"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></span>' +
         '</header><div class="lesson-row">';
+      // "ปูพื้นฐาน" card first when the unit has primers (easy basics to read before lesson 1; always open)
+      const pn = u.lessons.filter((l) => PRIMERS()[l.id]).length;
+      if (pn) html += '<button class="lesson-card open primer-card" data-unit="' + ui + '" aria-label="' + T('ปูพื้นฐาน') + ' ' + esc(u.th || u.title) + '">' +
+        '<span class="lc-top"><span class="lc-num">' + T('ก่อนเริ่ม') + '</span><span class="primer-chip">' + T('อ่าน 3 นาที') + '</span></span>' +
+        '<span class="lc-ico">' + TI('<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M9 8h7M9 12h5"/>') + '</span>' +
+        '<span class="lc-title">' + T('ปูพื้นฐาน') + '</span>' +
+        '<span class="lc-meta">' + T('สรุปง่าย ๆ · สูตร · ตัวอย่าง') + '</span>' +
+        '<span class="lc-foot"><span class="lc-go" aria-label="' + T('อ่าน') + '">' + PLAY_ICON + '</span></span></button>';
       // One card per lesson, in a row you swipe sideways
       u.lessons.forEach((l, li) => {
         const gl = guestLocked(i) && !isDone(l.id);
@@ -342,6 +389,12 @@
           '<button class="topic-btn" data-go="' + t.id + '" style="--c:' + t.c + ';--d:' + t.d + '"><span class="tb-ico">' + t.icon + '</span><span class="tb-lab">' + esc(t.label) + '</span></button>').join('') +
         '</div><button class="row-arrow topic-next" type="button" data-dir="1" aria-controls="topic-row" aria-label="' + T('เลื่อนหัวข้อไปทางขวา') + '">' +
           TI('<path d="M9 5l7 7-7 7"/>') + '</button></div>' + html;
+    }
+    if (course === 'vocab' && window.VOCAB_FLASH_WORDS?.length) {
+      html = '<section class="card"><h3>' + T('ฝึกคำศัพท์แบบสุ่มต่อเนื่อง') + '</h3>' +
+        '<div class="g-chips">' + Object.entries(VOCAB_FLASH_PARTS).map(([hash, part]) =>
+          '<a class="btn' + (part ? ' ghost' : '') + '" href="' + hash + '">' + T(VOCAB_PART_NAMES[part] || 'ทั้งหมด') + '</a>').join('') +
+        '</div></section>' + html;
     }
     // Picture cards are no longer listed on the course page — each picture shows inside its question (after answering)
     const figs = [];
@@ -1340,19 +1393,26 @@
     model.addEventListener('error', unavailable, { once: true });
     import('./vendor/model-viewer-4.1.0.min.js').catch(unavailable);
   }
+  const VOCAB_FLASH_PARTS = {
+    '#vocab-flash': '', '#vocab-flash-nouns': 'n.', '#vocab-flash-verbs': 'v.',
+    '#vocab-flash-adjectives': 'adj.', '#vocab-flash-adverbs': 'adv.'
+  };
+  const VOCAB_PART_NAMES = { 'n.': 'คำนาม', 'v.': 'คำกริยา', 'adj.': 'คำคุณศัพท์', 'adv.': 'คำกริยาวิเศษณ์' };
   let FC = null;
   function fcStop() { if (FC) { clearInterval(FC.timer); clearTimeout(FC.next); FC.on = false; } }
   const fcId = (t, mode) => mode === 'air' ? (t.name || '') + '|' + (t.q || t.icao || '') : mode === 'pic' ? (t.q || '') : (t[0] || '') + '|' + (t[1] || '');
-  function startFlash(picture = false, aircraft = false) {
+  function startFlash(picture = false, aircraft = false, vocabPart = null) {
     fcStop();
-    const pool = aircraft ? AIRCRAFT_FLASH : picture
+    const pool = vocabPart !== null
+      ? (window.VOCAB_FLASH_WORDS || []).filter((word) => !vocabPart || word[1] === vocabPart)
+      : aircraft ? AIRCRAFT_FLASH : picture
       ? (window.PM_QUIZ || [])
       : glossaryList().length >= 4 ? glossaryList() : aviaTerms();
     if (pool.length < 4) return toast(T('ยังไม่มีคำศัพท์ให้ทดสอบ'));
     // Never the same order: every start is a fresh shuffle, and cards not seen in earlier
     // sessions come first (the list of seen cards resets once every card has been shown)
-    const mode = aircraft ? 'air' : picture ? 'pic' : 'word';
-    const seenKey = 'ohh_fc_seen_' + mode;
+    const mode = vocabPart !== null ? 'vocab' : aircraft ? 'air' : picture ? 'pic' : 'word';
+    const seenKey = 'ohh_fc_seen_' + mode + (vocabPart || '');
     let seen = [];
     try { seen = JSON.parse(localStorage.getItem(seenKey) || '[]'); } catch (e) { seen = []; }
     let seenSet = new Set(seen);
@@ -1360,11 +1420,12 @@
     const fresh = shuffle(pool.filter((t) => !seenSet.has(fcId(t, mode))));
     const old = shuffle(pool.filter((t) => seenSet.has(fcId(t, mode))));
     const deck = fresh.concat(old).slice(0, picture && !aircraft ? PICTURE_FLASH_LIMIT : pool.length);
-    FC = { on: true, picture, aircraft, mode, seenKey, seen, pool, deck, i: 0, round: 1, right: 0, wrong: 0, streak: 0 };
+    FC = { on: true, picture, aircraft, vocabPart, mode, seenKey, seen, pool, deck, i: 0, round: 1, right: 0, wrong: 0, streak: 0 };
     fcCard();
   }
   function fcCard() {
     if (!FC || !FC.on) return;
+    clearTimeout(FC.next);
     if (FC.picture && FC.i >= FC.deck.length) {
       $('#glossary-body').innerHTML = '<div class="fc-wrap"><div class="fc-card"><h1>' + T('จบชุดคำถาม') +
         '</h1><b>' + FC.right + '/' + FC.deck.length + '</b><p>' + T('ตอบถูก') + '</p></div>' +
@@ -1388,8 +1449,8 @@
     } else if (FC.picture) {
       FC.opts = shuffle(t.o.map((option, index) => ({ s: option, c: index === t.a })));
     } else {
-      const others = shuffle(FC.pool.filter((option) => option[2] !== t[2])).slice(0, 3);
-      FC.opts = shuffle([{ s: t[2], c: true }].concat(others.map((option) => ({ s: option[2], c: false }))));
+      const others = [...new Set(shuffle(FC.pool).map((option) => option[2]))].filter((meaning) => meaning !== t[2]).slice(0, 3);
+      FC.opts = shuffle([{ s: t[2], c: true }].concat(others.map((meaning) => ({ s: meaning, c: false }))));
     }
     FC.t = t; FC.done = false; FC.start = Date.now();
     $('#glossary-body').innerHTML =
@@ -1405,7 +1466,7 @@
         '<p class="fc-ex no-i18n" id="fc-ex" role="status"></p>' +
         '<div class="fc-actions"><button class="btn ghost" id="fc-back">' + T('หยุด') + '</button>' +
           (FC.picture && FC.i < FC.deck.length - 1 ? '<button class="btn ghost" id="fc-skip">' + T('ข้ามไว้ก่อน') + '</button>' : '') +
-          (FC.picture ? '<button class="btn hidden" id="fc-next">' + T('ถัดไป') + '</button>' : '') + '</div>' +
+          '<button class="btn hidden" id="fc-next">' + T('ถัดไป') + '</button></div>' +
       '</div>';
     if (FC.picture) { if (FC.aircraft) loadAircraftModel(); return; }
     FC.timer = setInterval(() => {
@@ -1415,7 +1476,7 @@
     }, 50);
   }
   function fcAnswer(k) {
-    if (!FC || FC.done) return;
+    if (!FC || !FC.on || FC.done || (k >= 0 && !FC.opts[k])) return;
     FC.done = true; clearInterval(FC.timer);
     const ok = k >= 0 && FC.opts[k].c;
     if (ok) { FC.right++; FC.streak++; S.xp += 2; S.todayXp += 2; S.hist[dayKey()] = (S.hist[dayKey()] || 0) + 2; S.daily.correct++; save(); }
@@ -1440,14 +1501,13 @@
     }
     FC.i++;
     $('#glossary .fc-card').classList.add(ok ? 'is-correct' : 'is-incorrect');
-    if (FC.picture) {
-      $('#fc-skip')?.classList.add('hidden');
-      const next = $('#fc-next');
-      next.classList.remove('hidden');
-      next.focus();
-      return;
-    }
-    FC.next = setTimeout(fcCard, ok ? 1100 : 2400);   // a little longer to read the answer after a miss
+    // Vocab advances after a short pause for the answer. Other modes wait for the next button.
+    if (FC.mode === 'vocab') FC.next = setTimeout(fcCard, 1800);
+    $('#fc-skip')?.classList.add('hidden');
+    const next = $('#fc-next');
+    next.classList.remove('hidden');
+    next.focus({ preventScroll: true });
+    next.scrollIntoView({ behavior: 'smooth', block: 'nearest' });   // phones: bring the button out from under the tab bar
   }
 
   /* ---------- Router: bottom tab bar ---------- */
@@ -1469,14 +1529,15 @@
       return;
     }
     if (aptOpen) { aptOpen = null; if (window.APT) APT.stop(); }
-    const page = PAGES[location.hash] || 'hub';
+    const vocabPart = VOCAB_FLASH_PARTS[location.hash];
+    const page = vocabPart !== undefined ? 'glossary' : PAGES[location.hash] || 'hub';
     const sub = location.hash === '#pilot' ? 'pilot' : location.hash === '#english' ? 'english' : null;
     if (page === 'learn') setCourse({ '#learn-physics': 'physics', '#learn-chem': 'chem', '#learn-bio': 'bio', '#learn-math': 'math', '#learn-toeic': 'toeic', '#learn-grammar': 'grammar', '#learn-vocab': 'vocab' }[location.hash] || 'pilot');
     show('home');
     ['hub', 'learn', 'glossary', 'practice', 'missions', 'stats', 'profile'].forEach((p) => $('#' + p).classList.toggle('hidden', p !== page));
     // Back arrow: Pilot lessons → Pilot page, physics lessons / Pilot page → mode picker
     $('#to-hub').classList.toggle('hidden', !(page === 'learn' || page === 'glossary' || sub));
-    $('#to-hub').setAttribute('href', page === 'glossary' ? '#learn' : page === 'learn' ? COURSES[course].back : '#exams');
+    $('#to-hub').setAttribute('href', page === 'glossary' ? (vocabPart !== undefined ? '#learn-vocab' : '#learn') : page === 'learn' ? COURSES[course].back : '#exams');
     const tab = page === 'learn' || page === 'hub' || page === 'glossary' ? 'home' : page;
     $$('#tabbar a').forEach((a) => a.classList.toggle('on', a.dataset.tab === tab));
     sync(); renderStats();
@@ -1489,8 +1550,14 @@
     else if (page === 'glossary') {
       const aircraft = location.hash === '#aircraft-flash';
       const picture = aircraft || location.hash === '#picture-flash';
-      if (picture && !(FC && FC.on && FC.picture && FC.aircraft === aircraft)) startFlash(true, aircraft);
-      if (!picture && !(FC && FC.on && !FC.picture)) { fcStop(); renderGlossary(); }
+      if (vocabPart !== undefined) {
+        if (!(FC && FC.on && FC.mode === 'vocab' && FC.vocabPart === vocabPart)) startFlash(false, false, vocabPart);
+      } else if (picture) {
+        if (!(FC && FC.on && FC.picture && FC.aircraft === aircraft)) startFlash(true, aircraft);
+      } else if (!(FC && FC.on && FC.mode === 'word')) {
+        fcStop();
+        renderGlossary();
+      }
     }
     else renderHub(sub);
     $('#tab-dot').classList.toggle('hidden', !claimable());
@@ -1504,7 +1571,7 @@
     const img = e.target;
     if (!(img instanceof HTMLImageElement) || !img.closest('.fc-picture')) return;
     img.style.maxWidth = 'min(100%, ' + Math.round(img.naturalWidth * 2.2) + 'px)';
-    img.style.maxHeight = 'min(62vh, ' + Math.round(img.naturalHeight * 2.2) + 'px)';
+    img.style.maxHeight = 'min(var(--fc-img-h, 62vh), ' + Math.round(img.naturalHeight * 2.2) + 'px)';
   }, true);
   document.addEventListener('click', (e) => {
     const zoom = document.querySelector('.img-zoom');
@@ -1543,7 +1610,7 @@
         FC.deck.push(deferred);
         return fcCard();
       }
-      if (e.target.closest('#fc-back')) { if (FC.picture) { location.hash = '#learn'; return; } fcStop(); return renderGlossary(); }
+      if (e.target.closest('#fc-back')) { if (FC.mode === 'vocab') { fcStop(); location.hash = '#learn-vocab'; return; } if (FC.picture) { location.hash = '#learn'; return; } fcStop(); return renderGlossary(); }
       return;
     }
     const chip = e.target.closest('.g-chip');
@@ -1604,7 +1671,7 @@
   /* ---------- Modal & toast ---------- */
   let modalOutside = null, modalGuard = null;
   function modal(o) {
-    $('#modal-box').classList.remove('wide');
+    $('#modal-box').classList.remove('wide', 'primer');
     $('#modal-box').innerHTML = '<h3>' + o.title + '</h3><p>' + o.body + '</p><div class="modal-actions"></div>';
     const wrap = $('#modal-box .modal-actions');
     o.actions.forEach((a) => {
@@ -1618,7 +1685,7 @@
     $('#modal').classList.remove('hidden');
     wrap.firstChild.focus();
   }
-  function closeModal() { $('#modal').classList.add('hidden'); $('#modal-box').classList.remove('wide'); modalOutside = null; modalGuard = null; }
+  function closeModal() { $('#modal').classList.add('hidden'); $('#modal-box').classList.remove('wide', 'primer'); modalOutside = null; modalGuard = null; }
   function dismissModal() {
     if (modalGuard && !modalGuard()) return;   // form pop-ups ask before leaving
     const f = modalOutside; closeModal(); if (f) f();
@@ -1678,6 +1745,8 @@
     if (tb) { const sec = document.getElementById(tb.dataset.go); if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     const fc = e.target.closest('.fig-card');
     if (fc) return openFig(fc.dataset.fig);
+    const pc = e.target.closest('.primer-card');
+    if (pc) return openPrimer(+pc.dataset.unit);
     if (e.target.closest('.lesson-card.guest')) return askSignup();
     const ex = e.target.closest('a.exam-lc');
     if (ex) return;   // aptitude test link: the router opens it
